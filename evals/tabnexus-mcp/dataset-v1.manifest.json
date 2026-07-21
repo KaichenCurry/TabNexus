@@ -1,0 +1,45 @@
+{
+  "evalVersion": "1.2.0",
+  "generatedAt": "2026-07-21T17:49:36.316Z",
+  "total": 600,
+  "uniqueQueries": 600,
+  "scenarios": 50,
+  "byFrequency": {
+    "high": 360,
+    "long_tail": 120,
+    "safety": 120
+  },
+  "byComplexity": {
+    "complex": 180,
+    "medium": 276,
+    "simple": 144
+  },
+  "byLocale": {
+    "en": 200,
+    "zh": 400
+  },
+  "byIntent": {
+    "activity": 12,
+    "ambiguity": 12,
+    "batch_edge": 12,
+    "browser": 48,
+    "browser_edge": 36,
+    "capture": 36,
+    "deduplication": 12,
+    "destructive_browser": 48,
+    "destructive_workspace": 36,
+    "edit_card": 24,
+    "export": 12,
+    "mind_map": 60,
+    "organize": 60,
+    "permission_edge": 12,
+    "preferences": 12,
+    "privacy": 12,
+    "read_context": 24,
+    "report": 12,
+    "revision": 24,
+    "search": 36,
+    "search_edge": 12,
+    "workspace": 48
+  }
+}

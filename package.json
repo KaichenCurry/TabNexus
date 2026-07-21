@@ -1,0 +1,72 @@
+{
+  "name": "tabnexus",
+  "version": "0.17.0",
+  "description": "A local-first Chrome workspace for browser tabs, intent-first AI organization, and Agent collaboration through MCP.",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KaichenCurry/TabNexus.git"
+  },
+  "homepage": "https://github.com/KaichenCurry/TabNexus#readme",
+  "bugs": {
+    "url": "https://github.com/KaichenCurry/TabNexus/issues"
+  },
+  "keywords": [
+    "chrome-extension",
+    "tab-manager",
+    "workspace",
+    "local-first",
+    "model-context-protocol",
+    "mcp",
+    "ai-agent"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "node scripts/build-agent-packages.mjs && tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "npm run build && playwright test",
+    "m0:cluster": "tsx scripts/m0-cluster.ts",
+    "m0:score": "tsx scripts/m0-score.ts",
+    "m0:h2": "tsx scripts/h2-export.ts",
+    "bridge:install": "node scripts/install-native-host.mjs",
+    "bridge:uninstall": "node scripts/install-native-host.mjs --uninstall",
+    "bridge:check": "node scripts/check-mcp.mjs",
+    "bridge:verify": "node scripts/verify-bridge.mjs",
+    "bridge:audit": "node scripts/audit-mcp-installations.mjs",
+    "mcp:test": "node scripts/test-mcp-capabilities.mjs",
+    "agent:package": "node scripts/build-agent-packages.mjs",
+    "eval:mcp:generate": "node plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs generate",
+    "eval:mcp:validate": "node plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs validate",
+    "eval:mcp:contract": "node plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs contract",
+    "eval:mcp:smoke": "node plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs run --suite smoke --trials 3 --confirm-cost",
+    "check": "npm run typecheck && npm test && npm run mcp:test && npm run bridge:check && npm run build"
+  },
+  "dependencies": {
+    "@xyflow/react": "12.11.2",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@types/chrome": "0.2.2",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "6.0.3",
+    "jsdom": "29.1.1",
+    "tsx": "4.23.1",
+    "typescript": "7.0.2",
+    "vite": "8.1.5",
+    "vitest": "4.1.10"
+  },
+  "packageManager": "pnpm@11.9.0"
+}

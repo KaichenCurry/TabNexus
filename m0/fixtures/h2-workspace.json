@@ -1,0 +1,29 @@
+{
+  "name": "Tab management research",
+  "groups": [
+    {
+      "name": "Platform constraints",
+      "cards": [
+        {
+          "title": "Chrome Tabs API",
+          "url": "https://developer.chrome.com/docs/extensions/reference/api/tabs",
+          "note": "Confirm tab collection, focus and restore behavior."
+        },
+        {
+          "title": "Manifest V3",
+          "url": "https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3"
+        }
+      ]
+    },
+    {
+      "name": "Product evidence",
+      "cards": [
+        {
+          "title": "Interview synthesis",
+          "url": "https://example.org/interviews/tab-overload",
+          "note": "Use only the findings relevant to task-context recovery."
+        }
+      ]
+    }
+  ]
+}

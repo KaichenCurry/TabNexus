@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "tabnexus": {
+      "command": "node",
+      "args": ["./server/index.mjs"],
+      "cwd": ".",
+      "env": {
+        "TABNEXUS_AGENT_NAME": "Codex",
+        "TABNEXUS_MCP_VERSION": "0.8.0"
+      }
+    }
+  }
+}

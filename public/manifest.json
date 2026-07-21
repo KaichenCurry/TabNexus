@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "TabNexus",
+  "short_name": "TabNexus",
+  "version": "0.17.0",
+  "description": "A local-first workspace for browser tabs and AI task context.",
+  "minimum_chrome_version": "118",
+  "incognito": "not_allowed",
+  "permissions": ["tabs", "storage", "clipboardWrite"],
+  "host_permissions": [
+    "https://api.deepseek.com/*",
+    "https://api.openai.com/*",
+    "https://api.anthropic.com/*",
+    "https://api.moonshot.cn/*",
+    "https://dashscope.aliyuncs.com/*",
+    "https://api.minimaxi.com/*",
+    "file:///*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://api.deepseek.com https://api.openai.com https://api.anthropic.com https://api.moonshot.cn https://dashscope.aliyuncs.com https://api.minimaxi.com ws://127.0.0.1:43119"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Open TabNexus",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

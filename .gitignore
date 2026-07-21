@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+.env
+.env.*
+!.env.example
+scripts/results/
+artifacts/
+.playwright/
+*.zip
+/evals/tabnexus-mcp/runs/
+/TabNexus Workspace (单文件分享版).html

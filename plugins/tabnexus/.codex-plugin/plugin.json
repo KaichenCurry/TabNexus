@@ -1,0 +1,40 @@
+{
+  "name": "tabnexus",
+  "version": "0.17.0+codex.20260722000000",
+  "description": "Search, manage, and edit TabNexus workspaces and Chrome tabs from Codex.",
+  "author": {
+    "name": "TabNexus"
+  },
+  "license": "MIT",
+  "keywords": [
+    "tabs",
+    "browser",
+    "workspace",
+    "research",
+    "local-first"
+  ],
+  "interface": {
+    "displayName": "TabNexus",
+    "shortDescription": "Use browser workspaces and tabs in Codex",
+    "longDescription": "Search and manage versioned TabNexus workspaces, operate the visible tab workbench and its selection, save or restore supported Chrome tabs, edit classifications and mind-map layouts, and write reports from Codex.",
+    "developerName": "TabNexus",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Organize"
+    ],
+    "defaultPrompt": [
+      "Read my active TabNexus workspace and current Chrome tabs.",
+      "Summarize my saved sources and write a report back to TabNexus.",
+      "Reorganize my sources into clear groups and update their status.",
+      "Arrange my relationship map and connect supporting sources."
+      ,"Save my selected Chrome tabs into the right workspace and close only the non-pinned tabs after confirmation."
+    ],
+    "brandColor": "#5368AC",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
+  },
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/"
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "TabNexus MCP Evals"
+  short_description: "Run isolated Codex MCP quality and stability evals"
+  default_prompt: "Use $tabnexus-mcp-evals to generate and run the BO3 TabNexus MCP evaluation suite."

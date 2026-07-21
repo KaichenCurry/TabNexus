@@ -1,0 +1,30 @@
+{
+  "samples": [
+    {
+      "id": "research-session-01",
+      "task": "Compare tab-management product positioning and extension architecture",
+      "tabs": [
+        {
+          "id": "tab-01",
+          "title": "Chrome Extensions: Tabs API",
+          "url": "https://developer.chrome.com/docs/extensions/reference/api/tabs"
+        },
+        {
+          "id": "tab-02",
+          "title": "Manifest V3 overview",
+          "url": "https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3"
+        },
+        {
+          "id": "tab-03",
+          "title": "Tab manager product notes",
+          "url": "https://example.com/research/tab-manager-notes"
+        },
+        {
+          "id": "tab-04",
+          "title": "User interview synthesis",
+          "url": "https://example.org/interviews/tab-overload"
+        }
+      ]
+    }
+  ]
+}

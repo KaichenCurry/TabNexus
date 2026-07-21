@@ -1,0 +1,101 @@
+{
+  "manifest_version": "0.3",
+  "name": "tabnexus",
+  "display_name": "TabNexus",
+  "version": "0.17.0",
+  "description": "Use TabNexus browser workspaces and current Chrome tabs from Claude.",
+  "long_description": "A local-first bridge between Claude and the TabNexus Chrome extension. Search across workspaces, manage workspace lifecycle, save or restore Chrome tabs, batch-add sources, and edit classification, metadata, mind-map layout, and relationships. The bridge never reads your model API keys.",
+  "author": {
+    "name": "TabNexus"
+  },
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.mjs"],
+      "env": {
+        "TABNEXUS_AGENT_NAME": "Claude"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "read_workspace",
+      "description": "Read the active or selected TabNexus workspace and current-window tab context."
+    },
+    {
+      "name": "search_cards",
+      "description": "Search and filter cards across TabNexus workspaces."
+    },
+    {
+      "name": "add_card",
+      "description": "Add one source or note to a TabNexus workspace."
+    },
+    {
+      "name": "add_cards",
+      "description": "Add up to 100 sources, notes, or reports atomically."
+    },
+    {
+      "name": "write_report",
+      "description": "Write a reviewable Agent report into TabNexus."
+    },
+    {
+      "name": "propose_structure",
+      "description": "Propose non-destructive relationships for human review."
+    },
+    {
+      "name": "edit_workspace",
+      "description": "Edit workspace groups, classification, card metadata, mind-map layout, and relationships without deleting data."
+    },
+    {
+      "name": "manage_workspaces",
+      "description": "Create, select, rename, reorder, or duplicate workspaces."
+    },
+    {
+      "name": "delete_workspace_items",
+      "description": "Explicitly delete cards, groups, or one workspace after confirmation."
+    },
+    {
+      "name": "read_tab_workbench",
+      "description": "Read the visible tab workbench, including selection, saved state, and recovery entries."
+    },
+    {
+      "name": "manage_tab_workbench",
+      "description": "Select tabs, select all by state, collapse the rail, focus tabs, or reopen recovery entries."
+    },
+    {
+      "name": "dismiss_recent_tabs",
+      "description": "Explicitly remove recently closed recovery entries after confirmation."
+    },
+    {
+      "name": "sync_browser_tabs",
+      "description": "Save current-window tabs, reopen saved cards, or focus a card without closing anything."
+    },
+    {
+      "name": "close_browser_tabs",
+      "description": "Save and explicitly close selected non-pinned current-window tabs."
+    },
+    {
+      "name": "export_workspace",
+      "description": "Export a workspace as Markdown or JSON without settings or secrets."
+    },
+    {
+      "name": "manage_preferences",
+      "description": "Read or update safe TabNexus display and behavior preferences."
+    },
+    {
+      "name": "manage_agent_activity",
+      "description": "Read or explicitly clear local Agent activity history."
+    }
+  ],
+  "keywords": ["tabs", "browser", "workspace", "research", "local-first"],
+  "license": "MIT",
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}

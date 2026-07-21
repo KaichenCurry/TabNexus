@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "tabnexus": {
+      "command": "node",
+      "args": [
+        "<ABSOLUTE_PATH_TO_TABNEXUS>/bridge/tabnexus-mcp.mjs"
+      ],
+      "env": {
+        "TABNEXUS_AGENT_NAME": "Agent IDE",
+        "TABNEXUS_MCP_VERSION": "0.8.0"
+      }
+    }
+  }
+}

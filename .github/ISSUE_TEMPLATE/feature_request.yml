@@ -1,0 +1,37 @@
+name: Product idea
+description: Suggest an outcome or workflow TabNexus should improve
+title: "[Idea]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the browser workflow and why the current experience is difficult.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What would a successful outcome look like?
+      description: Focus on the benefit before prescribing a feature.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What do you do today?
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Tab workbench
+        - Workspace and cards
+        - AI organization
+        - Relationship map
+        - Agent / MCP
+        - Privacy and security
+        - Other
+    validations:
+      required: true

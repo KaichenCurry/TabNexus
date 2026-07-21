@@ -1,0 +1,15 @@
+{
+  "name": "tabnexus-local",
+  "description": "Local development marketplace for the TabNexus Claude Code integration.",
+  "owner": {
+    "name": "TabNexus"
+  },
+  "plugins": [
+    {
+      "name": "tabnexus",
+      "description": "Read and edit TabNexus browser workspaces, classifications, and relationship maps from Claude Code.",
+      "version": "0.17.0",
+      "source": "./integrations/claude-code"
+    }
+  ]
+}
