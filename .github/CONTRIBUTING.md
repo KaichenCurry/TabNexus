@@ -2,6 +2,8 @@
 
 Thanks for helping make browser context easier to keep and reuse. Focused issues and pull requests are welcome, especially around tab-workbench clarity, accessibility, provider adapters, MCP interoperability, performance, and documentation.
 
+For product ideas, experience feedback, or future improvements, email [currykchen@hotmail.com](mailto:currykchen@hotmail.com).
+
 ## Before opening an issue
 
 - Search existing issues first.
