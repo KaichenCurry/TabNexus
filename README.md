@@ -24,7 +24,7 @@
 ![TabNexus 工作区：分组、卡片与当前窗口标签操作台](docs/assets/tabnexus-workspace.png)
 
 > [!IMPORTANT]
-> **当前是 v0.17.0 开发者预览版。** 它是 Chrome 扩展，不是网页。现在需要从源码构建后，在 `chrome://extensions` 中加载 `dist` 文件夹；Chrome 应用商店版本尚未发布。完整步骤见下方[「立即安装」](#立即安装)。
+> **当前是 v0.17.0 开发者预览版。** 已提供两分钟安装包，不需要 Node、pnpm 或终端；Chrome 应用商店版本尚未发布。
 
 ## 你可能不是标签太多，而是有太多事情还没有做完
 
@@ -70,31 +70,31 @@ flowchart LR
 
 ## 立即安装
 
-### 开始前需要什么
+**不需要终端，不需要安装开发工具，通常两分钟内完成。**
 
-- Google Chrome 118 或更高版本
-- Node.js 22 或更高版本
-- 约 3–5 分钟
+### 1. 下载并解压
 
-### 方式一：下载源码（第一次使用推荐）
+点击 **[下载 TabNexus Chrome 安装包](https://github.com/KaichenCurry/TabNexus/releases/download/v0.17.0/TabNexus-Chrome-v0.17.0.zip)**，下载后双击解压。
 
-1. 点击仓库右上角绿色 **Code** 按钮，再点 **Download ZIP**；也可以[直接下载当前源码](https://github.com/KaichenCurry/TabNexus/archive/refs/heads/main.zip)。
-2. 解压文件，进入 `TabNexus-main` 文件夹。
-3. 在该文件夹打开终端：
-   - macOS：Finder 右键文件夹 →「新建位于文件夹位置的终端窗口」。
-   - Windows：在文件夹地址栏输入 `powershell` 并回车。
-4. 复制并依次运行：
+### 2. 打开扩展管理页
 
-```bash
-corepack enable
-corepack prepare pnpm@11.9.0 --activate
-pnpm install --frozen-lockfile
-pnpm build
+在 Chrome 地址栏粘贴 `chrome://extensions` 并回车，然后打开右上角的 **开发者模式**。
+
+### 3. 选择文件夹
+
+点击 **加载已解压的扩展程序**，选择刚刚解压出来的 `TabNexus-Chrome-v0.17.0` 文件夹。
+
+最后，把 TabNexus 固定到浏览器工具栏并点击图标，就可以开始使用。
+
+```mermaid
+flowchart LR
+    A["下载安装包"] --> B["解压"] --> C["Chrome 加载文件夹"] --> D["点击扩展图标开始使用"]
 ```
 
-如果系统提示没有 `corepack`，先运行 `npm install -g pnpm@11.9.0`，再执行最后两条命令。
+> 更新版本时，重新下载并解压，在 `chrome://extensions` 中删除旧版后加载新文件夹即可。使用本地 `file://...html` 页面时，请在扩展详情中开启「允许访问文件网址」。
 
-### 方式二：Git 克隆（开发者）
+<details>
+<summary><strong>开发者：从源码构建</strong></summary>
 
 ```bash
 git clone https://github.com/KaichenCurry/TabNexus.git
@@ -104,20 +104,8 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-### 加载到 Chrome
-
-1. 在 Chrome 地址栏打开 `chrome://extensions`。
-2. 打开右上角 **开发者模式**。
-3. 点击 **加载已解压的扩展程序**。
-4. 选择刚刚生成的 `TabNexus/dist` 文件夹——不是项目根目录。
-5. 在浏览器工具栏固定 TabNexus，然后点击图标。
-
-```mermaid
-flowchart LR
-    A["下载 / 克隆源码"] --> B["pnpm install"] --> C["pnpm build"] --> D["Chrome 加载 dist"] --> E["点击扩展图标开始使用"]
-```
-
-> 使用本地 `file://...html` 页面时，请在扩展详情中开启「允许访问文件网址」。TabNexus 不会替换新标签页，也不使用 Side Panel。
+构建完成后，在 Chrome 中加载项目的 `dist` 文件夹。源码版用于开发、运行测试，以及连接 Codex、Cursor、VS Code、TRAE 等本地 Agent。
+</details>
 
 ## 第一次使用
 
@@ -245,8 +233,7 @@ flowchart LR
 
 接下来：
 
-- 不需要源码构建的公开安装包；
-- Chrome Web Store 上架；
+- Chrome Web Store 签名安装与自动更新；
 - 面向扣子等云端 Agent 的鉴权远程 MCP；
 - 更完整的无障碍、快捷键与大型工作区性能验证。
 

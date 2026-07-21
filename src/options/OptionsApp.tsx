@@ -154,6 +154,10 @@ export function OptionsApp() {
   };
 
   const selectedClient = selectedAgent ? AGENT_CLIENTS.find((client) => client.id === selectedAgent) ?? null : null;
+  const portableAgentRequiresSource = __TABNEXUS_PORTABLE_BUILD__
+    && selectedAgent !== null
+    && selectedAgent !== "claude_desktop"
+    && selectedAgent !== "coze";
   const standardClientConfig = JSON.stringify(createStandardMcpConfig(__TABNEXUS_LOCAL_MCP_ENTRY__, "TRAE Work"), null, 2);
   const vsCodeClientConfig = JSON.stringify(createVsCodeMcpConfig(__TABNEXUS_LOCAL_MCP_ENTRY__), null, 2);
   const cursorInstallUrl = createCursorInstallUrl(__TABNEXUS_LOCAL_MCP_ENTRY__);
@@ -250,7 +254,9 @@ export function OptionsApp() {
     coze: text("扣子目前没有官方本地 stdio MCP 客户端，不能直接读取这台电脑上的 Chrome 工作区。", "Coze currently has no official local stdio MCP client, so it cannot directly read this computer's Chrome workspace.")
   })[client];
 
-  const installMethodLabel = (client: AgentClient) => ({
+  const installMethodLabel = (client: AgentClient) => __TABNEXUS_PORTABLE_BUILD__ && client !== "claude_desktop" && client !== "coze"
+    ? text("源码版", "Source build")
+    : ({
     codex: text("一键安装", "One-click"),
     claude_desktop: text("扩展包", "Extension package"),
     claude_code: text("对话内安装", "Install in chat"),
@@ -471,6 +477,13 @@ export function OptionsApp() {
 
           {!selectedAgent ? (
             <div className="agent-picker">
+              {__TABNEXUS_PORTABLE_BUILD__ && <div className="bridge-update-notice" role="note">
+                <span aria-hidden="true">✓</span>
+                <div>
+                  <strong>{text("两分钟安装包已可直接使用工作区", "The two-minute package is ready for workspace use")}</strong>
+                  <p>{text("Claude Desktop 可直接下载扩展包；Codex、Cursor 等本地 Agent 需要源码版完成一次连接配置。", "Claude Desktop can use the bundled extension; Codex, Cursor, and other local Agents need the source build for one-time connection setup.")}</p>
+                </div>
+              </div>}
               <div className="agent-picker-toolbar">
                 <div>
                   <strong>{text("选择要连接的应用", "Choose an app to connect")}</strong>
@@ -535,7 +548,17 @@ export function OptionsApp() {
                 <span className={`agent-method-chip ${selectedClient.availability}`}>{installMethodLabel(selectedAgent)}</span>
               </div>
 
-              {selectedAgent === "coze" ? (
+              {portableAgentRequiresSource ? (
+                <div className="agent-remote-panel">
+                  <span className="agent-remote-icon" aria-hidden="true">↗</span>
+                  <div>
+                    <span className="agent-card-kicker">{text("源码版连接", "SOURCE BUILD CONNECTION")}</span>
+                    <strong>{text(`连接 ${selectedClient.name} 需要源码版`, `The source build is required for ${selectedClient.name}`)}</strong>
+                    <p>{text("当前两分钟安装包已经可以完整管理 Chrome 标签；Agent 连接需要本机 MCP 文件，因此要从源码完成一次配置。", "The two-minute package already provides the full Chrome tab workspace. Agent setup needs the local MCP file, so it requires a one-time source setup.")}</p>
+                    <a className="button primary agent-install-button" href="https://github.com/KaichenCurry/TabNexus#连接-ai-agent" target="_blank" rel="noreferrer">{text("查看 Agent 安装", "View Agent setup")}</a>
+                  </div>
+                </div>
+              ) : selectedAgent === "coze" ? (
                 <div className="agent-remote-panel">
                   <span className="agent-remote-icon" aria-hidden="true">↗</span>
                   <div>

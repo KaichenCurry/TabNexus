@@ -28,6 +28,8 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "node scripts/build-agent-packages.mjs && tsc -b && vite build",
+    "build:portable": "TABNEXUS_PORTABLE_BUILD=1 npm run build",
+    "release:chrome": "npm run build:portable && node scripts/package-chrome-release.mjs",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",

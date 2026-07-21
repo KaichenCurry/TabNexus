@@ -36,3 +36,6 @@ jobs:
 
       - name: Check and build
         run: pnpm check
+
+      - name: Build portable Chrome package
+        run: pnpm release:chrome
