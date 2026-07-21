@@ -16,7 +16,7 @@
 ![TabNexus workspace with groups, cards, and the current-window tab workbench](assets/tabnexus-workspace.png)
 
 > [!IMPORTANT]
-> **v0.17.0 is a developer preview.** TabNexus is a Chrome extension, not a website. Today you build it from source and load the generated `dist` folder in `chrome://extensions`; a Chrome Web Store build is not available yet.
+> **v0.17.0 is a developer preview.** A two-minute Chrome package is available—no Node, pnpm, or terminal required. A Chrome Web Store build is not available yet.
 
 ## The problem is not too many tabs. It is too much unfinished work.
 
@@ -55,28 +55,22 @@ The right-side tab workbench distinguishes unsaved and open, saved and open, sav
 
 ## Install now
 
-### Requirements
+**No terminal or developer tools. This usually takes less than two minutes.**
 
-- Google Chrome 118+
-- Node.js 22+
-- About 3–5 minutes
+1. **[Download the TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v0.17.0/TabNexus-Chrome-v0.17.0.zip)** and unzip it.
+2. Open `chrome://extensions` and enable **Developer mode**.
+3. Click **Load unpacked** and select the extracted `TabNexus-Chrome-v0.17.0` folder.
+4. Pin TabNexus and click its toolbar icon.
 
-### Option A: download the source
-
-1. Use **Code → Download ZIP** on GitHub, or [download the current source directly](https://github.com/KaichenCurry/TabNexus/archive/refs/heads/main.zip).
-2. Unzip it and open a terminal in the `TabNexus-main` folder.
-3. Run:
-
-```bash
-corepack enable
-corepack prepare pnpm@11.9.0 --activate
-pnpm install --frozen-lockfile
-pnpm build
+```mermaid
+flowchart LR
+    A["Download package"] --> B["Unzip"] --> C["Load folder in Chrome"] --> D["Click the extension icon"]
 ```
 
-If `corepack` is unavailable, run `npm install -g pnpm@11.9.0`, then repeat the final two commands.
+To update, download the new package, remove the old unpacked extension, and load the new folder. For local `file://...html` pages, enable **Allow access to file URLs** in the extension details.
 
-### Option B: clone with Git
+<details>
+<summary><strong>Developers: build from source</strong></summary>
 
 ```bash
 git clone https://github.com/KaichenCurry/TabNexus.git
@@ -86,20 +80,8 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-### Load it into Chrome
-
-1. Open `chrome://extensions`.
-2. Enable **Developer mode**.
-3. Click **Load unpacked**.
-4. Select the generated `TabNexus/dist` folder—not the repository root.
-5. Pin TabNexus and click its toolbar icon.
-
-```mermaid
-flowchart LR
-    A["Download / clone"] --> B["pnpm install"] --> C["pnpm build"] --> D["Load dist in Chrome"] --> E["Click the extension icon"]
-```
-
-For local `file://...html` pages, enable **Allow access to file URLs** in the extension details. TabNexus does not replace your new-tab page and does not use Chrome's Side Panel.
+Load the generated `dist` folder. The source build is intended for development, tests, and local Agent connections such as Codex, Cursor, VS Code, and TRAE.
+</details>
 
 ## Your first five minutes
 
