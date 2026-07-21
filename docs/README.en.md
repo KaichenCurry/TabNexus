@@ -1,19 +1,19 @@
 <div align="center">
   <img src="../public/icons/icon128.png" width="88" alt="TabNexus logo" />
   <h1>TabNexus</h1>
-  <p><strong>Turn the tabs you are afraid to close into a workspace you can actually resume.</strong></p>
-  <p>A local-first Chrome workspace that preserves browsing context, organizes it around your intent, and hands it to an AI Agent when you want help.</p>
+  <p><strong>A web-tab workbench where you, your browser, and AI Agents share the same task context.</strong></p>
+  <p>Turn the tabs you are afraid to close into work that can be saved, understood, resumed, and handed off.</p>
 
   <p>
     <a href="#install-now">Install</a> ·
     <a href="#your-first-five-minutes">First use</a> ·
-    <a href="#three-outcomes-that-matter">Benefits</a> ·
+    <a href="#three-core-layers">Core layers</a> ·
     <a href="#connect-an-ai-agent">Agent MCP</a> ·
     <a href="../README.md">简体中文</a>
   </p>
 </div>
 
-![TabNexus workspace with groups, cards, and the current-window tab workbench](assets/tabnexus-workspace.png)
+![TabNexus workspace with 12 tabs saved into three working groups](assets/tabnexus-after.png)
 
 > [!IMPORTANT]
 > **v0.17.0 is a developer preview.** A two-minute Chrome package is available—no Node, pnpm, or terminal required. A Chrome Web Store build is not available yet.
@@ -26,16 +26,53 @@ Every tab becomes a promise to your future self: **“This still matters. Do not
 
 But once the titles collapse into favicon-sized hints, the browser can no longer tell you why a page was opened, which task it belongs to, what you already learned, or where to restart tomorrow. The browser remembers pages; it does not remember the work behind them.
 
-![A workday overwhelmed by unfinished browser tabs](assets/tab-overload-hero.jpg)
+![An illustration of tab overload](assets/tab-overload-hero.jpg)
 
 **TabNexus does not merely hide tabs. It makes unfinished work safe to pause, clear to resume, and easy to hand off.**
 
-| Before | With TabNexus |
-|---|---|
-| Keep everything open because closing feels risky | See what is saved, then close with confidence |
-| Restore a pile of URLs and reconstruct the task from scratch | Restore groups, notes, reading states, order, and relationships |
-| Re-explain the context and paste links into every AI conversation | Let an Agent read and operate the same local workspace |
-| Accept a fixed topic taxonomy | Organize by type, recency, stage, priority, or your own instruction |
+## From tab overload to shared context
+
+These are **real extension screenshots from the same run**. The same 12 sanitized pages start as loose, unsaved tabs and end as three resumable working groups. They are not static mockups.
+
+<table>
+  <thead>
+    <tr>
+      <th width="50%">Before: the pages exist, but the task structure does not</th>
+      <th width="50%">With TabNexus: the context is saved and keeps moving</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="assets/tabnexus-before.png" alt="Real TabNexus before screenshot with 12 unsaved tabs and an empty workspace" /></td>
+      <td><img src="assets/tabnexus-after.png" alt="Real TabNexus after screenshot with 12 tabs organized into three working groups" /></td>
+    </tr>
+    <tr>
+      <td>Closing a tab feels like losing both the page and the thought behind it.</td>
+      <td>Save and close are explicit actions, so you close only after the state is visible.</td>
+    </tr>
+    <tr>
+      <td>Restoring URLs still means reconstructing why each page mattered.</td>
+      <td>Groups, notes, reading states, relationships, and progress return together.</td>
+    </tr>
+    <tr>
+      <td>Every AI conversation starts by re-explaining the task and pasting links.</td>
+      <td>An Agent reads the same local workspace, adds material, and writes results back.</td>
+    </tr>
+  </tbody>
+</table>
+
+## One context shared by three participants
+
+TabNexus is not another bookmark manager. It lets **you, the live browser window, and AI Agents work against the same task context**. Model APIs are optional assistants: they interpret organization intent and suggest task structure, while every consequential change remains previewable and user-controlled.
+
+```mermaid
+flowchart TB
+    Context["TabNexus task context<br/>pages · groups · notes · states · relationships · progress"]
+    User["You<br/>set goals and confirm actions"] <--> Context
+    Browser["Browser<br/>provides live window tabs"] <--> Context
+    Agent["AI Agent<br/>reads, acts, and writes back"] <--> Context
+    Model["Optional model APIs<br/>DeepSeek · OpenAI · Claude · Kimi · Qwen · MiniMax"] -. "organization / structure suggestions" .-> Context
+```
 
 ## TabNexus in 30 seconds
 
@@ -91,39 +128,37 @@ Load the generated `dist` folder. The source build is intended for development, 
 4. **Build the structure.** Drag cards into groups, describe a grouping rule to AI, or use the relationship map.
 5. **Resume without duplicates.** Open one card, one group, or the whole workspace; URLs already open are skipped.
 
-## Three outcomes that matter
+## Three core layers
 
-### 1. Close tabs without losing the work
+### 1. Multi-tab and Workspace management
 
-TabNexus preserves groups, order, notes, reading states, and relationships—not just URLs. The workspace survives Chrome and extension restarts, and restores only pages that are missing.
+Select the live tabs that belong to a task, capture and group them, then explicitly decide whether to close the originals. Workspaces stay isolated, saved state remains visible, and restore skips URLs that are already open.
 
-**The outcome is not merely a cleaner tab strip. It is the confidence that the task is safe to pause.**
+Organize manually or ask an optional provider such as DeepSeek to classify by page type, recent access time, task stage, priority, or your own instruction. Local domain grouping still works without a key.
 
-![The real TabNexus grouped workspace and tab workbench](assets/tabnexus-workspace.png)
+**The outcome is not merely a cleaner tab strip. It is knowing the task is safe to pause and easy to resume.**
 
-### 2. AI organization that follows your instruction
+![The real TabNexus AI command surface for the whole workspace or selected live tabs](assets/tabnexus-ai-organize.png)
 
-Run AI on the whole workspace or only the tabs selected on the right. Ask for page type, recent access time, workflow stage, priority, or any custom rule. TabNexus shows the basis and proposed actions before applying them, and lets you redirect individual pages.
+### 2. Task-thinking management
 
-DeepSeek, OpenAI, Claude, Kimi, Qwen, and MiniMax are optional. Without a key, deterministic local domain grouping remains available.
+The same material can switch between a card board and an infinite relationship canvas. The board is for grouping, notes, and reading states; the canvas is for evidence, conclusions, dependencies, next steps, and persistent progress.
 
-**The structure follows the work instead of forcing the work into a fixed topic taxonomy.**
+AI acts as a structure assistant here: it can propose groups, relationships, and task stages from your goal. TabNexus shows the rationale and change preview first, and you can redirect individual pages before applying anything.
 
-![The real TabNexus AI command surface with workspace and selected-tab scopes](assets/tabnexus-ai-organize.png)
-
-### 3. See relationships a folder cannot express
-
-The same cards can switch to an Obsidian-inspired infinite canvas with selection, group movement, pan and zoom, minimap, automatic layout, and persistent editable connections.
-
-**When a task is not a linear list, you can still see how evidence, decisions, and next steps connect.**
+**You are no longer managing a URL list. You are managing visible reasoning, relationships, and progress.**
 
 ![The real TabNexus infinite relationship canvas](assets/tabnexus-relationship-map.png)
 
-## Connect an AI Agent
+### 3. Agent collaboration interface
 
-TabNexus can be the local context layer for Codex, Claude, Cursor, VS Code, and TRAE. Through MCP, an Agent can search workspaces, classify and move material, edit relationship layouts, and safely save or restore browser tabs—without repeatedly asking you to paste a flat URL list.
+Through MCP, TabNexus becomes a local context layer for Codex, Claude, Cursor, VS Code, and TRAE. An Agent can read the current task and browser tabs, search the workspace, add sources, change groups and relationship layouts, write back reports and task-structure suggestions, and safely save, close, or restore pages behind confirmation guards.
+
+**You stop re-explaining the background, links, and latest progress. The Agent picks up the same continuously updated workspace.**
 
 ![The real TabNexus Agent connection settings](assets/tabnexus-agent-connect.png)
+
+## Connect an AI Agent
 
 | Client | Local support | Integration |
 |---|---:|---|
