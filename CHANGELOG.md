@@ -8,7 +8,7 @@ All notable changes to TabNexus will be documented here.
 
 - Made Chinese the primary project language with English as an optional guide.
 - Rebuilt the README around the multi-tab pain, an explicit installation path, first-use guidance, benefit-led product storytelling, real sanitized UI screenshots, and visual workflows.
-- Added an in-README expandable product gallery with seven real, sanitized interface views; tightened section titles, introduced restrained emoji wayfinding, and added a direct contribution contact.
+- Embedded real, sanitized product screenshots directly into the three core capability stories; tightened section titles, introduced restrained emoji wayfinding, and added a direct contribution contact.
 - Reframed the product around one shared task context across the user, browser, and AI Agents; added real before-and-after screenshots from the same sanitized 12-tab run.
 - Added a portable Chrome package and reduced first-time installation to download, unzip, and load—no Node or pnpm required.
 - Consolidated the MCP bridge, integrations, and plugins under `agent/`; moved E2E, fixtures, and evaluation data under `tests/`; archived the original PRD under `docs/product/`.

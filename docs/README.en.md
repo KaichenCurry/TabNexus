@@ -6,18 +6,13 @@
 
   <p>
     <a href="#install">Install</a> ·
-    <a href="#gallery">Screenshots</a> ·
     <a href="#core">Core layers</a> ·
     <a href="#agent">Agent MCP</a> ·
     <a href="../README.md">简体中文</a>
   </p>
 </div>
 
-<details>
-<summary><strong>🖼️ See the workspace</strong><br /><picture><img src="assets/tabnexus-after.png" width="860" alt="TabNexus workspace with 12 tabs saved into three working groups" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-after.png" alt="Large TabNexus workspace with 12 tabs saved into three working groups" /></picture>
-</details>
+![TabNexus workspace with 12 tabs saved into three working groups](assets/tabnexus-after.png)
 
 > [!IMPORTANT]
 > **v0.17.0 is a developer preview.** A two-minute Chrome package is available—no Node, pnpm, or terminal required. A Chrome Web Store build is not available yet.
@@ -35,11 +30,7 @@ Every tab becomes a promise to your future self: **“This still matters. Do not
 
 The browser remembers pages, but not the story of the task. The exhausting part is not the tab count—it is rebuilding context every time you return.
 
-<details>
-<summary><strong>🔍 See tab overload</strong><br /><picture><img src="assets/tab-overload-hero.jpg" width="760" alt="An illustration of tab overload" /></picture></summary>
-<br />
-<picture><img src="assets/tab-overload-hero.jpg" alt="Large illustration of tab overload" /></picture>
-</details>
+![An illustration of tab overload](assets/tab-overload-hero.jpg)
 
 **TabNexus does not merely hide tabs. It makes unfinished work safe to pause, clear to resume, and easy to hand off.**
 
@@ -47,17 +38,9 @@ The browser remembers pages, but not the story of the task. The exhausting part 
 
 These are **real extension screenshots from the same run**. The same 12 sanitized pages start as loose, unsaved tabs and end as three resumable working groups. They are not static mockups.
 
-<details>
-<summary><strong>😵 Before | Pages exist, but task structure does not</strong><br /><picture><img src="assets/tabnexus-before.png" width="760" alt="Real TabNexus before screenshot with 12 unsaved tabs and an empty workspace" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-before.png" alt="Large real TabNexus before screenshot" /></picture>
-</details>
-
-<details>
-<summary><strong>✨ After | Context is saved and keeps moving</strong><br /><picture><img src="assets/tabnexus-after.png" width="760" alt="Real TabNexus after screenshot with 12 tabs organized into three working groups" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-after.png" alt="Large real TabNexus after screenshot" /></picture>
-</details>
+| 😵 Before — pages exist, but task structure does not | ✨ After — context is saved and keeps moving |
+|---|---|
+| ![Real TabNexus before screenshot with 12 unsaved tabs and an empty workspace](assets/tabnexus-before.png) | ![Real TabNexus after screenshot with 12 tabs organized into three working groups](assets/tabnexus-after.png) |
 
 | Before | With TabNexus |
 |---|---|
@@ -93,53 +76,6 @@ flowchart LR
 ```
 
 The right-side tab workbench distinguishes unsaved and open, saved and open, saved but closed, and closed without being saved. Saving and closing are separate, explicit actions. Pinned tabs are never closed in bulk.
-
-<a id="gallery"></a>
-## 🖼️ Product tour
-
-Every image comes from the real extension UI and has been sanitized. **Click a title or thumbnail to expand it inside this README; click the title again to collapse it.**
-
-<details>
-<summary><strong>🗂️ Grouped workspace</strong> · saved states, cards, and the live-tab workbench<br /><picture><img src="assets/tabnexus-workspace.png" width="720" alt="TabNexus grouped workspace thumbnail" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-workspace.png" alt="Large TabNexus grouped workspace" /></picture>
-</details>
-
-<details>
-<summary><strong>✨ AI command bar</strong> · organize a whole workspace or only selected live tabs<br /><picture><img src="assets/tabnexus-ai-organize.png" width="720" alt="TabNexus AI command bar thumbnail" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-ai-organize.png" alt="Large TabNexus AI command bar" /></picture>
-</details>
-
-<details>
-<summary><strong>🔍 Change preview</strong> · inspect the rationale and scope before applying<br /><picture><img src="assets/tabnexus-ai-preview.png" width="460" alt="TabNexus AI organization preview thumbnail" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-ai-preview.png" alt="Large TabNexus AI organization preview" /></picture>
-</details>
-
-<details>
-<summary><strong>🕸️ Infinite relationship map</strong> · drag, zoom, connect, and preserve task structure<br /><picture><img src="assets/tabnexus-relationship-map.png" width="720" alt="TabNexus infinite relationship map thumbnail" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-relationship-map.png" alt="Large TabNexus infinite relationship map" /></picture>
-</details>
-
-<details>
-<summary><strong>🤖 Model choice</strong> · DeepSeek, OpenAI, Claude, Kimi, Qwen, and MiniMax<br /><picture><img src="assets/tabnexus-provider-settings.png" width="720" alt="TabNexus model settings thumbnail" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-provider-settings.png" alt="Large TabNexus model settings" /></picture>
-</details>
-
-<details>
-<summary><strong>🤝 Agent write-back</strong> · sources, reports, and relationship suggestions<br /><picture><img src="assets/tabnexus-agent-activity.png" width="460" alt="TabNexus Agent activity thumbnail" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-agent-activity.png" alt="Large TabNexus Agent activity dialog" /></picture>
-</details>
-
-<details>
-<summary><strong>🔌 Agent connections</strong> · Codex, Claude, Cursor, VS Code, and TRAE<br /><picture><img src="assets/tabnexus-agent-connect.png" width="720" alt="TabNexus Agent connection settings thumbnail" /></picture></summary>
-<br />
-<picture><img src="assets/tabnexus-agent-connect.png" alt="Large TabNexus Agent connection settings" /></picture>
-</details>
 
 <a id="install"></a>
 ## 🚀 Two-minute install
@@ -192,6 +128,11 @@ Organize manually or ask an optional provider such as DeepSeek to classify by pa
 
 **The outcome is not merely a cleaner tab strip. It is knowing the task is safe to pause and easy to resume.**
 
+| Workspace overview | Organize by intent |
+|---|---|
+| ![TabNexus grouped workspace with cards and the live-tab workbench](assets/tabnexus-workspace.png) | ![TabNexus AI command bar for a workspace or selected live tabs](assets/tabnexus-ai-organize.png) |
+| Saved states, grouped cards, and the current browser window stay in one line of sight. | Choose the scope first, then describe your own grouping rule instead of accepting a fixed taxonomy. |
+
 ### 2. 🧠 Task thinking
 
 The same material can switch between a card board and an infinite relationship canvas. The board is for grouping, notes, and reading states; the canvas is for evidence, conclusions, dependencies, next steps, and persistent progress.
@@ -200,11 +141,21 @@ AI acts as a structure assistant here: it can propose groups, relationships, and
 
 **You are no longer managing a URL list. You are managing visible reasoning, relationships, and progress.**
 
+| Infinite relationship map | Change preview |
+|---|---|
+| ![TabNexus infinite relationship map with drag, zoom, and connections](assets/tabnexus-relationship-map.png) | ![TabNexus AI organization preview with rationale, groups, and page assignments](assets/tabnexus-ai-preview.png) |
+| Arrange sources, dependencies, and next steps on an infinite canvas; positions and connections persist. | Review the rationale, movement scope, and result first; redirect items before applying anything. |
+
 ### 3. 🤝 Agent collaboration
 
 Through MCP, TabNexus becomes a local context layer for Codex, Claude, Cursor, VS Code, and TRAE. An Agent can read the current task and browser tabs, search the workspace, add sources, change groups and relationship layouts, write back reports and task-structure suggestions, and safely save, close, or restore pages behind confirmation guards.
 
 **You stop re-explaining the background, links, and latest progress. The Agent picks up the same continuously updated workspace.**
+
+| Agent connection | Agent write-back |
+|---|---|
+| ![TabNexus Agent connection page for Codex, Claude, Cursor, VS Code, and TRAE](assets/tabnexus-agent-connect.png) | ![TabNexus Agent activity for adding sources, reports, and relationship suggestions](assets/tabnexus-agent-activity.png) |
+| Choose the client you already use and follow its shortest setup path; daily work stays inside the Agent conversation. | Reads, new sources, structure changes, and written results remain visible in a clear activity trail. |
 
 <a id="agent"></a>
 ## 🔌 Connect an Agent
