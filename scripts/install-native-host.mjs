@@ -12,8 +12,8 @@ if (platform() !== "darwin") {
 }
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const hostPath = resolve(root, "bridge", "native-host.mjs");
-const mcpPath = resolve(root, "bridge", "tabnexus-mcp.mjs");
+const hostPath = resolve(root, "agent", "bridge", "native-host.mjs");
+const mcpPath = resolve(root, "agent", "bridge", "tabnexus-mcp.mjs");
 const installedBridgeDir = resolve(homedir(), "Library", "Application Support", "TabNexus");
 const wrapperPath = resolve(installedBridgeDir, "native-host");
 const manifestPath = resolve(

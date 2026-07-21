@@ -7,7 +7,7 @@ type H2Workspace = {
   groups: Array<{ name: string; cards: Array<{ title: string; url: string; note?: string }> }>;
 };
 
-const inputPath = resolve(argument("--input", "m0/fixtures/h2-workspace.json")!);
+const inputPath = resolve(argument("--input", "tests/fixtures/m0/h2-workspace.json")!);
 const outputDir = resolve(argument("--output-dir", "artifacts/m0/h2")!);
 const workspace = JSON.parse(await readFile(inputPath, "utf8")) as H2Workspace;
 if (!workspace.name || !Array.isArray(workspace.groups)) throw new Error("Invalid H2 workspace fixture");

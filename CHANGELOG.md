@@ -2,6 +2,15 @@
 
 All notable changes to TabNexus will be documented here.
 
+## [Unreleased]
+
+### Documentation and repository experience
+
+- Made Chinese the primary project language with English as an optional guide.
+- Rebuilt the README around the multi-tab pain, an explicit source-install path, first-use guidance, benefit-led product storytelling, real sanitized UI screenshots, and visual workflows.
+- Consolidated the MCP bridge, integrations, and plugins under `agent/`; moved E2E, fixtures, and evaluation data under `tests/`; archived the original PRD under `docs/product/`.
+- Moved GitHub community health documents under `.github/` while preserving their standard discovery locations.
+
 ## [0.17.0] - 2026-07-22
 
 First public developer preview.

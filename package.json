@@ -42,10 +42,10 @@
     "bridge:audit": "node scripts/audit-mcp-installations.mjs",
     "mcp:test": "node scripts/test-mcp-capabilities.mjs",
     "agent:package": "node scripts/build-agent-packages.mjs",
-    "eval:mcp:generate": "node plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs generate",
-    "eval:mcp:validate": "node plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs validate",
-    "eval:mcp:contract": "node plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs contract",
-    "eval:mcp:smoke": "node plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs run --suite smoke --trials 3 --confirm-cost",
+    "eval:mcp:generate": "node agent/plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs generate",
+    "eval:mcp:validate": "node agent/plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs validate",
+    "eval:mcp:contract": "node agent/plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs contract",
+    "eval:mcp:smoke": "node agent/plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs run --suite smoke --trials 3 --confirm-cost",
     "check": "npm run typecheck && npm test && npm run mcp:test && npm run bridge:check && npm run build"
   },
   "dependencies": {

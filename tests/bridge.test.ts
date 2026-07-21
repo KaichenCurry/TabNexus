@@ -40,7 +40,7 @@ function writeNativeFrame(child: ChildProcessWithoutNullStreams, message: unknow
 
 describe("M3 native and MCP bridge", () => {
   it("serves MCP initialize and versioned workspace tools over JSON-RPC stdio", async () => {
-    const child = spawn(process.execPath, [resolve("bridge/tabnexus-mcp.mjs")], { stdio: ["pipe", "pipe", "pipe"] });
+    const child = spawn(process.execPath, [resolve("agent/bridge/tabnexus-mcp.mjs")], { stdio: ["pipe", "pipe", "pipe"] });
     children.push(child);
     const responses: any[] = [];
     createInterface({ input: child.stdout, crlfDelay: Infinity }).on("line", (line) => responses.push(JSON.parse(line)));
@@ -77,7 +77,7 @@ describe("M3 native and MCP bridge", () => {
 
   it("lets an Agent-launched MCP server relay tools to the Chrome extension over localhost WebSocket", async () => {
     const port = 43241;
-    const child = spawn(process.execPath, [resolve("bridge/tabnexus-mcp.mjs")], {
+    const child = spawn(process.execPath, [resolve("agent/bridge/tabnexus-mcp.mjs")], {
       env: { ...process.env, TABNEXUS_BRIDGE_PORT: String(port), TABNEXUS_AGENT_NAME: "Cursor" },
       stdio: ["pipe", "pipe", "pipe"]
     });
@@ -132,7 +132,7 @@ describe("M3 native and MCP bridge", () => {
 
   it("shares one localhost broker across Codex and Cursor MCP processes", async () => {
     const port = 43242;
-    const codex = spawn(process.execPath, [resolve("bridge/tabnexus-mcp.mjs")], {
+    const codex = spawn(process.execPath, [resolve("agent/bridge/tabnexus-mcp.mjs")], {
       env: { ...process.env, TABNEXUS_BRIDGE_PORT: String(port), TABNEXUS_AGENT_NAME: "Codex" },
       stdio: ["pipe", "pipe", "pipe"]
     });
@@ -166,7 +166,7 @@ describe("M3 native and MCP bridge", () => {
       }));
     });
 
-    const cursor = spawn(process.execPath, [resolve("bridge/tabnexus-mcp.mjs")], {
+    const cursor = spawn(process.execPath, [resolve("agent/bridge/tabnexus-mcp.mjs")], {
       env: { ...process.env, TABNEXUS_BRIDGE_PORT: String(port), TABNEXUS_AGENT_NAME: "Cursor" },
       stdio: ["pipe", "pipe", "pipe"]
     });
@@ -242,7 +242,7 @@ describe("M3 native and MCP bridge", () => {
       response.end(JSON.stringify({ ok: false, error: "not supported" }));
     });
     await new Promise<void>((resolveListen) => oldBroker.listen(port, "127.0.0.1", resolveListen));
-    const child = spawn(process.execPath, [resolve("bridge/tabnexus-mcp.mjs")], {
+    const child = spawn(process.execPath, [resolve("agent/bridge/tabnexus-mcp.mjs")], {
       env: { ...process.env, TABNEXUS_BRIDGE_PORT: String(port), TABNEXUS_AGENT_NAME: "Cursor" },
       stdio: ["pipe", "pipe", "pipe"]
     });
@@ -266,7 +266,7 @@ describe("M3 native and MCP bridge", () => {
   it("starts a permission-restricted Unix socket and answers bridge health checks", async () => {
     const directory = await mkdtemp(join(tmpdir(), "tabnexus-bridge-"));
     const socketPath = join(directory, "bridge.sock");
-    const child = spawn(process.execPath, [resolve("bridge/native-host.mjs")], {
+    const child = spawn(process.execPath, [resolve("agent/bridge/native-host.mjs")], {
       env: { ...process.env, TABNEXUS_BRIDGE_SOCKET: socketPath },
       stdio: ["pipe", "pipe", "pipe"]
     });
@@ -338,14 +338,14 @@ describe("M3 native and MCP bridge", () => {
   it("streams versioned workspace resource changes back to subscribed MCP clients", async () => {
     const directory = await mkdtemp(join(tmpdir(), "tabnexus-context-"));
     const socketPath = join(directory, "bridge.sock");
-    const host = spawn(process.execPath, [resolve("bridge/native-host.mjs")], {
+    const host = spawn(process.execPath, [resolve("agent/bridge/native-host.mjs")], {
       env: { ...process.env, TABNEXUS_BRIDGE_SOCKET: socketPath },
       stdio: ["pipe", "pipe", "pipe"]
     });
     children.push(host);
     await nativeFrame(host);
 
-    const mcp = spawn(process.execPath, [resolve("bridge/tabnexus-mcp.mjs")], {
+    const mcp = spawn(process.execPath, [resolve("agent/bridge/tabnexus-mcp.mjs")], {
       env: { ...process.env, TABNEXUS_BRIDGE_SOCKET: socketPath },
       stdio: ["pipe", "pipe", "pipe"]
     });
@@ -465,7 +465,7 @@ describe("M3 native and MCP bridge", () => {
   it("runs the user-facing bridge verification against the live extension relay", async () => {
     const directory = await mkdtemp(join(tmpdir(), "tabnexus-verify-"));
     const socketPath = join(directory, "bridge.sock");
-    const host = spawn(process.execPath, [resolve("bridge/native-host.mjs")], {
+    const host = spawn(process.execPath, [resolve("agent/bridge/native-host.mjs")], {
       env: { ...process.env, TABNEXUS_BRIDGE_SOCKET: socketPath },
       stdio: ["pipe", "pipe", "pipe"]
     });

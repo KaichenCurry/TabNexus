@@ -4,7 +4,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "<ABSOLUTE_PATH_TO_TABNEXUS>/bridge/tabnexus-mcp.mjs"
+        "<ABSOLUTE_PATH_TO_TABNEXUS>/agent/bridge/tabnexus-mcp.mjs"
       ],
       "env": {
         "TABNEXUS_AGENT_NAME": "VS Code",

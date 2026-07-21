@@ -9,7 +9,7 @@ import {
   EXPECTED_MCP_VERSION,
   EXPECTED_TOOLS,
   startMockBroker
-} from "../plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs";
+} from "../agent/plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs";
 
 const SCRIPT_VERSION = "1.0.0";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -384,8 +384,8 @@ async function runCapabilityTest({ serverEntry, reportDirectory }) {
 
 const options = parseArgs(process.argv.slice(2));
 const report = await runCapabilityTest({
-  serverEntry: resolve(root, String(options.server ?? "bridge/tabnexus-mcp.mjs")),
-  reportDirectory: resolve(root, String(options.report_dir ?? "evals/tabnexus-mcp"))
+  serverEntry: resolve(root, String(options.server ?? "agent/bridge/tabnexus-mcp.mjs")),
+  reportDirectory: resolve(root, String(options.report_dir ?? "tests/evals/tabnexus-mcp"))
 });
 console.log(JSON.stringify({
   pass: report.pass,
@@ -393,7 +393,7 @@ console.log(JSON.stringify({
   tools: `${report.successfulTools.length}/${report.expectedTools.length}`,
   checks: `${report.passedChecks}/${report.totalChecks}`,
   durationMs: report.durationMs,
-  report: resolve(root, String(options.report_dir ?? "evals/tabnexus-mcp"), "capability-latest.md"),
+  report: resolve(root, String(options.report_dir ?? "tests/evals/tabnexus-mcp"), "capability-latest.md"),
   ...(report.failure ? { failure: report.failure } : {})
 }, null, 2));
 if (!report.pass) process.exitCode = 1;

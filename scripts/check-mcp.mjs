@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 import { createInterface } from "node:readline";
 
-const serverEntry = process.argv[2] ? resolve(process.argv[2]) : resolve("bridge/tabnexus-mcp.mjs");
+const serverEntry = process.argv[2] ? resolve(process.argv[2]) : resolve("agent/bridge/tabnexus-mcp.mjs");
 const child = spawn(process.execPath, [serverEntry], {
   stdio: ["pipe", "pipe", "inherit"]
 });

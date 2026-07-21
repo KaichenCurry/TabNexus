@@ -1,0 +1,688 @@
+{
+  "scriptVersion": "1.0.0",
+  "mcpVersion": "0.8.0",
+  "generatedAt": "2026-07-21T18:31:17.393Z",
+  "pass": true,
+  "durationMs": 108,
+  "totalChecks": 36,
+  "passedChecks": 36,
+  "expectedTools": [
+    "read_workspace",
+    "search_cards",
+    "add_card",
+    "add_cards",
+    "write_report",
+    "propose_structure",
+    "edit_workspace",
+    "manage_workspaces",
+    "delete_workspace_items",
+    "read_tab_workbench",
+    "manage_tab_workbench",
+    "dismiss_recent_tabs",
+    "sync_browser_tabs",
+    "close_browser_tabs",
+    "export_workspace",
+    "manage_preferences",
+    "manage_agent_activity"
+  ],
+  "successfulTools": [
+    "read_workspace",
+    "search_cards",
+    "add_card",
+    "add_cards",
+    "write_report",
+    "propose_structure",
+    "edit_workspace",
+    "manage_workspaces",
+    "delete_workspace_items",
+    "read_tab_workbench",
+    "manage_tab_workbench",
+    "dismiss_recent_tabs",
+    "sync_browser_tabs",
+    "close_browser_tabs",
+    "export_workspace",
+    "manage_preferences",
+    "manage_agent_activity"
+  ],
+  "brokerCalls": [
+    {
+      "tool": "read_workspace",
+      "args": {
+        "detail": "summary"
+      },
+      "at": "2026-07-21T18:31:17.370Z",
+      "ok": true
+    },
+    {
+      "tool": "read_tab_workbench",
+      "args": {},
+      "at": "2026-07-21T18:31:17.373Z",
+      "ok": true
+    },
+    {
+      "tool": "read_workspace",
+      "args": {
+        "detail": "summary"
+      },
+      "at": "2026-07-21T18:31:17.375Z",
+      "ok": true
+    },
+    {
+      "tool": "search_cards",
+      "args": {
+        "query": "DeepSeek",
+        "includeNotes": false,
+        "limit": 20
+      },
+      "at": "2026-07-21T18:31:17.376Z",
+      "ok": true
+    },
+    {
+      "tool": "add_card",
+      "args": {
+        "title": "Capability source",
+        "url": "https://capability.example/source",
+        "note": "single add",
+        "expectedRevision": "wsr_eval_0001",
+        "operationId": "cap:add-one"
+      },
+      "at": "2026-07-21T18:31:17.377Z",
+      "ok": true
+    },
+    {
+      "tool": "add_cards",
+      "args": {
+        "cards": [
+          {
+            "title": "Batch note",
+            "note": "batch one",
+            "type": "note"
+          },
+          {
+            "title": "Batch URL",
+            "url": "https://capability.example/batch",
+            "type": "web",
+            "status": "read"
+          }
+        ],
+        "expectedRevision": "wsr_eval_0002",
+        "operationId": "cap:add-batch"
+      },
+      "at": "2026-07-21T18:31:17.377Z",
+      "ok": true
+    },
+    {
+      "tool": "write_report",
+      "args": {
+        "title": "Capability report",
+        "content": "Automated MCP capability test",
+        "groupId": "group_research",
+        "expectedRevision": "wsr_eval_0003",
+        "operationId": "cap:report"
+      },
+      "at": "2026-07-21T18:31:17.378Z",
+      "ok": true
+    },
+    {
+      "tool": "propose_structure",
+      "args": {
+        "summary": "Connect docs to home",
+        "edges": [
+          {
+            "fromCardId": "card_docs",
+            "toCardId": "card_home",
+            "label": "supports"
+          }
+        ],
+        "expectedRevision": "wsr_eval_0004",
+        "operationId": "cap:proposal"
+      },
+      "at": "2026-07-21T18:31:17.379Z",
+      "ok": true
+    },
+    {
+      "tool": "edit_workspace",
+      "args": {
+        "expectedRevision": "wsr_eval_0004",
+        "operationId": "cap:edit",
+        "actions": [
+          {
+            "type": "create_group",
+            "groupId": "auto_group",
+            "name": "Automation",
+            "color": "#5368AC"
+          },
+          {
+            "type": "move_cards",
+            "cardIds": [
+              "card_notes"
+            ],
+            "targetGroupId": "auto_group"
+          },
+          {
+            "type": "update_card",
+            "cardId": "card_notes",
+            "status": "read",
+            "note": "Updated by capability test"
+          },
+          {
+            "type": "position_cards",
+            "positions": [
+              {
+                "cardId": "card_notes",
+                "x": 320,
+                "y": 180
+              }
+            ]
+          },
+          {
+            "type": "upsert_edges",
+            "edges": [
+              {
+                "fromCardId": "card_notes",
+                "toCardId": "card_docs",
+                "label": "references"
+              }
+            ]
+          }
+        ]
+      },
+      "at": "2026-07-21T18:31:17.380Z",
+      "ok": true
+    },
+    {
+      "tool": "export_workspace",
+      "args": {
+        "format": "markdown"
+      },
+      "at": "2026-07-21T18:31:17.380Z",
+      "ok": true
+    },
+    {
+      "tool": "manage_preferences",
+      "args": {
+        "action": "read"
+      },
+      "at": "2026-07-21T18:31:17.381Z",
+      "ok": true
+    },
+    {
+      "tool": "manage_preferences",
+      "args": {
+        "action": "update",
+        "expectedRevision": "prefr_eval_0001",
+        "operationId": "cap:update-preferences",
+        "preferences": {
+          "workspaceView": "flow",
+          "rightRailCollapsed": true
+        }
+      },
+      "at": "2026-07-21T18:31:17.381Z",
+      "ok": true
+    },
+    {
+      "tool": "manage_agent_activity",
+      "args": {
+        "action": "read"
+      },
+      "at": "2026-07-21T18:31:17.382Z",
+      "ok": true
+    },
+    {
+      "tool": "manage_agent_activity",
+      "args": {
+        "action": "clear",
+        "expectedRevision": "actr_eval_0001",
+        "operationId": "cap:clear-activity",
+        "confirm": true,
+        "confirmationText": "I confirm clearing this test activity"
+      },
+      "at": "2026-07-21T18:31:17.383Z",
+      "ok": true
+    },
+    {
+      "tool": "read_workspace",
+      "args": {
+        "detail": "summary"
+      },
+      "at": "2026-07-21T18:31:17.383Z",
+      "ok": true
+    },
+    {
+      "tool": "manage_workspaces",
+      "args": {
+        "expectedStateRevision": "asr_eval_0001",
+        "operationId": "cap:manage-workspaces",
+        "actions": [
+          {
+            "type": "create_workspace",
+            "workspaceId": "ws_auto",
+            "name": "Automation workspace",
+            "makeActive": false
+          },
+          {
+            "type": "rename_workspace",
+            "workspaceId": "ws_research",
+            "name": "浏览器调研 · 已测试"
+          },
+          {
+            "type": "duplicate_workspace",
+            "workspaceId": "ws_research",
+            "name": "Automation copy",
+            "makeActive": false
+          },
+          {
+            "type": "set_active_workspace",
+            "workspaceId": "ws_research"
+          }
+        ]
+      },
+      "at": "2026-07-21T18:31:17.384Z",
+      "ok": true
+    },
+    {
+      "tool": "delete_workspace_items",
+      "args": {
+        "expectedRevision": "wsr_eval_0006",
+        "operationId": "cap:delete-items",
+        "cardIds": [
+          "card_added_1"
+        ],
+        "groupIds": [
+          "auto_group"
+        ],
+        "confirm": true,
+        "confirmationText": "I confirm deleting these test items"
+      },
+      "at": "2026-07-21T18:31:17.384Z",
+      "ok": true
+    },
+    {
+      "tool": "delete_workspace_items",
+      "args": {
+        "workspaceId": "ws_auto",
+        "expectedRevision": "wsr_eval_0007",
+        "expectedStateRevision": "asr_eval_0002",
+        "operationId": "cap:delete-workspace",
+        "deleteWorkspace": true,
+        "confirm": true,
+        "confirmationText": "I confirm deleting this test workspace"
+      },
+      "at": "2026-07-21T18:31:17.385Z",
+      "ok": true
+    },
+    {
+      "tool": "read_tab_workbench",
+      "args": {},
+      "at": "2026-07-21T18:31:17.385Z",
+      "ok": true
+    },
+    {
+      "tool": "manage_tab_workbench",
+      "args": {
+        "expectedRevision": "railr_eval_0001",
+        "operationId": "cap:select-save",
+        "actions": [
+          {
+            "type": "set_selection",
+            "mode": "replace",
+            "tabIds": [
+              102
+            ]
+          },
+          {
+            "type": "set_collapsed",
+            "collapsed": true
+          },
+          {
+            "type": "focus_tab",
+            "tabId": 101
+          },
+          {
+            "type": "reopen_recent",
+            "recentIds": [
+              "recent_2"
+            ]
+          }
+        ]
+      },
+      "at": "2026-07-21T18:31:17.386Z",
+      "ok": true
+    },
+    {
+      "tool": "sync_browser_tabs",
+      "args": {
+        "action": "save_tabs",
+        "scope": "workbench_selection",
+        "expectedWorkbenchRevision": "railr_eval_0002",
+        "expectedRevision": "wsr_eval_0008",
+        "operationId": "cap:save-selection",
+        "groupId": "group_research"
+      },
+      "at": "2026-07-21T18:31:17.387Z",
+      "ok": true
+    },
+    {
+      "tool": "sync_browser_tabs",
+      "args": {
+        "action": "open_cards",
+        "cardIds": [
+          "card_home"
+        ],
+        "expectedRevision": "wsr_eval_0009",
+        "operationId": "cap:open-card"
+      },
+      "at": "2026-07-21T18:31:17.387Z",
+      "ok": true
+    },
+    {
+      "tool": "sync_browser_tabs",
+      "args": {
+        "action": "focus_card",
+        "cardId": "card_docs",
+        "expectedRevision": "wsr_eval_0009",
+        "operationId": "cap:focus-card"
+      },
+      "at": "2026-07-21T18:31:17.388Z",
+      "ok": true
+    },
+    {
+      "tool": "read_tab_workbench",
+      "args": {},
+      "at": "2026-07-21T18:31:17.388Z",
+      "ok": true
+    },
+    {
+      "tool": "dismiss_recent_tabs",
+      "args": {
+        "expectedRevision": "railr_eval_0003",
+        "operationId": "cap:dismiss-recent",
+        "recentIds": [
+          "recent_1"
+        ],
+        "confirm": true,
+        "confirmationText": "I confirm dismissing this recovery entry"
+      },
+      "at": "2026-07-21T18:31:17.389Z",
+      "ok": true
+    },
+    {
+      "tool": "manage_tab_workbench",
+      "args": {
+        "expectedRevision": "railr_eval_0004",
+        "operationId": "cap:select-close",
+        "actions": [
+          {
+            "type": "select_all",
+            "scope": "open",
+            "includePinned": true
+          },
+          {
+            "type": "set_collapsed",
+            "collapsed": false
+          }
+        ]
+      },
+      "at": "2026-07-21T18:31:17.390Z",
+      "ok": true
+    },
+    {
+      "tool": "close_browser_tabs",
+      "args": {
+        "scope": "workbench_selection",
+        "expectedWorkbenchRevision": "railr_eval_0005",
+        "expectedRevision": "wsr_eval_0009",
+        "operationId": "cap:close-selection",
+        "saveBeforeClose": true,
+        "confirm": true,
+        "confirmationText": "I confirm closing the selected test tabs"
+      },
+      "at": "2026-07-21T18:31:17.390Z",
+      "ok": true
+    },
+    {
+      "tool": "read_tab_workbench",
+      "args": {},
+      "at": "2026-07-21T18:31:17.391Z",
+      "ok": true
+    },
+    {
+      "tool": "close_browser_tabs",
+      "args": {
+        "tabIds": [
+          103
+        ],
+        "expectedRevision": "wsr_eval_0009",
+        "operationId": "cap:unsafe-close",
+        "confirm": false
+      },
+      "at": "2026-07-21T18:31:17.391Z",
+      "ok": false,
+      "error": "Explicit confirmation is required."
+    },
+    {
+      "tool": "dismiss_recent_tabs",
+      "args": {
+        "expectedRevision": "railr_eval_0006",
+        "operationId": "cap:unsafe-dismiss",
+        "recentIds": [
+          "missing"
+        ],
+        "confirm": false
+      },
+      "at": "2026-07-21T18:31:17.392Z",
+      "ok": false,
+      "error": "Explicit confirmation is required."
+    },
+    {
+      "tool": "manage_agent_activity",
+      "args": {
+        "action": "clear",
+        "expectedRevision": "actr_eval_0002",
+        "operationId": "cap:unsafe-clear-activity",
+        "confirm": false
+      },
+      "at": "2026-07-21T18:31:17.392Z",
+      "ok": false,
+      "error": "Explicit confirmation is required."
+    },
+    {
+      "tool": "edit_workspace",
+      "args": {
+        "expectedRevision": "wsr_eval_0001",
+        "operationId": "cap:stale-edit",
+        "actions": [
+          {
+            "type": "rename_workspace",
+            "name": "Stale overwrite"
+          }
+        ]
+      },
+      "at": "2026-07-21T18:31:17.393Z",
+      "ok": false,
+      "error": "Workspace changed; read the latest revision and retry."
+    }
+  ],
+  "checks": [
+    {
+      "name": "protocol:initialize",
+      "pass": true,
+      "durationMs": 72
+    },
+    {
+      "name": "protocol:tools-list",
+      "pass": true,
+      "durationMs": 4
+    },
+    {
+      "name": "protocol:prompts",
+      "pass": true,
+      "durationMs": 2
+    },
+    {
+      "name": "protocol:workbench-prompt",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "protocol:resources-list",
+      "pass": true,
+      "durationMs": 3
+    },
+    {
+      "name": "protocol:workbench-resource",
+      "pass": true,
+      "durationMs": 2
+    },
+    {
+      "name": "tool:read_workspace",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:search_cards",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:add_card",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:add_cards",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:write_report",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:propose_structure",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:edit_workspace",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:export_workspace",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:manage_preferences",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:manage_preferences",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:manage_agent_activity",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:manage_agent_activity",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:read_workspace",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:manage_workspaces",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:delete_workspace_items",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:delete_workspace_items",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:read_tab_workbench",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:manage_tab_workbench",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:sync_browser_tabs",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:sync_browser_tabs",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:sync_browser_tabs",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:read_tab_workbench",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:dismiss_recent_tabs",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:manage_tab_workbench",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "tool:close_browser_tabs",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "tool:read_tab_workbench",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "guard:close_browser_tabs:confirm",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "guard:dismiss_recent_tabs:confirm",
+      "pass": true,
+      "durationMs": 0
+    },
+    {
+      "name": "guard:manage_agent_activity:confirmation",
+      "pass": true,
+      "durationMs": 1
+    },
+    {
+      "name": "guard:edit_workspace:changed",
+      "pass": true,
+      "durationMs": 0
+    }
+  ]
+}

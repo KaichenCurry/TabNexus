@@ -10,7 +10,7 @@ import {
   scoreTrial,
   startMockBroker,
   validateDataset
-} from "../plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs";
+} from "../agent/plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs";
 
 const brokers = [];
 

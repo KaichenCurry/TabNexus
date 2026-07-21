@@ -32,13 +32,13 @@ npm run mcp:test
 
 成功时会显示 `17/17 tools` 和 `36/36 checks`。详细报告生成在：
 
-- `evals/tabnexus-mcp/capability-latest.md`
-- `evals/tabnexus-mcp/capability-latest.json`
+- `tests/evals/tabnexus-mcp/capability-latest.md`
+- `tests/evals/tabnexus-mcp/capability-latest.json`
 
 也可以使用不同的 MCP 服务文件或报告目录：
 
 ```bash
-node scripts/test-mcp-capabilities.mjs --server bridge/tabnexus-mcp.mjs --report-dir evals/tabnexus-mcp
+node scripts/test-mcp-capabilities.mjs --server agent/bridge/tabnexus-mcp.mjs --report-dir tests/evals/tabnexus-mcp
 ```
 
 ## 第一次连接：只做 3 步
@@ -55,7 +55,7 @@ node scripts/test-mcp-capabilities.mjs --server bridge/tabnexus-mcp.mjs --report
 
 当前源码安装中，Codex、Claude Desktop 和 Claude Code 包已经包含连接程序；Cursor、VS Code 和 TRAE Work 的入口会使用执行 `pnpm build` 时的本地项目路径。因此请在最终保存位置完成构建，不要在构建后移动仓库。
 
-本仓库使用 Codex 标准本地市场结构：`.agents/plugins/marketplace.json` 与 `plugins/tabnexus/`。开发机只需由维护流程注册一次仓库市场；这台测试机已经完成注册，普通测试不需要再运行命令。公开发布后由插件市场接管这一步。
+本仓库使用 Codex 标准本地市场结构：`.agents/plugins/marketplace.json` 与 `agent/plugins/tabnexus/`。开发机只需由维护流程注册一次仓库市场；这台测试机已经完成注册，普通测试不需要再运行命令。公开发布后由插件市场接管这一步。
 
 ## 只读测试（先做这个）
 

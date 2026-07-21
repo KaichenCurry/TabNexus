@@ -11,5 +11,5 @@ scripts/results/
 artifacts/
 .playwright/
 *.zip
-/evals/tabnexus-mcp/runs/
+/tests/evals/tabnexus-mcp/runs/
 /TabNexus Workspace (单文件分享版).html

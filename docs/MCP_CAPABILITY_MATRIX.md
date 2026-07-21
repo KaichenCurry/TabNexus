@@ -4,7 +4,7 @@ Status: v0.17.0 / MCP bridge 0.8.0
 
 All adapters must pass the same runtime contract: MCP `0.8.0`, exactly 17 tools, four prompts, and subscribed versioned resources. `npm run bridge:audit` verifies both release packages and installed local copies; it does not infer capability parity from configuration files alone.
 
-`npm run mcp:test` executes every tool through a real stdio MCP process and isolated local broker, including positive workflows and destructive/stale-revision guard cases. It writes a machine-readable JSON result and a Markdown report under `evals/tabnexus-mcp/`.
+`npm run mcp:test` executes every tool through a real stdio MCP process and isolated local broker, including positive workflows and destructive/stale-revision guard cases. It writes a machine-readable JSON result and a Markdown report under `tests/evals/tabnexus-mcp/`.
 
 The audit target is practical parity with normal workspace operations, not a large tool count. External Agents should be able to discover context, make one coherent revision-safe change, and receive enough result detail to continue without guessing IDs.
 

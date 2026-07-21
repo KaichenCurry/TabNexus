@@ -9,7 +9,7 @@ import {
   type M0Input
 } from "./m0-lib";
 
-const inputPath = argument("--input", "m0/fixtures/sample-tabs.json")!;
+const inputPath = argument("--input", "tests/fixtures/m0/sample-tabs.json")!;
 const outputPath = argument("--output", "artifacts/m0/proposals.json")!;
 const reviewPath = argument("--review", "artifacts/m0/review.csv")!;
 const apiKey = process.env.DEEPSEEK_API_KEY?.trim();

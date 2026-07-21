@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 
 const manifest = JSON.parse(readFileSync("public/manifest.json", "utf8")) as Record<string, unknown>;
 const pluginMarketplace = JSON.parse(readFileSync(".agents/plugins/marketplace.json", "utf8"));
-const codexPlugin = JSON.parse(readFileSync("plugins/tabnexus/.codex-plugin/plugin.json", "utf8"));
-const codexMcp = JSON.parse(readFileSync("plugins/tabnexus/.mcp.json", "utf8"));
+const codexPlugin = JSON.parse(readFileSync("agent/plugins/tabnexus/.codex-plugin/plugin.json", "utf8"));
+const codexMcp = JSON.parse(readFileSync("agent/plugins/tabnexus/.mcp.json", "utf8"));
 const claudeCodeMarketplace = JSON.parse(readFileSync(".claude-plugin/marketplace.json", "utf8"));
-const claudeCodePlugin = JSON.parse(readFileSync("integrations/claude-code/.claude-plugin/plugin.json", "utf8"));
-const claudeCodeMcp = JSON.parse(readFileSync("integrations/claude-code/.mcp.json", "utf8"));
+const claudeCodePlugin = JSON.parse(readFileSync("agent/integrations/claude-code/.claude-plugin/plugin.json", "utf8"));
+const claudeCodeMcp = JSON.parse(readFileSync("agent/integrations/claude-code/.mcp.json", "utf8"));
 
 describe("MV3 manifest security surface", () => {
   it("uses the required standalone service worker architecture", () => {
@@ -45,7 +45,7 @@ describe("Codex plugin package", () => {
   it("uses the repository marketplace layout Codex can discover", () => {
     expect(pluginMarketplace.plugins).toContainEqual(expect.objectContaining({
       name: "tabnexus",
-      source: { source: "local", path: "./plugins/tabnexus" }
+      source: { source: "local", path: "./agent/plugins/tabnexus" }
     }));
     expect(codexPlugin).toMatchObject({ name: "tabnexus", mcpServers: "./.mcp.json", skills: "./skills/" });
     expect(codexMcp.mcpServers.tabnexus).toMatchObject({
@@ -53,10 +53,10 @@ describe("Codex plugin package", () => {
       args: ["./server/index.mjs"],
       cwd: "."
     });
-    expect(existsSync("plugins/tabnexus/server/index.mjs")).toBe(true);
-    expect(existsSync("plugins/tabnexus/assets/icon.png")).toBe(true);
-    expect(existsSync("plugins/tabnexus/skills/tabnexus-mcp-evals/SKILL.md")).toBe(true);
-    expect(existsSync("plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs")).toBe(true);
+    expect(existsSync("agent/plugins/tabnexus/server/index.mjs")).toBe(true);
+    expect(existsSync("agent/plugins/tabnexus/assets/icon.png")).toBe(true);
+    expect(existsSync("agent/plugins/tabnexus/skills/tabnexus-mcp-evals/SKILL.md")).toBe(true);
+    expect(existsSync("agent/plugins/tabnexus/skills/tabnexus-mcp-evals/scripts/run-evals.mjs")).toBe(true);
   });
 });
 
@@ -64,7 +64,7 @@ describe("Claude Code plugin package", () => {
   it("uses the official marketplace and bundled MCP layout", () => {
     expect(claudeCodeMarketplace).toMatchObject({
       name: "tabnexus-local",
-      plugins: [expect.objectContaining({ name: "tabnexus", version: "0.17.0", source: "./integrations/claude-code" })]
+      plugins: [expect.objectContaining({ name: "tabnexus", version: "0.17.0", source: "./agent/integrations/claude-code" })]
     });
     expect(claudeCodePlugin).toMatchObject({ name: "tabnexus", version: "0.17.0" });
     expect(claudeCodeMcp.mcpServers.tabnexus).toMatchObject({
