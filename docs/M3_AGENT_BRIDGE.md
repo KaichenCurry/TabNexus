@@ -96,10 +96,10 @@ If an external Agent can classify well, the built-in provider remains optional. 
 
 ## Transport components
 
-- `bridge/tabnexus-mcp.mjs`: dependency-free MCP JSON-RPC stdio server plus loopback-only WebSocket relay.
-- `integrations/claude/manifest.json`: self-contained Claude Desktop MCPB metadata.
-- `integrations/claude-code/`: Claude Code plugin with a bundled MCP definition.
-- `plugins/tabnexus/`: Codex marketplace plugin with the same bundled MCP server.
+- `agent/bridge/tabnexus-mcp.mjs`: dependency-free MCP JSON-RPC stdio server plus loopback-only WebSocket relay.
+- `agent/integrations/claude/manifest.json`: self-contained Claude Desktop MCPB metadata.
+- `agent/integrations/claude-code/`: Claude Code plugin with a bundled MCP definition.
+- `agent/plugins/tabnexus/`: Codex marketplace plugin with the same bundled MCP server.
 - `src/core/agentClients.ts`: shared adapter definitions and official Cursor, VS Code, and TRAE install-link generation.
 - `scripts/build-agent-packages.mjs`: reproducible dependency-free MCPB packager.
 - `src/background.ts`: Agent connection manager, WebSocket keepalive, tool execution, persistence, and activity logging.

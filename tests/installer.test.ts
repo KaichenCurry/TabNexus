@@ -54,7 +54,7 @@ describe.runIf(platform() === "darwin")("MCP dogfood installer", () => {
     const calls = await readFile(codexLog, "utf8");
     expect(calls).toContain("mcp remove tabnexus");
     expect(calls).toContain("mcp add tabnexus --");
-    expect(calls).toContain("bridge/tabnexus-mcp.mjs");
+    expect(calls).toContain("agent/bridge/tabnexus-mcp.mjs");
 
     await rm(temporaryHome, { recursive: true, force: true });
   });

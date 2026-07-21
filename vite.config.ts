@@ -5,7 +5,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   define: {
-    __TABNEXUS_LOCAL_MCP_ENTRY__: JSON.stringify(resolve(__dirname, "bridge/tabnexus-mcp.mjs")),
+    __TABNEXUS_LOCAL_MCP_ENTRY__: JSON.stringify(resolve(__dirname, "agent/bridge/tabnexus-mcp.mjs")),
     __TABNEXUS_CODEX_MARKETPLACE__: JSON.stringify(resolve(__dirname, ".agents/plugins/marketplace.json")),
     __TABNEXUS_REPO_ROOT__: JSON.stringify(resolve(__dirname))
   },
@@ -30,7 +30,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
-    exclude: ["e2e/**", "node_modules/**", "dist/**"],
+    exclude: ["tests/e2e/**", "node_modules/**", "dist/**"],
     coverage: {
       reporter: ["text", "html"]
     }
