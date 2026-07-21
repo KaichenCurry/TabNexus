@@ -12,7 +12,7 @@
   </p>
 </div>
 
-![TabNexus workspace with 12 tabs saved into three working groups](assets/tabnexus-after.png)
+<picture><img src="assets/tabnexus-after.png" alt="TabNexus workspace with 12 tabs saved into three working groups" /></picture>
 
 > [!IMPORTANT]
 > **v0.17.0 is a developer preview.** A two-minute Chrome package is available—no Node, pnpm, or terminal required. A Chrome Web Store build is not available yet.
@@ -30,7 +30,7 @@ Every tab becomes a promise to your future self: **“This still matters. Do not
 
 The browser remembers pages, but not the story of the task. The exhausting part is not the tab count—it is rebuilding context every time you return.
 
-![An illustration of tab overload](assets/tab-overload-hero.jpg)
+<picture><img src="assets/tab-overload-hero.jpg" alt="An illustration of tab overload" /></picture>
 
 **TabNexus does not merely hide tabs. It makes unfinished work safe to pause, clear to resume, and easy to hand off.**
 
@@ -40,7 +40,7 @@ These are **real extension screenshots from the same run**. The same 12 sanitize
 
 | 😵 Before — pages exist, but task structure does not | ✨ After — context is saved and keeps moving |
 |---|---|
-| ![Real TabNexus before screenshot with 12 unsaved tabs and an empty workspace](assets/tabnexus-before.png) | ![Real TabNexus after screenshot with 12 tabs organized into three working groups](assets/tabnexus-after.png) |
+| <picture><img src="assets/tabnexus-before.png" alt="Real TabNexus before screenshot with 12 unsaved tabs and an empty workspace" /></picture> | <picture><img src="assets/tabnexus-after.png" alt="Real TabNexus after screenshot with 12 tabs organized into three working groups" /></picture> |
 
 | Before | With TabNexus |
 |---|---|
@@ -130,7 +130,7 @@ Organize manually or ask an optional provider such as DeepSeek to classify by pa
 
 | Workspace overview | Organize by intent |
 |---|---|
-| ![TabNexus grouped workspace with cards and the live-tab workbench](assets/tabnexus-workspace.png) | ![TabNexus AI command bar for a workspace or selected live tabs](assets/tabnexus-ai-organize.png) |
+| <picture><img src="assets/tabnexus-workspace.png" alt="TabNexus grouped workspace with cards and the live-tab workbench" /></picture> | <picture><img src="assets/tabnexus-ai-organize.png" alt="TabNexus AI command bar for a workspace or selected live tabs" /></picture> |
 | Saved states, grouped cards, and the current browser window stay in one line of sight. | Choose the scope first, then describe your own grouping rule instead of accepting a fixed taxonomy. |
 
 ### 2. 🧠 Task thinking
@@ -143,7 +143,7 @@ AI acts as a structure assistant here: it can propose groups, relationships, and
 
 | Infinite relationship map | Change preview |
 |---|---|
-| ![TabNexus infinite relationship map with drag, zoom, and connections](assets/tabnexus-relationship-map.png) | ![TabNexus AI organization preview with rationale, groups, and page assignments](assets/tabnexus-ai-preview.png) |
+| <picture><img src="assets/tabnexus-relationship-map.png" alt="TabNexus infinite relationship map with drag, zoom, and connections" /></picture> | <picture><img src="assets/tabnexus-ai-preview.png" alt="TabNexus AI organization preview with rationale, groups, and page assignments" /></picture> |
 | Arrange sources, dependencies, and next steps on an infinite canvas; positions and connections persist. | Review the rationale, movement scope, and result first; redirect items before applying anything. |
 
 ### 3. 🤝 Agent collaboration
@@ -154,7 +154,7 @@ Through MCP, TabNexus becomes a local context layer for Codex, Claude, Cursor, V
 
 | Agent connection | Agent write-back |
 |---|---|
-| ![TabNexus Agent connection page for Codex, Claude, Cursor, VS Code, and TRAE](assets/tabnexus-agent-connect.png) | ![TabNexus Agent activity for adding sources, reports, and relationship suggestions](assets/tabnexus-agent-activity.png) |
+| <picture><img src="assets/tabnexus-agent-connect.png" alt="TabNexus Agent connection page for Codex, Claude, Cursor, VS Code, and TRAE" /></picture> | <picture><img src="assets/tabnexus-agent-activity.png" alt="TabNexus Agent activity for adding sources, reports, and relationship suggestions" /></picture> |
 | Choose the client you already use and follow its shortest setup path; daily work stays inside the Agent conversation. | Reads, new sources, structure changes, and written results remain visible in a clear activity trail. |
 
 <a id="agent"></a>
