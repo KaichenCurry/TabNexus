@@ -2,14 +2,15 @@
   <img src="../extension/public/icons/icon128.png" width="88" alt="TabNexus logo" />
   <h1>TabNexus</h1>
   <p><strong>You didn't open tabs. You started a task that isn't finished yet.<br/>TabNexus turns scattered tabs into task context that both you and AI can pick up.</strong></p>
-  <p>Local-first Chrome extension · intent-driven AI API · optional MCP Agent collaboration</p>
+  <p>Local organization out of the box · bring your own AI API for intent-based organization · connect an MCP Agent when needed</p>
 
   <p>
     <a href="#why">Why</a> ·
     <a href="#what">What it is</a> ·
-    <a href="#features">Core capabilities</a> ·
+    <a href="#features">Full workflow</a> ·
+    <a href="#ai-api">AI API</a> ·
+    <a href="#agent">Agent collaboration</a> ·
     <a href="#start">2-minute start</a> ·
-    <a href="#agent">Connect an Agent</a> ·
     <a href="../README.md">简体中文</a>
   </p>
 
@@ -30,83 +31,107 @@
 > **v0.17.0 is a developer preview.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
 
 <a id="why"></a>
-## 😵 You are not afraid to close tabs. You are afraid to lose the unfinished task.
+## 😵 Your tab bar is not clutter. It is unfinished thinking you are afraid to lose.
 
-The last time you had 20 tabs open, you probably were not wandering. You were **researching a company, comparing options, or hunting down a bug**. Every page was a reference for the same goal:
+Your browser may be holding a task you do not dare to close.
 
-~~~mermaid
-flowchart LR
-    Intent["🎯 Intent<br/>research a company"] --> Tabs["📑 Tabs<br/>product · filings · competitors · reviews"]
-    Tabs --> Context["🧠 Context<br/>evidence · notes · links · progress"]
-    Context --> Output["✅ Output<br/>judgment · report · decision"]
-~~~
+It began with one company to research, a few options to compare, or a bug to track down. One page led to the next clue, until there were twenty tabs. You know some are background, some are evidence, some contradict each other, and several are still unread—but the browser sees only twenty URLs.
 
-The browser remembers what you opened, but not why, which pages are evidence, or how far the task has come. You are not afraid of losing a URL. You are afraid of **losing your train of thought with it**.
+**One tab is a clue. Taken together, those tabs are a judgment taking shape.** Yet why those pages belong together, what role each one plays, and how far the task has come all live only in your head. You return the next day: the pages remain, but the train of thought is gone.
+
+You were never afraid to lose the pages. You were afraid to lose the unfinished thinking behind them.
 
 <picture><img src="assets/tab-overload-hero.jpg" alt="Tab overload anxiety from dozens of stacked browser tabs" /></picture>
 
-Traditional tab tools such as Toby, OneTab, and Workona proved the need to save and group pages, but they still struggle to preserve task intent, relationships, and progress. The AI era adds more tabs, while handing them to AI still means copy-pasting links and repeating context—or asking Computer Use / Playwright to operate page by page, which is typically slower and more token-heavy for this kind of context transfer.
+Traditional tools such as Toby, OneTab, and Workona answer “where should these pages go?” but struggle to preserve “why did I open them?” The gap is sharper in the AI era: to hand the task over, you still copy links one by one and explain the background again—or ask Computer Use / Playwright to rediscover the browser page by page. You become the human API between your browser and AI.
 
-**TabNexus starts from one idea: stop managing tabs as tabs. Manage them as task context.**
+This is not a failure to stay organized. The browser simply never saved the “why” behind the task.
+
+> [!IMPORTANT]
+> **TabNexus starts with one idea: stop managing tabs as tabs. Treat them as task context.**
 
 <a id="what"></a>
-## ✨ TabNexus turns tabs into context you can continue
+## ✨ TabNexus: turn tabs into task context you can resume
 
-TabNexus is a Chrome extension. It captures a messy browsing session inside a persistent **Workspace**, so you, the browser, and AI can operate on the same context:
+TabNexus is not another folder for links. It adds a layer that has long been missing between the browser and the final result: **task context**.
+
+A conventional tab manager ends at “I can reopen these later.” TabNexus begins with “I can return and know why I opened them, where I stopped, and what comes next.”
 
 ~~~mermaid
-flowchart TB
-    Context["📦 Workspace<br/>pages · groups · notes · states · relationships"]
-    User["👤 You<br/>set goals · approve changes"] <--> Context
-    Browser["🌐 Chrome<br/>collect · close · restore"] <--> Context
-    API["✨ AI API (default)<br/>classify by intent"] <--> Context
-    Agent["🤖 MCP Agent (optional)<br/>read · add · write back"] <--> Context
+flowchart LR
+    Intent["🎯 A goal takes shape"] --> Tabs["📑 Open tabs"]
+    Tabs --> Workspace["📦 Local Workspace<br/>save · restore · organize locally"]
+    Workspace --> Thinking["🧠 Task thinking<br/>cards · relationships · progress"]
+    Thinking --> Output["✅ Output<br/>decision · report · next step"]
+    API["✨ AI API<br/>organize by intent after setup"] -. "proposes structure" .-> Thinking
+    Agent["🤖 MCP Agent<br/>optional advanced collaboration"] <-->|read · add · write back| Workspace
 ~~~
 
-| Approach | What it does | What is still missing |
-|---|---|---|
-| Bookmarks / tab managers | Save pages and restore windows | Task intent, structure, and progress |
-| Domain-based grouping | Knows where pages came from | Knows why you opened them |
-| Copy-paste / browser automation | Gives pages to AI | Efficient, complete, reusable context |
-| **TabNexus** | **Organizes by intent, then continues through one interface** | **You set the goal and review key changes** |
+A Workspace is not just storage for pages. It is a living record of the task: what each page contributes, how the sources relate, and how far the work has progressed. You can stay entirely local, add an AI API when intent-aware organization helps, and hand the same context to an Agent only when the task grows into research, writing, or coding.
 
-There are two independent AI paths: one for everyday organizing, one for advanced collaboration.
-
-| Path | Best for | What it does |
-|---|---|---|
-| **AI API (default path)** | Anyone who wants tabs organized quickly | Connect DeepSeek or another model inside the Workspace; classify with your own query and intent, preview first, then apply |
-| **MCP Agent (optional, advanced)** | People continuing research, writing, or coding | Let MCP-capable Agents read context, add sources, write reports back, and propose task structure |
-
-It is built for researchers, product managers, developers, and anyone trapped beneath dozens of tabs they do not dare close.
+**These are not separate features bolted together. Saving is not the finish line, and an Agent is not the starting point. Every stage enriches the same Workspace so the next one never starts from zero.**
 
 <a id="features"></a>
-## 🧩 One context, three layers
+## 🧩 One context, four stages from page overload to task progress
 
-### 1️⃣ Tabs and Workspaces: save first, then clear the tab bar
+The first two stages form a complete local workflow: preserve the task, then make the thinking visible. The AI API is an optional enhancement; MCP Agent collaboration goes one step further.
+
+### 1️⃣ Tabs and Workspaces: stop using “leave it open” as a reminder
 
 Select the pages that belong to one task from the current Chrome window, then **collect, group, and save** them. Once saved, close the originals: the cards remain in the local Workspace and you can restore one card, a group, or the whole Workspace anytime.
 
-- Saving and closing are separate actions; closing a tab never deletes its card;
-- Multiple Workspaces, drag-and-drop groups, notes, deduplication, and Markdown / JSON export;
-- Already-open URLs are not duplicated on restore, and pinned tabs are never bulk-closed.
+Clearing the tab bar no longer means abandoning the task. It means moving the task out of browser noise and into a place designed to preserve it.
+
+Saving and closing are separate actions: closing a tab never deletes its card, restoring avoids already-open URLs, and pinned tabs are never bulk-closed. Multiple Workspaces, notes, drag-and-drop groups, and Markdown / JSON export remain available.
 
 <picture><img src="assets/tabnexus-before.png" alt="Before organizing: multiple open tabs waiting to be saved" /></picture>
 
-### 2️⃣ Task thinking: cards, relationships, and progress
+### 2️⃣ Task thinking: do not just arrange the tabs—make sense of the problem
 
-The **card board** is for grouping, notes, and moving items through “to read / read / adopted.” The **flow / relationship view** turns evidence, conclusions, dependencies, and next steps into a structure. Positions and links persist, so your thinking is where you left it.
+Saving pages is only the first step. The harder question is: **what does each page mean inside this task?**
 
-This is also the main AI API entry point. Ask for “market / product / tech / finance” or “problem → options → decision.” AI explains and previews the change; you decide whether to apply it. DeepSeek, OpenAI, Claude, Kimi, Qwen, and MiniMax are supported. Without a key, drag manually or use local domain grouping.
+- Use cards and groups to separate background, evidence, options, counterexamples, and conclusions—so every tab has a role;
+- Use the relationship view to expose support, contrast, dependencies, and next steps—and reveal where evidence is still missing;
+- Use **To read / Read / Adopted** to track progress instead of leaving everything at “later.”
+
+A conventional tab manager tells you where a page is stored. TabNexus helps you understand what that page contributes. When you reopen the Workspace, you recover more than pages: you return to **the exact point where your thinking stopped**.
 
 | Card board | Flow / relationship view |
 |---|---|
 | <picture><img src="assets/tabnexus-workspace.png" alt="TabNexus card workspace and current-tabs workbench" /></picture> | <picture><img src="assets/tabnexus-relationship-map.png" alt="TabNexus infinite relationship map and task structure" /></picture> |
 
-### 3️⃣ Agent collaboration: stop being the human API
+<a id="ai-api"></a>
+### 3️⃣ AI API: configure your model, then organize by intent
 
-When the task needs more research, new sources, or a report, an Agent can receive the already-organized groups, notes, relationships, and progress through the local MCP. No copying a dozen links; no driving the browser page by page.
+Domain grouping tells you where a page came from. It cannot tell you why you opened it. Once AI is configured, you can say:
+
+> “Organize this research as background, evidence, counterarguments, and conclusions.”
+
+Your selected model interprets the role each page plays, proposes groups, and can separately suggest relationship structure. The default workflow shows a preview first; you decide whether to apply it.
+
+> [!IMPORTANT]
+> **TabNexus uses local organization by default. To use AI organization, you must first choose a provider under Settings → Choose your organizing model, enter your own valid API key and model, and enable AI. Otherwise intent-aware AI organization is unavailable, the system stays in local mode, and no external model is called.**
+>
+> Without an API configuration, capture, save, restore, manual and local-domain grouping, cards, relationships, and progress all remain fully available.
+
+TabNexus currently supports DeepSeek, OpenAI, Claude, Kimi, Qwen, and MiniMax. We recommend clicking **Test connection**; success enables the model automatically. The default workflow remains **select tabs → describe intent → preview → apply**.
+
+<picture><img src="assets/tabnexus-ai-provider-setup.png" alt="Choose an AI provider, enter an API key, and test the connection in TabNexus" /></picture>
+
+<div align="center"><sub>Local mode is the default; configure and enable a model to use intent-aware AI organization.</sub></div>
+
+The AI API understands and organizes the Workspace; MCP exposes that Workspace to an Agent. They work independently, or as two stages of the same workflow.
+
+<a id="agent"></a>
+### 4️⃣ Agent collaboration: stop being the human API
+
+If saving, thinking, or AI organization is enough, your workflow can end at the previous stage. Invite an Agent only when the task needs more research, new sources, a report, or a coding workflow.
+
+Instead of copying a dozen links into a chat and explaining the background again—or asking Computer Use / Playwright to rediscover the browser page by page—one local MCP interface gives a supported Agent the organized groups, notes, relationships, and progress.
 
 Agents can search Workspaces, add pages or notes, update states and groups, propose relationship structure, and write reports back. Critical writes support version checks and activity logging; destructive actions such as close or delete require your approval.
+
+**You own the goal and the judgment. TabNexus carries the context. The Agent continues where you stopped.**
 
 | Connect common Agents | Review Agent reads and writes |
 |---|---|
@@ -117,10 +142,10 @@ Agents can search Workspaces, add pages or notes, update states and groups, prop
 
 1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v0.17.0/TabNexus-Chrome-v0.17.0.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
 2. **Save one task:** open TabNexus, select pages that belong together, and click **Save**. You can now close the original tabs.
-3. **Organize by intent:** drag manually, or add a model API key in Settings and ask the assistant to “classify by my research goal.”
+3. **Choose how to organize:** local organization is the default. For AI, first choose a model in Settings, enter your API key, enable it, and then describe your intent.
 4. **Keep moving:** track progress on the board or relationship view; restore a card, group, or entire Workspace when needed.
 
-That is the complete everyday workflow—**no Agent and no terminal required**.
+That is the complete everyday workflow—**no Agent and no terminal required.**
 
 <details>
 <summary><strong>Build from source</strong></summary>
@@ -139,10 +164,10 @@ Then load the generated <code>dist</code> directory at <code>chrome://extensions
 
 </details>
 
-<a id="agent"></a>
-## 🤖 Let an Agent take over when you need one
+<a id="agent-setup"></a>
+## 🔌 Connect an Agent (optional, advanced)
 
-The everyday workflow ends above. When research, writing, or coding needs to continue, open **Settings → Connect your Agents**. The local MCP exposes **17 focused tools** for Workspaces, cards, relationships, exports, and tab operations.
+Open **Settings → Connect your Agents**. The local MCP exposes **17 focused tools** for Workspaces, cards, relationships, exports, and tab operations.
 
 <details>
 <summary><strong>Supported clients and technical docs</strong></summary>
@@ -161,7 +186,7 @@ The everyday workflow ends above. When research, writing, or coding needs to con
 ## 🔒 Local first, with explicit boundaries
 
 - TabNexus has no account and no hosted cloud; Workspaces and model keys stay in Chrome local storage;
-- Only when you invoke AI does the minimum required card metadata go to the selected model provider; notes and model keys are never sent;
+- Only when you invoke AI do your instruction and the required task metadata go to the selected model provider; page bodies and card notes are not sent, and the API key is used only to authenticate that provider request;
 - MCP listens on <code>127.0.0.1</code> only and never exposes model keys to Agents;
 - No content scripts, <code>&lt;all_urls&gt;</code>, <code>webRequest</code>, download permission, or new-tab hijacking;
 - Destructive actions require explicit approval, and exports contain no credentials.
