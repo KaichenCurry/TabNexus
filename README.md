@@ -48,6 +48,8 @@ flowchart LR
 
 于是标签越开越多。你不敢关，不是因为每个页面都重要，而是担心关掉以后，连同当时的思路一起丢失。
 
+<picture><img src="docs/assets/tab-overload-hero.jpg" alt="大量浏览器标签与任务窗口堆积造成的多 Tab 焦虑" /></picture>
+
 **TabNexus 的出发点很简单：Tab 不是待处理的浏览器垃圾，而是任务上下文的原材料。**
 
 ### 为什么是现在？

@@ -48,6 +48,8 @@ The browser usually preserves only the strip in the middle. It remembers **what 
 
 Tabs keep accumulating. You are afraid to close them not because every page matters, but because the train of thought around them might disappear too.
 
+<picture><img src="assets/tab-overload-hero.jpg" alt="Tab overload anxiety caused by a browser full of tabs and stacked task windows" /></picture>
+
 **TabNexus starts from one idea: a tab is not browser clutter waiting to be filed. It is raw material for task context.**
 
 ### Why now?
