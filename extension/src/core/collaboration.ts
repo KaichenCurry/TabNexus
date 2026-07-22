@@ -254,7 +254,7 @@ export const COLLABORATION_TOOL_DEFINITIONS = [
         cardIds: { type: "array", maxItems: 100, items: { type: "string" } },
         deleteWorkspace: { type: "boolean" },
         confirm: { const: true },
-        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's explicit confirmation words, such as 我确认删除… or I confirm closing…." }
+        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's affirmative confirmation words, such as 我确认删除… or I confirm closing…. Negated or ambiguous wording is rejected." }
       },
       additionalProperties: false
     }
@@ -307,7 +307,7 @@ export const COLLABORATION_TOOL_DEFINITIONS = [
         operationId: { type: "string", maxLength: 120, pattern: "^[A-Za-z0-9._:-]+$" },
         recentIds: { type: "array", minItems: 1, maxItems: 30, items: { type: "string" } },
         confirm: { const: true },
-        confirmationText: { type: "string", minLength: 2, maxLength: 500 }
+        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's affirmative confirmation words; negated or ambiguous wording is rejected." }
       },
       additionalProperties: false
     }
@@ -348,7 +348,7 @@ export const COLLABORATION_TOOL_DEFINITIONS = [
         expectedRevision: { type: "string" },
         operationId: { type: "string", maxLength: 120, pattern: "^[A-Za-z0-9._:-]+$" },
         confirm: { const: true },
-        confirmationText: { type: "string", minLength: 2, maxLength: 500 }
+        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's affirmative confirmation words; negated or ambiguous wording is rejected." }
       },
       additionalProperties: false
     }
@@ -401,7 +401,7 @@ export const COLLABORATION_TOOL_DEFINITIONS = [
         expectedRevision: { type: "string" },
         operationId: { type: "string", maxLength: 120, pattern: "^[A-Za-z0-9._:-]+$" },
         confirm: { const: true },
-        confirmationText: { type: "string", minLength: 2, maxLength: 500 }
+        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's affirmative confirmation words; negated or ambiguous wording is rejected." }
       },
       allOf: [
         {

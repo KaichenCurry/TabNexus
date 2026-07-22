@@ -43,7 +43,7 @@ node scripts/test-mcp-capabilities.mjs --server agent/bridge/tabnexus-mcp.mjs --
 
 ## 第一次连接：只做 3 步
 
-1. 打开 TabNexus **设置 → 在你的 Agent 中使用 TabNexus**，选择第一个要连接的助手。需要时可以返回列表继续安装其他 Agent。
+1. 打开 TabNexus **设置 → 连接你常用的 Agent**，选择第一个要连接的助手。需要时可以返回列表继续安装其他 Agent。
 2. 点击页面里唯一的蓝色安装按钮：
    - **Codex**：点击“在 Codex 中安装”，Codex 打开后点“安装”。
    - **Claude Desktop**：下载安装包，双击后在 Claude 中点“安装”。
@@ -128,6 +128,8 @@ node scripts/test-mcp-capabilities.mjs --server agent/bridge/tabnexus-mcp.mjs --
 ### Cursor / VS Code / TRAE 找不到连接程序
 
 源码安装配置含有构建时的绝对项目路径。如果项目移动过，请重新运行 `pnpm build`、重新加载扩展，并回到 TabNexus 设置重新安装。未来的签名安装包会移除这项限制。
+
+如果从旧目录布局升级，Agent 配置仍可能指向已经移除的 `bridge/tabnexus-mcp.mjs`。在仓库新位置运行 `pnpm build`，回到设置重新安装对应 Agent，再运行 `pnpm bridge:audit` 检查是否仍有旧路径。
 
 ### 为什么扣子不能点击安装
 

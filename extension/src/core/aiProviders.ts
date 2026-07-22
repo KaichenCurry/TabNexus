@@ -67,7 +67,7 @@ export const AI_PROVIDERS: Record<AiProviderId, AiProviderDefinition> = {
     endpoint: "https://api.moonshot.cn/v1/chat/completions",
     protocol: "openai-compatible",
     defaultModel: "kimi-k2.6",
-    suggestedModels: ["kimi-k2.6", "kimi-k2-thinking"],
+    suggestedModels: ["kimi-k2.6", "kimi-k2.5"],
     keyPlaceholder: "sk-…",
     accent: "#202633"
   },
@@ -88,7 +88,7 @@ export const AI_PROVIDERS: Record<AiProviderId, AiProviderDefinition> = {
     name: "MiniMax",
     shortName: "MM",
     mark: "M",
-    endpoint: "https://api.minimaxi.com/v1/text/chatcompletion_v2",
+    endpoint: "https://api.minimaxi.com/v1/chat/completions",
     protocol: "openai-compatible",
     defaultModel: "MiniMax-M2.7",
     suggestedModels: ["MiniMax-M2.7", "MiniMax-M2.7-highspeed", "MiniMax-M2.5"],
@@ -96,6 +96,27 @@ export const AI_PROVIDERS: Record<AiProviderId, AiProviderDefinition> = {
     accent: "#1677ff"
   }
 };
+
+export function kimiSupportsDisabledThinking(model: string): boolean {
+  return /^kimi-k2\.(?:5|6)(?:$|-)/i.test(model.trim());
+}
+
+export function aiCompletionTokenBudget(provider: AiProviderId, model: string, requestedTokens: number): number {
+  if (provider === "minimax") return Math.max(1_024, requestedTokens);
+  if (provider === "kimi" && /^kimi-k2-thinking(?:$|-)/i.test(model.trim())) {
+    return Math.max(16_000, requestedTokens);
+  }
+  return requestedTokens;
+}
+
+export function aiRequestTimeoutMs(provider: AiProviderId, model: string, requestedTokens: number): number {
+  const budget = aiCompletionTokenBudget(provider, model, requestedTokens);
+  if (provider === "minimax") {
+    return Math.min(120_000, Math.max(45_000, Math.ceil((budget / 45) * 1_000) + 15_000));
+  }
+  if (provider === "kimi" && /^kimi-k2-thinking(?:$|-)/i.test(model.trim())) return 90_000;
+  return 25_000;
+}
 
 export function createDefaultAiProviderConfigs(): Record<AiProviderId, AiProviderConfig> {
   return Object.fromEntries(AI_PROVIDER_IDS.map((id) => [id, {

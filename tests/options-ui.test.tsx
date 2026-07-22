@@ -13,6 +13,8 @@ describe("settings UI", () => {
     expect(screen.getByText("未验证 · 本地模式")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "选择你的整理模型" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "连接你常用的 Agent" })).toBeInTheDocument();
+    expect(screen.getByText(/仅发送本次整理所需的任务元数据/)).toBeInTheDocument();
+    expect(screen.getByText(/不发送网页正文或卡片备注/)).toBeInTheDocument();
     expect(screen.getByText("选择要连接的应用")).toBeInTheDocument();
     expect(screen.getByText("6 个可用")).toBeInTheDocument();
     expect(screen.getByText("OpenAI")).toBeInTheDocument();
@@ -40,6 +42,7 @@ describe("settings UI", () => {
     fireEvent.change(input, { target: { value: "local-runtime-value" } });
     fireEvent.click(screen.getByRole("button", { name: "English" }));
     expect(await screen.findByRole("heading", { name: "Settings" })).toBeInTheDocument();
+    expect(screen.getByText(/page bodies and card notes are not/)).toBeInTheDocument();
     expect(screen.getByText(/not OS-level encrypted/)).toBeInTheDocument();
   });
 

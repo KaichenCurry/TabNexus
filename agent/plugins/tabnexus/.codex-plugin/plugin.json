@@ -1,6 +1,6 @@
 {
   "name": "tabnexus",
-  "version": "0.17.0+codex.20260722000000",
+  "version": "0.17.1+codex.20260722000000",
   "description": "Search, manage, and edit TabNexus workspaces and Chrome tabs from Codex.",
   "author": {
     "name": "TabNexus"

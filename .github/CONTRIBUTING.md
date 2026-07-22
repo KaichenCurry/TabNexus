@@ -13,10 +13,9 @@ For product ideas, experience feedback, or future improvements, email [currykche
 
 ## Local development
 
-Requirements: Node.js 22+ and pnpm 11.
+Requirements: Node.js 22.13+ and pnpm 11. If pnpm is not installed, first run `npm install --global pnpm@11.9.0`.
 
 ```bash
-corepack enable
 pnpm install
 pnpm dev
 ```

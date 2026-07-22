@@ -4,6 +4,19 @@ All notable changes to TabNexus will be documented here.
 
 ## [Unreleased]
 
+## [0.17.1] - 2026-07-22
+
+### Reliability and safety
+
+- Updated MiniMax and Kimi to their current chat-completion contracts and disabled unnecessary thinking for short structured requests where providers support it.
+- Hardened destructive Agent confirmations so negated or ambiguous phrases fail closed.
+- Corrected the AI metadata disclosure, documented the localhost process trust boundary, and fixed the Agent setup path from the portable package.
+- Added packaged-extension Chromium E2E coverage to CI and aligned the documented Node.js requirement with locked dependencies.
+
+### Validation
+
+- 189 automated tests, 8 packaged-extension browser scenarios, 17/17 MCP tools, and 36/36 deterministic capability checks.
+
 ### Documentation and repository experience
 
 - Made Chinese the primary project language with English as an optional guide.

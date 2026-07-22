@@ -428,7 +428,7 @@ export function OptionsApp() {
 
             <div className="provider-config-footer">
               <span>✓</span>
-              <p><strong>{text("只在你主动整理时调用", "Called only when you organize")}</strong>{text("仅发送卡片 ID、标题和 URL；密钥保存在本机扩展存储中，并非操作系统级加密。", "Only card IDs, titles, and URLs are sent; keys stay in local extension storage and are not OS-level encrypted.")}</p>
+              <p><strong>{text("只在你主动整理时调用", "Called only when you organize")}</strong>{text("仅发送本次整理所需的任务元数据（如 ID、标题、URL、类型、分组、进度和时间）；不发送网页正文或卡片备注。密钥保存在本机扩展存储中，并非操作系统级加密。", "Only task metadata required for this organization (such as IDs, titles, URLs, types, groups, progress, and timestamps) is sent; page bodies and card notes are not. Keys stay in local extension storage and are not OS-level encrypted.")}</p>
               <span className="provider-flow-hint">{text("选择标签 → 描述意图 → 预览 → 应用", "Select tabs → Describe intent → Preview → Apply")}</span>
             </div>
           </div>
@@ -555,7 +555,7 @@ export function OptionsApp() {
                     <span className="agent-card-kicker">{text("源码版连接", "SOURCE BUILD CONNECTION")}</span>
                     <strong>{text(`连接 ${selectedClient.name} 需要源码版`, `The source build is required for ${selectedClient.name}`)}</strong>
                     <p>{text("当前两分钟安装包已经可以完整管理 Chrome 标签；Agent 连接需要本机 MCP 文件，因此要从源码完成一次配置。", "The two-minute package already provides the full Chrome tab workspace. Agent setup needs the local MCP file, so it requires a one-time source setup.")}</p>
-                    <a className="button primary agent-install-button" href="https://github.com/KaichenCurry/TabNexus#连接-ai-agent" target="_blank" rel="noreferrer">{text("查看 Agent 安装", "View Agent setup")}</a>
+                    <a className="button primary agent-install-button" href="https://github.com/KaichenCurry/TabNexus#agent-setup" target="_blank" rel="noreferrer">{text("查看 Agent 安装", "View Agent setup")}</a>
                   </div>
                 </div>
               ) : selectedAgent === "coze" ? (

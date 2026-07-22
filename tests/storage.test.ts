@@ -51,6 +51,8 @@ describe("versioned local persistence", () => {
     expect(settings.deepSeekApiKey).toBe("runtime-only");
     expect(settings.deepSeekVerifiedAt).toBe("2026-07-21T00:00:00.000Z");
     expect(settings.workspaceView).toBe("board");
+    expect(settings.aiEnabled).toBe(false);
+    expect(settings.agentBridgeEnabled).toBe(false);
     expect(settings.aiProvider).toBe("deepseek");
     expect(settings.aiProviderConfigs.deepseek).toMatchObject({
       apiKey: "runtime-only",

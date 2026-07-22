@@ -1,5 +1,6 @@
 import { createId } from "./id";
 import { workspaceRevision } from "./collaboration";
+import { assertExplicitAgentConfirmation } from "./confirmation";
 import {
   createEmptyWorkspace,
   deleteCard,
@@ -241,10 +242,7 @@ export function deleteWorkspaceItems(
   locale: Locale,
   request: Extract<CollaborationToolRequest, { tool: "delete_workspace_items" }>
 ): { state: AppState; changed: boolean; result: Extract<CollaborationToolResult, { tool: "delete_workspace_items" }> } {
-  if (request.input.confirm !== true) throw new Error("delete_workspace_items requires confirm=true");
-  if (typeof request.input.confirmationText !== "string" || request.input.confirmationText.length > 500 || !/(?:我确认|确认|i\s+confirm|confirmed)/i.test(request.input.confirmationText.trim())) {
-    throw new Error("delete_workspace_items requires confirmationText copied from the user's explicit confirmation");
-  }
+  assertExplicitAgentConfirmation(request.input.confirm, request.input.confirmationText, "delete_workspace_items");
   const operationId = safeOperationId(request.input.operationId);
   const workspace = knownWorkspace(state, workspaceId);
   if (request.input.expectedRevision !== workspaceRevision(workspace)) {

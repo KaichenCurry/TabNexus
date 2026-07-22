@@ -248,7 +248,7 @@ const tools = [
         cardIds: cardIdList,
         deleteWorkspace: { type: "boolean", default: false },
         confirm: { const: true, description: "Set only when the latest user message explicitly confirms this exact deletion. Never infer confirmation from an imperative request." },
-        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's literal confirmation words. The extension rejects text without explicit confirmation language such as 我确认 or I confirm." }
+        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's literal affirmative confirmation words. Negated or ambiguous wording is rejected." }
       },
       additionalProperties: false
     },
@@ -308,7 +308,7 @@ const tools = [
         operationId: revisionFields.operationId,
         recentIds: { type: "array", minItems: 1, maxItems: 30, uniqueItems: true, items: { type: "string" } },
         confirm: { const: true, description: "Set only after literal, explicit confirmation in the latest user message." },
-        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's literal confirmation words." }
+        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's literal affirmative confirmation words. Negated or ambiguous wording is rejected." }
       },
       additionalProperties: false
     },
@@ -357,7 +357,7 @@ const tools = [
         scope: { type: "string", enum: ["explicit", "workbench_selection", "current_window"], default: "explicit" },
         expectedWorkbenchRevision: { type: "string", description: "Required when scope uses the workbench selection or current window; returned by read_tab_workbench." },
         saveBeforeClose: { type: "boolean", default: true }, groupId: { type: "string" }, confirm: { const: true, description: "Set only when the latest user message explicitly confirms closing these exact tabs. Never infer confirmation from an imperative request." },
-        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's literal confirmation words. The extension rejects text without explicit confirmation language such as 我确认 or I confirm." }
+        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's literal affirmative confirmation words. Negated or ambiguous wording is rejected." }
       },
       additionalProperties: false,
       anyOf: [
@@ -429,7 +429,7 @@ const tools = [
         expectedRevision: { type: "string" },
         operationId: revisionFields.operationId,
         confirm: { const: true, description: "Set only after literal, explicit confirmation in the latest user message." },
-        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's literal confirmation words." }
+        confirmationText: { type: "string", minLength: 2, maxLength: 500, description: "Copy the user's literal affirmative confirmation words. Negated or ambiguous wording is rejected." }
       },
       additionalProperties: false,
       allOf: [{ if: { properties: { action: { const: "clear" } } }, then: { required: ["expectedRevision", "operationId", "confirm", "confirmationText"] } }]
