@@ -64,9 +64,9 @@ describe("Claude Code plugin package", () => {
   it("uses the official marketplace and bundled MCP layout", () => {
     expect(claudeCodeMarketplace).toMatchObject({
       name: "tabnexus-local",
-      plugins: [expect.objectContaining({ name: "tabnexus", version: "0.17.1", source: "./agent/integrations/claude-code" })]
+      plugins: [expect.objectContaining({ name: "tabnexus", version: "1.0.2", source: "./agent/integrations/claude-code" })]
     });
-    expect(claudeCodePlugin).toMatchObject({ name: "tabnexus", version: "0.17.1" });
+    expect(claudeCodePlugin).toMatchObject({ name: "tabnexus", version: "1.0.2" });
     expect(claudeCodeMcp.mcpServers.tabnexus).toMatchObject({
       command: "node",
       args: ["${CLAUDE_PLUGIN_ROOT}/server/index.mjs"]

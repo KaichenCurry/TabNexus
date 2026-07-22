@@ -2,9 +2,10 @@
   "servers": {
     "tabnexus": {
       "type": "stdio",
-      "command": "node",
+      "command": "npx",
       "args": [
-        "<ABSOLUTE_PATH_TO_TABNEXUS>/agent/bridge/tabnexus-mcp.mjs"
+        "--yes",
+        "github:KaichenCurry/TabNexus#v1.0.2"
       ],
       "env": {
         "TABNEXUS_AGENT_NAME": "VS Code",

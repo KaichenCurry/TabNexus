@@ -3,8 +3,11 @@ import {
   AGENT_CLIENTS,
   MCP_BRIDGE_VERSION,
   MCP_TOOL_COUNT,
+  TABNEXUS_RELEASE_VERSION,
   createClaudeCodeInstallPrompts,
+  createCodexLauncherCommand,
   createCursorInstallUrl,
+  createReleaseServerSource,
   createStandardMcpConfig,
   createTraeInstallUrl,
   createVsCodeInstallUrl,
@@ -73,6 +76,23 @@ describe("Agent client adapters", () => {
 
     const traeConfig = JSON.parse(Buffer.from(new URL(traeUrl).searchParams.get("config") ?? "", "base64").toString("utf8"));
     expect(traeConfig).toMatchObject({ command: "node", args: [entry], env: { TABNEXUS_AGENT_NAME: "TRAE Work", TABNEXUS_MCP_VERSION: "0.8.0" } });
+  });
+
+  it("creates path-free, release-pinned installers for the portable package", () => {
+    const source = createReleaseServerSource();
+    const config = createStandardMcpConfig(source, "Portable Agent").mcpServers.tabnexus;
+    expect(TABNEXUS_RELEASE_VERSION).toBe("1.0.2");
+    expect(config).toMatchObject({
+      command: "npx",
+      args: ["--yes", "github:KaichenCurry/TabNexus#v1.0.2"],
+      env: { TABNEXUS_AGENT_NAME: "Portable Agent", TABNEXUS_MCP_VERSION: "0.8.0" }
+    });
+    expect(JSON.stringify(config)).not.toContain("/Users/");
+    expect(createCodexLauncherCommand()).toBe("npx --yes github:KaichenCurry/TabNexus#v1.0.2");
+
+    const cursorUrl = createCursorInstallUrl(source);
+    const cursorConfig = JSON.parse(Buffer.from(new URL(cursorUrl).searchParams.get("config") ?? "", "base64").toString("utf8"));
+    expect(cursorConfig).toMatchObject({ command: "npx", args: ["--yes", "github:KaichenCurry/TabNexus#v1.0.2"] });
   });
 
   it("installs Claude Code through its in-chat plugin marketplace", () => {

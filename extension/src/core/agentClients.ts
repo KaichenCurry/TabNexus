@@ -24,8 +24,15 @@ export type StdioMcpServer = {
   env: Record<string, string>;
 };
 
+export type AgentServerSource = string | {
+  kind: "release";
+  version: string;
+};
+
 export const MCP_BRIDGE_VERSION = "0.8.0" as const;
 export const MCP_TOOL_COUNT = 17 as const;
+export const TABNEXUS_RELEASE_VERSION = "1.0.2" as const;
+export const TABNEXUS_GITHUB_REPOSITORY = "KaichenCurry/TabNexus" as const;
 
 export const AGENT_CLIENTS: readonly AgentClientDefinition[] = [
   {
@@ -80,14 +87,19 @@ export const AGENT_CLIENTS: readonly AgentClientDefinition[] = [
 ] as const;
 
 export function createAgentServerConfig(
-  entryPath: string,
+  source: AgentServerSource,
   agentName: string,
   options: { includeType?: boolean } = {}
 ): StdioMcpServer {
+  const launcher = typeof source === "string"
+    ? { command: "node", args: [source] }
+    : {
+        command: "npx",
+        args: ["--yes", `github:${TABNEXUS_GITHUB_REPOSITORY}#v${source.version}`]
+      };
   return {
     ...(options.includeType ? { type: "stdio" as const } : {}),
-    command: "node",
-    args: [entryPath],
+    ...launcher,
     env: {
       TABNEXUS_AGENT_NAME: agentName,
       TABNEXUS_MCP_VERSION: MCP_BRIDGE_VERSION
@@ -95,18 +107,18 @@ export function createAgentServerConfig(
   };
 }
 
-export function createStandardMcpConfig(entryPath: string, agentName: string) {
+export function createStandardMcpConfig(source: AgentServerSource, agentName: string) {
   return {
     mcpServers: {
-      tabnexus: createAgentServerConfig(entryPath, agentName)
+      tabnexus: createAgentServerConfig(source, agentName)
     }
   };
 }
 
-export function createVsCodeMcpConfig(entryPath: string) {
+export function createVsCodeMcpConfig(source: AgentServerSource) {
   return {
     servers: {
-      tabnexus: createAgentServerConfig(entryPath, "VS Code", { includeType: true })
+      tabnexus: createAgentServerConfig(source, "VS Code", { includeType: true })
     }
   };
 }
@@ -118,22 +130,22 @@ function utf8Base64(value: string) {
   return globalThis.btoa(binary);
 }
 
-export function createCursorInstallUrl(entryPath: string) {
-  const config = JSON.stringify(createAgentServerConfig(entryPath, "Cursor"));
+export function createCursorInstallUrl(source: AgentServerSource) {
+  const config = JSON.stringify(createAgentServerConfig(source, "Cursor"));
   return `https://cursor.com/en/install-mcp?name=tabnexus&config=${encodeURIComponent(utf8Base64(config))}`;
 }
 
-export function createVsCodeInstallUrl(entryPath: string) {
+export function createVsCodeInstallUrl(source: AgentServerSource) {
   const config = JSON.stringify({
     name: "tabnexus",
-    ...createAgentServerConfig(entryPath, "VS Code", { includeType: true })
+    ...createAgentServerConfig(source, "VS Code", { includeType: true })
   });
   const installTarget = `vscode:mcp/install?${encodeURIComponent(config)}`;
   return `https://insiders.vscode.dev/redirect?url=${encodeURIComponent(installTarget)}`;
 }
 
-export function createTraeInstallUrl(entryPath: string) {
-  const config = JSON.stringify(createAgentServerConfig(entryPath, "TRAE Work"));
+export function createTraeInstallUrl(source: AgentServerSource) {
+  const config = JSON.stringify(createAgentServerConfig(source, "TRAE Work"));
   return `trae://trae.ai-ide/mcp-import?type=stdio&name=TabNexus&config=${encodeURIComponent(utf8Base64(config))}`;
 }
 
@@ -142,4 +154,12 @@ export function createClaudeCodeInstallPrompts(repositoryRoot: string) {
     `/plugin marketplace add ${repositoryRoot}`,
     "/plugin install tabnexus@tabnexus-local"
   ] as const;
+}
+
+export function createReleaseServerSource(version = TABNEXUS_RELEASE_VERSION): AgentServerSource {
+  return { kind: "release", version };
+}
+
+export function createCodexLauncherCommand(version = TABNEXUS_RELEASE_VERSION) {
+  return `npx --yes github:${TABNEXUS_GITHUB_REPOSITORY}#v${version}`;
 }

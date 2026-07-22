@@ -14,7 +14,6 @@ const codexIconPath = resolve(root, "agent", "plugins", "tabnexus", "assets", "i
 const claudeCodeServerPath = resolve(root, "agent", "integrations", "claude-code", "server", "index.mjs");
 const standardConfigPath = resolve(root, "extension", "public", "agent", "tabnexus-standard.mcp.json");
 const vsCodeConfigPath = resolve(root, "extension", "public", "agent", "tabnexus-vscode.mcp.json");
-const publicServerEntry = "<ABSOLUTE_PATH_TO_TABNEXUS>/agent/bridge/tabnexus-mcp.mjs";
 
 function crc32(buffer) {
   let crc = 0xffffffff;
@@ -82,10 +81,11 @@ function createStoredZip(entries) {
   return Buffer.concat([...localParts, centralDirectory, end]);
 }
 
-const [manifest, server, icon] = await Promise.all([
+const [manifest, server, icon, packageJson] = await Promise.all([
   readFile(resolve(root, "agent", "integrations", "claude", "manifest.json")),
   readFile(resolve(root, "agent", "bridge", "tabnexus-mcp.mjs")),
-  readFile(resolve(root, "extension", "public", "icons", "icon128.png"))
+  readFile(resolve(root, "extension", "public", "icons", "icon128.png")),
+  readFile(resolve(root, "package.json"), "utf8").then(JSON.parse)
 ]);
 const serverVersion = server.toString("utf8").match(/const SERVER_VERSION = "([^"]+)"/)?.[1];
 if (!serverVersion) throw new Error("Unable to read MCP server version from agent/bridge/tabnexus-mcp.mjs");
@@ -108,8 +108,8 @@ await copyFile(resolve(root, "extension", "public", "icons", "icon128.png"), cod
 await writeFile(standardConfigPath, `${JSON.stringify({
   mcpServers: {
     tabnexus: {
-      command: "node",
-      args: [publicServerEntry],
+      command: "npx",
+      args: ["--yes", `github:KaichenCurry/TabNexus#v${packageJson.version}`],
       env: { TABNEXUS_AGENT_NAME: "Agent IDE", TABNEXUS_MCP_VERSION: serverVersion }
     }
   }
@@ -118,8 +118,8 @@ await writeFile(vsCodeConfigPath, `${JSON.stringify({
   servers: {
     tabnexus: {
       type: "stdio",
-      command: "node",
-      args: [publicServerEntry],
+      command: "npx",
+      args: ["--yes", `github:KaichenCurry/TabNexus#v${packageJson.version}`],
       env: { TABNEXUS_AGENT_NAME: "VS Code", TABNEXUS_MCP_VERSION: serverVersion }
     }
   }
