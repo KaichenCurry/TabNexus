@@ -33,6 +33,8 @@
     "build": "node scripts/build-agent-packages.mjs && tsc -b && vite build --config config/vite.config.ts",
     "build:portable": "TABNEXUS_PORTABLE_BUILD=1 npm run build",
     "release:chrome": "npm run build:portable && node scripts/package-chrome-release.mjs",
+    "release:mcp": "node scripts/package-mcp-runtime.mjs",
+    "release:assets": "npm run release:chrome && npm run release:mcp",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run --config config/vite.config.ts",
     "test:watch": "vitest --config config/vite.config.ts",

@@ -368,7 +368,7 @@ test("uses the correct Agent path for source and portable builds", async () => {
     const cursorConfig = JSON.parse(Buffer.from(encodedConfig, "base64").toString("utf8"));
     expect(cursorConfig).toMatchObject({
       command: "npx",
-      args: ["--yes", "github:KaichenCurry/TabNexus#v1.0.2"]
+      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.2/tabnexus-mcp-runtime-1.0.2.tgz"]
     });
     expect(cursorHref).not.toContain("agent-setup");
     return;

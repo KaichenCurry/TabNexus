@@ -34,6 +34,10 @@ export const MCP_TOOL_COUNT = 17 as const;
 export const TABNEXUS_RELEASE_VERSION = "1.0.2" as const;
 export const TABNEXUS_GITHUB_REPOSITORY = "KaichenCurry/TabNexus" as const;
 
+export function createReleasePackageUrl(version: string = TABNEXUS_RELEASE_VERSION) {
+  return `https://github.com/${TABNEXUS_GITHUB_REPOSITORY}/releases/download/v${version}/tabnexus-mcp-runtime-${version}.tgz`;
+}
+
 export const AGENT_CLIENTS: readonly AgentClientDefinition[] = [
   {
     id: "codex",
@@ -95,7 +99,7 @@ export function createAgentServerConfig(
     ? { command: "node", args: [source] }
     : {
         command: "npx",
-        args: ["--yes", `github:${TABNEXUS_GITHUB_REPOSITORY}#v${source.version}`]
+        args: ["--yes", createReleasePackageUrl(source.version)]
       };
   return {
     ...(options.includeType ? { type: "stdio" as const } : {}),
@@ -156,10 +160,10 @@ export function createClaudeCodeInstallPrompts(repositoryRoot: string) {
   ] as const;
 }
 
-export function createReleaseServerSource(version = TABNEXUS_RELEASE_VERSION): AgentServerSource {
+export function createReleaseServerSource(version: string = TABNEXUS_RELEASE_VERSION): AgentServerSource {
   return { kind: "release", version };
 }
 
-export function createCodexLauncherCommand(version = TABNEXUS_RELEASE_VERSION) {
-  return `npx --yes github:${TABNEXUS_GITHUB_REPOSITORY}#v${version}`;
+export function createCodexLauncherCommand(version: string = TABNEXUS_RELEASE_VERSION) {
+  return `npx --yes ${createReleasePackageUrl(version)}`;
 }
