@@ -11,7 +11,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Chromium for extension tests
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Validate evaluation dataset
         run: pnpm eval:mcp:validate
 
@@ -37,5 +40,19 @@ jobs:
       - name: Check and build
         run: pnpm check
 
+      - name: Test source build in Chromium
+        run: pnpm exec playwright test --config config/playwright.config.ts
+
       - name: Build portable Chrome package
         run: pnpm release:chrome
+
+      - name: Verify and unpack portable Chrome package
+        run: |
+          unzip -t artifacts/release/TabNexus-Chrome-v*.zip
+          mkdir -p .playwright/portable
+          unzip -q artifacts/release/TabNexus-Chrome-v*.zip -d .playwright/portable
+
+      - name: Test the packaged extension in Chromium
+        env:
+          TABNEXUS_E2E_EXTENSION_PATH: ${{ github.workspace }}/.playwright/portable
+        run: pnpm exec playwright test --config config/playwright.config.ts

@@ -155,8 +155,85 @@ describe("MV3 background action", () => {
       "anthropic-version": "2023-06-01"
     });
     const body = JSON.parse(String(fetchMock.mock.calls[0][1]?.body));
-    expect(body).toMatchObject({ model: "claude-sonnet-5", max_tokens: 64 });
+    expect(body).toMatchObject({ model: "claude-sonnet-5", max_tokens: 64, thinking: { type: "disabled" } });
     expect(body).not.toHaveProperty("response_format");
+  });
+
+  it("uses current OpenAI-compatible provider contracts", async () => {
+    let messageHandler: ((request: unknown, sender: unknown, sendResponse: (response: unknown) => void) => boolean) | undefined;
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ choices: [{ message: { content: '{"ok":true}' } }] })
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("chrome", {
+      action: { onClicked: { addListener: vi.fn() } },
+      runtime: {
+        id: "extension-id",
+        getURL: (path: string) => `chrome-extension://extension-id/${path}`,
+        onInstalled: { addListener: vi.fn() },
+        onMessage: { addListener: (handler: typeof messageHandler) => { messageHandler = handler; } }
+      },
+      tabs: { query: vi.fn(), update: vi.fn(), create: vi.fn() },
+      windows: { update: vi.fn() },
+      storage: {
+        local: { setAccessLevel: vi.fn(async () => undefined) },
+        session: { setAccessLevel: vi.fn(async () => undefined) }
+      }
+    });
+    await import("../extension/src/background");
+    const validate = (provider: "kimi" | "minimax" | "openai" | "qwen", model: string) => new Promise<unknown>((resolve) => messageHandler?.({
+      type: "VALIDATE_KEY",
+      provider,
+      apiKey: "runtime-key",
+      model
+    }, {}, resolve));
+
+    await expect(validate("kimi", "kimi-k2.6")).resolves.toEqual({ ok: true, data: { model: "kimi-k2.6" } });
+    expect(fetchMock.mock.calls[0][0]).toBe("https://api.moonshot.cn/v1/chat/completions");
+    const kimiBody = JSON.parse(String(fetchMock.mock.calls[0][1]?.body));
+    expect(kimiBody).toMatchObject({
+      model: "kimi-k2.6",
+      max_completion_tokens: 64,
+      thinking: { type: "disabled" },
+      response_format: { type: "json_object" }
+    });
+    expect(kimiBody).not.toHaveProperty("max_tokens");
+
+    await expect(validate("minimax", "MiniMax-M2.7")).resolves.toEqual({ ok: true, data: { model: "MiniMax-M2.7" } });
+    expect(fetchMock.mock.calls[1][0]).toBe("https://api.minimaxi.com/v1/chat/completions");
+    const minimaxBody = JSON.parse(String(fetchMock.mock.calls[1][1]?.body));
+    expect(minimaxBody).toMatchObject({ model: "MiniMax-M2.7", max_completion_tokens: 1_024, reasoning_split: true });
+    expect(minimaxBody).not.toHaveProperty("max_tokens");
+    expect(minimaxBody).not.toHaveProperty("response_format");
+
+    await expect(validate("kimi", "kimi-k2-thinking")).resolves.toEqual({ ok: true, data: { model: "kimi-k2-thinking" } });
+    const kimiThinkingBody = JSON.parse(String(fetchMock.mock.calls[2][1]?.body));
+    expect(kimiThinkingBody).toMatchObject({ model: "kimi-k2-thinking", max_completion_tokens: 16_000 });
+    expect(kimiThinkingBody).not.toHaveProperty("thinking");
+
+    await expect(validate("openai", "gpt-5.6-luna")).resolves.toEqual({ ok: true, data: { model: "gpt-5.6-luna" } });
+    expect(fetchMock.mock.calls[3][0]).toBe("https://api.openai.com/v1/chat/completions");
+    const openAiBody = JSON.parse(String(fetchMock.mock.calls[3][1]?.body));
+    expect(openAiBody).toMatchObject({
+      model: "gpt-5.6-luna",
+      max_completion_tokens: 64,
+      reasoning_effort: "none",
+      response_format: { type: "json_object" }
+    });
+    expect(openAiBody).not.toHaveProperty("max_tokens");
+
+    await expect(validate("qwen", "qwen-plus")).resolves.toEqual({ ok: true, data: { model: "qwen-plus" } });
+    expect(fetchMock.mock.calls[4][0]).toBe("https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions");
+    const qwenBody = JSON.parse(String(fetchMock.mock.calls[4][1]?.body));
+    expect(qwenBody).toMatchObject({
+      model: "qwen-plus",
+      max_tokens: 64,
+      response_format: { type: "json_object" }
+    });
+    expect(qwenBody).not.toHaveProperty("max_completion_tokens");
+    expect(qwenBody).not.toHaveProperty("reasoning_effort");
   });
 
   it("routes trusted M3 Agent tools through the versioned workspace store", async () => {

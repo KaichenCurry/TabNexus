@@ -84,6 +84,7 @@ If an external Agent can classify well, the built-in provider remains optional. 
 
 - The MCP process binds only to `127.0.0.1:43119`; it is not reachable from the LAN or internet.
 - WebSocket upgrades accept Chrome extension origins and reject ordinary webpage origins.
+- The loopback transport is a trust boundary, not authentication between processes on the same computer. Connect only trusted local Agent clients and disconnect the bridge when it is not in use.
 - A requested workspace ID must already exist.
 - URL, group, card, and edge references are validated before any write.
 - Workspace/card deletion and browser-tab closing require explicit confirmation. Deleting a group safely returns its cards to the ungrouped area; pinned browser tabs are never closed.

@@ -19,7 +19,7 @@ Updated: 2026-07-22
 | Settings and key privacy | Complete | Masked field test, trusted storage access, restricted manifest hosts |
 | M0 clustering/review/score tools | Complete pending real samples | Synthetic fixture is runnable; 3–5 real sample sets remain external |
 | H2 paired export experiment | Complete pending human run | Both variants and evaluation CSV are generated |
-| Developer-mode dogfood build | Complete | 106 unit/integration tests, extension E2E scenarios, Codex/Claude Code package validation, bridge self-check, and production build pass |
+| Developer-mode dogfood build | Complete | 189 unit/integration tests, packaged-extension E2E scenarios, Codex/Claude Code package validation, bridge self-check, and production build pass |
 | Shared board/relationship views | Complete | Persisted view preference, group swimlanes, curved edges, zoom/auto-layout, same Workspace cards/groups/edges, 1440×900 visual QA |
 | Card reading progress | Complete | Three-state control in board and relationship nodes, persistence/UI tests |
 | Manual relationship editing | Complete | Node drag persistence, directed links, labels, deletion, reload E2E |
@@ -28,7 +28,7 @@ Updated: 2026-07-22
 | Recently closed unsaved buffer | Complete | Separate bounded storage, gray non-draggable rows, explicit reopen/dismiss actions |
 | Unified AI workspace + tab operator | Complete | Intent planner, exact workspace/rail scope, validated action preview, save-before-close, pinned/ID safety, workspace undo |
 | M3 Agent tool contracts | Phase 2.8 complete | 17 focused tools, four prompts, cross-workspace search, shared tab-workbench selection/control, browser synchronization, export/preferences/activity management, atomic workspace edits, and isolated guarded destructive tools |
-| M3 local MCP transport | Phase 2.9 complete (v0.17.0) | Multi-Agent local broker shares one Chrome connection across Codex, Cursor, Claude, VS Code, and TRAE; every adapter receives the same workbench, workspace, export, safe-preference, and activity operations with idempotency, stale-revision protection, installed-copy audits, and mixed-version detection |
+| M3 local MCP transport | Phase 2.9 complete (v0.17.1) | Multi-Agent local broker shares one Chrome connection across Codex, Cursor, Claude, VS Code, and TRAE; every adapter receives the same workbench, workspace, export, safe-preference, and activity operations with idempotency, stale-revision protection, installed-copy audits, and mixed-version detection |
 | M3 context continuity | Complete | Workspace/current-window/workbench resources, UI-synchronized selection and collapse state, compact/card-scoped reads, deterministic revisions, conditional reads, subscriptions, stale-write rejection, idempotent retry receipts, structured MCP outputs |
 | MCP automated capability test | Complete | One-command stdio/JSON-RPC run exercises 17/17 tools, four prompts, resources, shared workbench workflows, and destructive/stale-revision guards; writes JSON and Markdown reports |
 | Codex MCP evaluation harness | Complete locally | 600 unique labeled queries across 50 archetypes, isolated synthetic broker, exact 17-tool contract check, workbench-operation coverage, 100-point executable rubric, BO3 stability reports, and hard safety gates |

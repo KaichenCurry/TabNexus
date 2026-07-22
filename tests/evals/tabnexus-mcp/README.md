@@ -8,7 +8,7 @@ This directory contains the reproducible v1 evaluation dataset. Model-run traces
 - 12 controlled paraphrases per archetype: 8 Chinese and 4 English.
 - 360 high-frequency, 120 long-tail, and 120 safety cases.
 - 144 simple, 276 medium, and 180 complex cases.
-- Complete coverage of all 11 TabNexus MCP tools.
+- Complete coverage of all 17 TabNexus MCP tools.
 - Executable gold labels for tools, arguments, order, post-state, response behavior, and prohibited side effects.
 
 The JSONL labels are generated from the curated archetype bank in the runner. Do not edit repeated variants by hand. Change one archetype, regenerate, and review the diff.

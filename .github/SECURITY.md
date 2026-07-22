@@ -23,7 +23,8 @@ Do not include a real API key, private URL, browser title, exported workspace, o
 - Provider hosts are allowlisted in `extension/public/manifest.json`.
 - Workspaces and provider credentials are stored in `chrome.storage.local`. This is extension-local persistence, not operating-system-level encryption.
 - Provider keys are excluded from exports, fixtures, logs, Agent resources, and MCP tools.
-- The MCP bridge listens only on `127.0.0.1`, validates the extension connection, uses revision-safe writes, and requires explicit confirmation proof for destructive operations.
+- The MCP bridge listens only on `127.0.0.1`, rejects ordinary webpage origins, uses revision-safe writes, and requires explicit confirmation proof for destructive operations.
+- Enabling MCP grants configured processes on the same computer access to the allowed Workspace and tab tools while the extension is connected. Configure only trusted local Agent clients and disconnect the bridge when it is not in use; the loopback boundary is not a sandbox between local processes.
 - Pinned tabs cannot be closed through MCP.
 
 Changes to permissions, host access, credential handling, remote transport, or destructive Agent operations require security tests and reviewer attention.

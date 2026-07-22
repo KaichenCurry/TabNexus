@@ -322,10 +322,63 @@ function assertFresh(state, args, app = false) {
   if (app && args.expectedStateRevision && args.expectedStateRevision !== stateRevision(state)) throw new Error("App state changed; read the latest state revision and retry.");
 }
 
-function assertExplicitConfirmation(args) {
+function confirmationTerms(tool) {
+  if (tool === "close_browser_tabs") return /关闭|关掉|clos(?:e|es|ed|ing)/iu;
+  if (tool === "dismiss_recent_tabs") return /删除|移除|清除|delet(?:e|es|ed|ing|ion|ions)|remov(?:e|es|ed|ing|al|als)|clear(?:s|ed|ing)?|dismiss(?:es|ed|ing)?/iu;
+  if (tool === "manage_agent_activity") return /删除|移除|清空|清除|delet(?:e|es|ed|ing|ion|ions)|remov(?:e|es|ed|ing|al|als)|clear(?:s|ed|ing)?/iu;
+  return /删除|移除|清空|清除|delet(?:e|es|ed|ing|ion|ions)|remov(?:e|es|ed|ing|al|als)|clear(?:s|ed|ing)?/iu;
+}
+
+function assertExplicitConfirmation(args, tool) {
   if (args.confirm !== true) throw new Error("Explicit confirmation is required.");
-  if (typeof args.confirmationText !== "string" || !/(?:我确认|确认|i\s+confirm|confirmed)/i.test(args.confirmationText.trim())) {
+  if (typeof args.confirmationText !== "string" || args.confirmationText.length > 500) {
     throw new Error("confirmationText must copy the user's explicit confirmation.");
+  }
+  const text = args.confirmationText.trim();
+  const prefix = text.match(/^(?:我确认|本人确认|确认|i\s+(?:explicitly\s+)?confirm\b|confirmed\b)/i);
+  if (!prefix) throw new Error("confirmationText must copy the user's explicit confirmation.");
+  const remainder = text.slice(prefix[0].length);
+  const withdrawal = /\b(?:(?:cancel|abort|stop|revoke|undo)\s+(?:it|that|this|(?:(?:this|that|the)\s+)?(?:delet(?:e|ing|ion)|remov(?:e|ing|al)|clear(?:ing)?|clos(?:e|ing)|execut(?:e|ing|ion)|operation|request|action))|(?:do\s+not|don[’']t)\s+(?:proceed|do\s+(?:it|that|this))|never\s+mind|(?:revoke|withdraw)(?:\s+my)?\s+(?:confirmation|approval)|(?:i\s+)?(?:change|changed|have\s+changed)\s+my\s+mind|(?:take|taking|took)\s+(?:it|that)\s+back|(?:i\s+)?(?:take|took)\s+back\s+my\s+(?:confirmation|approval)|scratch\s+that|on\s+second\s+thought\s*[,;:]?\s*(?:do\s+not|don[’']t))\b|(?:\bbut\b|[,.;!?])\s*(?:actually\s+)?no\s*[.!?]*$|(?:\bbut\b|[,.;!?])\s*(?:(?:i|please|actually)\s+){0,2}(?:cancel|abort|stop|revoke|undo)(?:\s+(?:it|that|this|now|please))?\s*[.!?]*$|(?:取消|撤销|撤回|停止)(?:这个|该|这次|本次|我的)?(?:删除|移除|清空|清除|关闭|执行|操作|请求|确认|授权)|(?:但|但是|[，,;；。.!！？])\s*(?:我)?(?:取消|撤销|撤回|停止)(?:吧|了|操作)?\s*$|作废|算了|反悔|改变(?:了)?主意|收回(?:刚才|之前|我的)?(?:确认|同意|话)|(?:别|不要)(?:再)?(?:继续|执行|操作)(?:了)?/iu;
+  const missingAuthorization = /\bwithout\s+(?:(?:the|your|my)\s+)?(?:user\s+)?(?:authorization|approval|consent|permission|confirmation)\b|\b(?:it|this|that|the\s+(?:deletion|removal|clearing|closing|execution|operation|request|action))\s+(?:is|was)\s+(?:unauthori[sz]ed|unapproved)\b|(?:但|但是|[，,;；。.!！？])\s*(?:该|这个|本次|此)?(?:删除|操作|请求)?(?:是)?(?:未经(?:用户)?(?:授权|批准|同意|许可|确认)|未获(?:用户)?(?:授权|批准|同意|许可|确认))/iu;
+  if (withdrawal.test(remainder) || missingAuthorization.test(remainder)) {
+    throw new Error("confirmationText must be affirmative, not withdrawn.");
+  }
+  const target = remainder.match(confirmationTerms(tool));
+  if (!target || target.index === undefined) {
+    if (/^[\s，,:：;；。.!！？]*$/u.test(remainder)) return;
+    throw new Error("confirmationText must name the confirmed destructive action.");
+  }
+  const negativeBeforeTarget = /不|未|没|别|取消|拒绝|并非|无需|反对|除外|避免|跳过|\b(?:do\s+not|does\s+not|did\s+not|don't|doesn't|didn't|not|never|no|without|won't|wouldn't|shouldn't|mustn't|can't|cannot|isn't|aren't|wasn't|weren't|haven't|hasn't|against|except\s+for|avoid|skip|abstain|refrain|oppose|refuse|cancel|decline)\b/iu;
+  const negativeAfterTarget = /别|取消|拒绝|并非|无需|反对|避免|跳过|不(?:是|代表|意味|应|要|能|可|想|同意|授权|确认|打算|允许)|未(?:被)?(?:授权|确认|同意|允许)|没(?:有)?(?:授权|确认|同意|允许)|\b(?:do\s+not|does\s+not|did\s+not|don't|doesn't|didn't|not|never|no|none|nothing|won't|wouldn't|shouldn't|mustn't|can't|cannot|isn't|aren't|wasn't|weren't|haven't|hasn't|against|avoid|skip|abstain|refrain|oppose|refuse|cancel|decline|unauthori[sz]ed|unapproved)\b/iu;
+  const withoutBenignDescriptors = (value) => value.replace(/不(?:再)?需要(?:的)?(?:标签|页面|卡片|资料|记录)/gu, "");
+  const beforeTarget = withoutBenignDescriptors(remainder.slice(0, target.index));
+  const targetClause = withoutBenignDescriptors(remainder.slice(target.index + target[0].length).split(/[，,;；。.!！？]|\bbut\b|但是|但/iu, 1)[0]);
+  if (negativeBeforeTarget.test(beforeTarget) || negativeAfterTarget.test(targetClause)) {
+    throw new Error("confirmationText must be affirmative, not negated or ambiguous.");
+  }
+  const matchedTarget = target[0];
+  const sameAction = /关闭|关掉|clos/iu.test(matchedTarget)
+    ? /关闭|关掉|关(?:了|上)?|clos(?:e|es|ed|ing)/iu
+    : /清空|清除|clear/iu.test(matchedTarget)
+      ? /清空|清除|清掉|clear(?:s|ed|ing)?/iu
+      : /移除|remov/iu.test(matchedTarget)
+        ? /移除|挪走|remov(?:e|es|ed|ing|al|als)/iu
+        : /dismiss/iu.test(matchedTarget)
+          ? /删除|移除|清除|dismiss(?:es|ed|ing)?/iu
+          : /执行|execut|proceed/iu.test(matchedTarget)
+            ? /执行|继续|execut(?:e|es|ed|ing|ion)|proceed(?:s|ed|ing)?/iu
+            : /删除|删(?:掉|了)?|delet(?:e|es|ed|ing|ion|ions)/iu;
+  const laterClauses = remainder.slice(target.index + target[0].length).split(/[，,;；。.!！？]|\b(?:but|however)\b|但是|但|不过|可是/iu).slice(1);
+  const negativeLead = /\b(?:do\s+not|don[’']t|does\s+not|doesn[’']t|will\s+not|won[’']t|never|stop)\b|不要|别|不(?:再)?/iu;
+  const anaphoricNegative = /\b(?:do\s+not|don[’']t|does\s+not|doesn[’']t|will\s+not|won[’']t|never)\s+(?:delete|remove|clear|dismiss|close|execute|proceed)\b[^,.;!?]{0,40}\b(?:it|this|that|them|these|those)\b|(?:我\s*)?(?:不要|别|不(?:再)?)\s*(?:删除|删掉|删|移除|清空|清除|关闭|关掉|关)\s*(?:它|它们|这个|这些|那些|该(?:项|条|个)?|了)/iu;
+  const reversal = /\b(?:keep|retain|preserve)\s+(?:it|this|that|them|these|those)\b|\bleave\s+(?:it|this|that|them|these|those|(?:these|those|the)\s+(?:tabs?|pages?))\s+open\b|保留(?:它|它们|这个|这些|那些)|保持(?:它|它们|这个|这些|那些)?(?:打开|开启)/iu;
+  const directPinnedExclusion = /\b(?:do\s+not|don[’']t|never)\s+clos(?:e|ing)\s+(?:the\s+)?(?:pinned|fixed)\s+(?:tabs?|pages?)\b|固定(?:的)?(?:标签|页面)[^，,;；。.!！？]{0,20}(?:不要|别|不再)[^，,;；。.!！？]{0,10}关闭|(?:不要|别|不再)[^，,;；。.!！？]{0,10}关闭[^，,;；。.!！？]{0,20}固定(?:的)?(?:标签|页面)/iu;
+  if (laterClauses.some((clause) => (
+    anaphoricNegative.test(clause)
+    || reversal.test(clause)
+    || (negativeLead.test(clause) && sameAction.test(clause) && !directPinnedExclusion.test(clause))
+  ))) {
+    throw new Error("confirmationText must be affirmative, not withdrawn.");
   }
 }
 
@@ -420,7 +473,7 @@ export function executeMockTool(state, tool, rawArgs = {}) {
     bumpWorkbench(state);
     result = { tool, revision: workbenchRevision(state), workbench: workbenchContext(state), operationId: args.operationId };
   } else if (tool === "dismiss_recent_tabs") {
-    assertExplicitConfirmation(args);
+    assertExplicitConfirmation(args, tool);
     if (args.expectedRevision !== workbenchRevision(state)) throw new Error("Tab workbench changed; read and retry.");
     const available = new Set(state.recentlyClosed.map((item) => item.id));
     const dismissedRecentIds = (args.recentIds ?? []).filter((id) => available.has(id));
@@ -493,7 +546,7 @@ export function executeMockTool(state, tool, rawArgs = {}) {
     bump(state, true);
     result = { tool, revision: revision(state), stateRevision: stateRevision(state), operationId: args.operationId };
   } else if (tool === "delete_workspace_items") {
-    assertExplicitConfirmation(args);
+    assertExplicitConfirmation(args, tool);
     for (const id of args.cardIds ?? []) delete state.workspace.cards[id];
     for (const id of args.groupIds ?? []) delete state.workspace.groups[id];
     if (args.deleteWorkspace) state.workspaceIndex = state.workspaceIndex.filter((item) => item.id !== (args.workspaceId ?? state.activeWorkspaceId));
@@ -524,7 +577,7 @@ export function executeMockTool(state, tool, rawArgs = {}) {
     } else result = { tool, revision: revision(state), action: args.action, opened: args.cardIds?.length ?? 1, existing: 0, failed: 0, operationId: args.operationId };
     if (args.scope === "workbench_selection") { state.workbenchSelection = { tabIds: [], cardIds: [] }; bumpWorkbench(state); result.workbenchRevision = workbenchRevision(state); }
   } else if (tool === "close_browser_tabs") {
-    assertExplicitConfirmation(args);
+    assertExplicitConfirmation(args, tool);
     if (args.scope === "workbench_selection") {
       if (args.expectedWorkbenchRevision !== workbenchRevision(state)) throw new Error("Tab workbench changed; read and retry.");
       args.tabIds = clone(state.workbenchSelection.tabIds);
@@ -543,7 +596,7 @@ export function executeMockTool(state, tool, rawArgs = {}) {
     result = { tool, revision: preferencesRevision(state), changed: true, preferences: clone(state.preferences), operationId: args.operationId };
   } else if (tool === "manage_agent_activity") {
     if (args.action !== "clear") throw new Error("Unsupported activity action.");
-    assertExplicitConfirmation(args);
+    assertExplicitConfirmation(args, tool);
     if (args.expectedRevision !== activityRevision(state)) throw new Error("Agent activity changed; read and retry.");
     const cleared = state.activities.length;
     state.activities = [];

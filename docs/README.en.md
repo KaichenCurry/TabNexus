@@ -28,7 +28,7 @@
 <div align="center"><sub>Save pages as a Workspace with groups, notes, states, and relationships. Close the originals with confidence; restore them in one click.</sub></div>
 
 > [!IMPORTANT]
-> **v0.17.0 is a developer preview.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
+> **v0.17.1 is a developer preview.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
 
 <a id="why"></a>
 ## 😵 Your tab bar is not clutter. It is unfinished thinking you are afraid to lose.
@@ -140,22 +140,22 @@ Agents can search Workspaces, add pages or notes, update states and groups, prop
 <a id="start"></a>
 ## 🚀 Install in two minutes and organize your first task
 
-1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v0.17.0/TabNexus-Chrome-v0.17.0.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
+1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v0.17.1/TabNexus-Chrome-v0.17.1.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
 2. **Save one task:** open TabNexus, select pages that belong together, and click **Save**. You can now close the original tabs.
 3. **Choose how to organize:** local organization is the default. For AI, first choose a model in Settings, enter your API key, enable it, and then describe your intent.
 4. **Keep moving:** track progress on the board or relationship view; restore a card, group, or entire Workspace when needed.
 
 That is the complete everyday workflow—**no Agent and no terminal required.**
 
+<a id="source-build"></a>
 <details>
 <summary><strong>Build from source</strong></summary>
 
-Requires Node.js 22+ and pnpm 11.
+Requires Node.js 22.13+ and pnpm 11. If pnpm is not installed, run <code>npm install --global pnpm@11.9.0</code> first.
 
 ~~~bash
 git clone https://github.com/KaichenCurry/TabNexus.git
 cd TabNexus
-corepack enable
 pnpm install --frozen-lockfile
 pnpm build
 ~~~
@@ -169,13 +169,16 @@ Then load the generated <code>dist</code> directory at <code>chrome://extensions
 
 Open **Settings → Connect your Agents**. The local MCP exposes **17 focused tools** for Workspaces, cards, relationships, exports, and tab operations.
 
+**Install boundary:** the two-minute package includes the complete Workspace, and Claude Desktop can also download its bundled MCPB directly. Codex, Claude Code, Cursor, VS Code, and TRAE currently require the [source build](#source-build): load <code>dist</code>, then return to Settings and choose that Agent.
+
 <details>
 <summary><strong>Supported clients and technical docs</strong></summary>
 
 | Client | Status | Setup |
 |---|:---:|---|
-| Codex | ✅ | Repository plugin package |
-| Claude Desktop / Claude Code | ✅ | MCPB / Marketplace plugin |
+| Codex | ✅ | Source-build repository plugin |
+| Claude Desktop | ✅ | MCPB bundled in the two-minute package |
+| Claude Code | ✅ | Source-build Marketplace plugin |
 | Cursor / VS Code / TRAE | ✅ | Local MCP configuration |
 | Coze | Planned | Authenticated remote MCP gateway |
 
@@ -187,7 +190,7 @@ Open **Settings → Connect your Agents**. The local MCP exposes **17 focused to
 
 - TabNexus has no account and no hosted cloud; Workspaces and model keys stay in Chrome local storage;
 - Only when you invoke AI do your instruction and the required task metadata go to the selected model provider; page bodies and card notes are not sent, and the API key is used only to authenticate that provider request;
-- MCP listens on <code>127.0.0.1</code> only and never exposes model keys to Agents;
+- MCP listens on <code>127.0.0.1</code> only and never exposes model keys to Agents; connect only trusted local Agents and disconnect it in Settings when unused;
 - No content scripts, <code>&lt;all_urls&gt;</code>, <code>webRequest</code>, download permission, or new-tab hijacking;
 - Destructive actions require explicit approval, and exports contain no credentials.
 
@@ -195,7 +198,7 @@ For security issues, read the [security policy](../.github/SECURITY.md) and use 
 
 ## 🛠️ Shipped and next
 
-**Shipped in v0.17.0:** multi-Workspace collect / save / restore, intent-driven multi-model AI classification with editable previews, a persistent relationship canvas, a 17-tool local MCP, and a bilingual UI. The automated baseline is 106 tests, 17/17 MCP tools, and 36/36 deterministic capability checks.
+**Shipped in v0.17.1:** multi-Workspace collect / save / restore, intent-driven multi-model AI classification with editable previews, a persistent relationship canvas, a 17-tool local MCP, and a bilingual UI. The automated baseline is 189 tests, 17/17 MCP tools, and 36/36 deterministic capability checks.
 
 **Next:** Chrome Web Store distribution, an authenticated remote MCP for cloud Agents, accessibility, and large-Workspace performance. See [implementation status](IMPLEMENTATION_STATUS.md) and the [PRD](product/PRD.md).
 

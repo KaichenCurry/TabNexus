@@ -17,8 +17,9 @@ import {
   saveTabWorkbenchSelection
 } from "./core/storage";
 import { buildAgentPlanPrompt } from "./core/agent";
-import { AI_PROVIDERS } from "./core/aiProviders";
+import { AI_PROVIDERS, aiCompletionTokenBudget, aiRequestTimeoutMs, kimiSupportsDisabledThinking } from "./core/aiProviders";
 import { agentPreferencesRevision, applyAgentPreferencePatch, safeAgentPreferences } from "./core/appPreferences";
+import { assertExplicitAgentConfirmation } from "./core/confirmation";
 import { exportWorkspaceJson, exportWorkspaceMarkdown, safeExportFilename } from "./core/export";
 import { buildGroupingPrompt } from "./core/groupingPrompt";
 import { isSupportedUrl, normalizeUrl } from "./core/url";
@@ -43,7 +44,6 @@ import type {
   Workspace
 } from "./core/types";
 
-const REQUEST_TIMEOUT_MS = 25_000;
 const RETRY_DELAY_MS = 750;
 const AGENT_BRIDGE_ENDPOINT = "ws://127.0.0.1:43119/tabnexus" as const;
 
@@ -78,9 +78,9 @@ async function openWorkspace(): Promise<void> {
   await chrome.tabs.create({ url, active: true });
 }
 
-async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await fetch(url, { ...init, signal: controller.signal });
   } catch (error) {
@@ -98,11 +98,11 @@ function retryableStatus(status: number): boolean {
   return status === 408 || status === 429 || status >= 500;
 }
 
-async function requestWithRetry(url: string, init: RequestInit): Promise<Response> {
+async function requestWithRetry(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
   let lastError: unknown;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      const response = await fetchWithTimeout(url, init);
+      const response = await fetchWithTimeout(url, init, timeoutMs);
       if (response.ok || !retryableStatus(response.status) || attempt === 1) return response;
     } catch (error) {
       lastError = error;
@@ -170,6 +170,7 @@ async function requestJsonCompletion(
   const provider = AI_PROVIDERS[request.provider];
   if (!provider) return { ok: false, code: "invalid_request", error: "Unsupported AI provider" };
   const isAnthropic = provider.protocol === "anthropic";
+  const completionTokens = aiCompletionTokenBudget(request.provider, request.model, maxTokens);
   const headers: HeadersInit = isAnthropic
     ? {
         "x-api-key": request.apiKey.trim(),
@@ -183,18 +184,32 @@ async function requestJsonCompletion(
       { role: "system", content: system },
       { role: "user", content: user }
     ],
-    response_format: { type: "json_object" },
     stream: false
   };
-  if (request.provider === "openai") openAiBody.max_completion_tokens = maxTokens;
-  else openAiBody.max_tokens = maxTokens;
-  if (request.provider === "deepseek") openAiBody.thinking = { type: "disabled" };
+  if (request.provider !== "minimax") openAiBody.response_format = { type: "json_object" };
+  if (request.provider === "openai" || request.provider === "kimi") {
+    openAiBody.max_completion_tokens = completionTokens;
+  } else if (request.provider === "minimax") {
+    openAiBody.max_completion_tokens = completionTokens;
+    openAiBody.reasoning_split = true;
+  } else {
+    openAiBody.max_tokens = completionTokens;
+  }
+  if (request.provider === "deepseek" || (request.provider === "kimi" && kimiSupportsDisabledThinking(request.model))) {
+    openAiBody.thinking = { type: "disabled" };
+  }
+  if (request.provider === "openai" && /^gpt-5\.6(?:$|-)/i.test(request.model.trim())) {
+    // These are short, structured workspace operations. GPT-5.6 otherwise defaults
+    // to medium reasoning, which can consume a small validation response budget.
+    openAiBody.reasoning_effort = "none";
+  }
   const body = isAnthropic
     ? {
         model: request.model,
-        max_tokens: maxTokens,
+        max_tokens: completionTokens,
         system,
-        messages: [{ role: "user", content: user }]
+        messages: [{ role: "user", content: user }],
+        ...(request.model.startsWith("claude-sonnet-5") ? { thinking: { type: "disabled" } } : {})
       }
     : openAiBody;
   try {
@@ -202,7 +217,7 @@ async function requestJsonCompletion(
       method: "POST",
       headers,
       body: JSON.stringify(body)
-    });
+    }, aiRequestTimeoutMs(request.provider, request.model, maxTokens));
     if (!response.ok) return await failureFromResponse(response, provider.name);
     const payload = await response.json() as {
       choices?: Array<{ message?: { content?: string | null } }>;
@@ -551,13 +566,6 @@ function assertAgentRevision(workspace: Workspace, revision: string): void {
 function assertAgentOperationId(value: string): string {
   if (!/^[A-Za-z0-9._:-]{1,120}$/.test(value)) throw new Error("operationId must use 1-120 safe characters");
   return value;
-}
-
-function assertExplicitAgentConfirmation(confirm: unknown, confirmationText: unknown, action: string): void {
-  if (confirm !== true) throw new Error(`${action} requires confirm=true`);
-  if (typeof confirmationText !== "string" || confirmationText.length > 500 || !/(?:我确认|确认|i\s+confirm|confirmed)/i.test(confirmationText.trim())) {
-    throw new Error(`${action} requires confirmationText copied from the user's explicit confirmation`);
-  }
 }
 
 function chromeTabToOpenTab(tab: chrome.tabs.Tab): OpenTab | undefined {

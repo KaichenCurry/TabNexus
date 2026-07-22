@@ -8,10 +8,14 @@ import { createInterface } from "node:readline";
 let context: BrowserContext;
 let extensionPath: string;
 const E2E_BRIDGE_PORT = 43243;
+const PACKAGED_EXTENSION_UNDER_TEST = Boolean(process.env.TABNEXUS_E2E_EXTENSION_PATH);
 
 test.beforeAll(async () => {
   extensionPath = await mkdtemp(resolve(tmpdir(), "tabnexus-e2e-extension-"));
-  await cp(resolve("dist"), extensionPath, { recursive: true });
+  const sourceExtensionPath = process.env.TABNEXUS_E2E_EXTENSION_PATH
+    ? resolve(process.env.TABNEXUS_E2E_EXTENSION_PATH)
+    : resolve("dist");
+  await cp(sourceExtensionPath, extensionPath, { recursive: true });
   const backgroundPath = resolve(extensionPath, "background.js");
   const background = await readFile(backgroundPath, "utf8");
   await writeFile(backgroundPath, background.replaceAll("ws://127.0.0.1:43119/tabnexus", `ws://127.0.0.1:${E2E_BRIDGE_PORT}/tabnexus`));
@@ -345,7 +349,21 @@ test("M3 Agent write-back appears live in the workspace and activity review", as
   await expect(workspace.locator(".flow-edge-label")).toHaveCount(1);
 });
 
-test("Codex and Cursor share the real extension connection without Native Messaging", async () => {
+test("uses the correct Agent path for source and portable builds", async () => {
+  if (PACKAGED_EXTENSION_UNDER_TEST) {
+    const id = await extensionId();
+    const settings = await context.newPage();
+    await settings.goto(`chrome-extension://${id}/options.html`);
+    await expect(settings.getByText("两分钟安装包已可直接使用工作区")).toBeVisible();
+    await settings.getByRole("button", { name: /Codex/ }).click();
+    await expect(settings.getByText("连接 Codex 需要源码版")).toBeVisible();
+    await expect(settings.getByRole("link", { name: "查看 Agent 安装" })).toHaveAttribute(
+      "href",
+      "https://github.com/KaichenCurry/TabNexus#agent-setup"
+    );
+    return;
+  }
+
   const codexMcp = spawn(process.execPath, [resolve("agent/bridge/tabnexus-mcp.mjs")], {
     env: { ...process.env, TABNEXUS_AGENT_NAME: "Codex", TABNEXUS_BRIDGE_PORT: String(E2E_BRIDGE_PORT) },
     stdio: ["pipe", "pipe", "pipe"]
