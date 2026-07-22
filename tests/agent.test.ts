@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createAgentCommandRequest, validateAgentPlan } from "../src/core/agent";
-import type { Card, OpenTab, Workspace } from "../src/core/types";
+import { createAgentCommandRequest, validateAgentPlan } from "../extension/src/core/agent";
+import type { Card, OpenTab, Workspace } from "../extension/src/core/types";
 
 const workspace: Workspace = {
   id: "ws",

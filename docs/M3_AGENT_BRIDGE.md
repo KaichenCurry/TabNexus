@@ -63,7 +63,7 @@ flowchart LR
 
 The server also exposes `organize_workspace`, `capture_tabs`, `operate_tab_workbench`, and `workspace_audit` prompts, plus versioned workspace and workbench resources.
 
-JSON-schema-compatible definitions live in `src/core/collaboration.ts` as `COLLABORATION_TOOL_DEFINITIONS`. The MCP-facing definitions also include `outputSchema` and read-only/destructive/idempotency annotations.
+JSON-schema-compatible definitions live in `extension/src/core/collaboration.ts` as `COLLABORATION_TOOL_DEFINITIONS`. The MCP-facing definitions also include `outputSchema` and read-only/destructive/idempotency annotations.
 
 ## DeepSeek and MCP Agent responsibilities
 
@@ -100,10 +100,10 @@ If an external Agent can classify well, the built-in provider remains optional. 
 - `agent/integrations/claude/manifest.json`: self-contained Claude Desktop MCPB metadata.
 - `agent/integrations/claude-code/`: Claude Code plugin with a bundled MCP definition.
 - `agent/plugins/tabnexus/`: Codex marketplace plugin with the same bundled MCP server.
-- `src/core/agentClients.ts`: shared adapter definitions and official Cursor, VS Code, and TRAE install-link generation.
+- `extension/src/core/agentClients.ts`: shared adapter definitions and official Cursor, VS Code, and TRAE install-link generation.
 - `scripts/build-agent-packages.mjs`: reproducible dependency-free MCPB packager.
-- `src/background.ts`: Agent connection manager, WebSocket keepalive, tool execution, persistence, and activity logging.
-- `src/workspace/WorkspaceModals.tsx`: live Agent activity and relationship-proposal review.
+- `extension/src/background.ts`: Agent connection manager, WebSocket keepalive, tool execution, persistence, and activity logging.
+- `extension/src/workspace/WorkspaceModals.tsx`: live Agent activity and relationship-proposal review.
 
 ## Remaining M3 hardening
 

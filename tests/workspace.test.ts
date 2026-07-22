@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OpenTab } from "../src/core/types";
+import type { OpenTab } from "../extension/src/core/types";
 import {
   addManualCard,
   addWorkspace,
@@ -13,7 +13,7 @@ import {
   updateCardFlows,
   updateCardStatus,
   upsertEdge
-} from "../src/core/workspace";
+} from "../extension/src/core/workspace";
 
 function tab(id: number, url: string, pinned = false): OpenTab {
   return { id, windowId: 1, title: `Tab ${id}`, url, pinned, active: false, supported: true };

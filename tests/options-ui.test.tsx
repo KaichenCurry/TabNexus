@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { OptionsApp } from "../src/options/OptionsApp";
+import { OptionsApp } from "../extension/src/options/OptionsApp";
 
 describe("settings UI", () => {
   beforeEach(() => localStorage.clear());

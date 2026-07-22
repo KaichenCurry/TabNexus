@@ -200,9 +200,9 @@ async function inspectBundle(path, port) {
 
 const projectEntries = [
   { client: "Shared development entry", path: join(root, "agent", "bridge", "tabnexus-mcp.mjs"), installed: true },
-  { client: "Codex package", path: join(root, "plugins", "tabnexus", "server", "index.mjs"), installed: true },
-  { client: "Claude Desktop package", path: join(root, "public", "agent", "tabnexus-claude.mcpb"), installed: true, bundle: true },
-  { client: "Claude Code package", path: join(root, "integrations", "claude-code", "server", "index.mjs"), installed: true },
+  { client: "Codex package", path: join(root, "agent", "plugins", "tabnexus", "server", "index.mjs"), installed: true },
+  { client: "Claude Desktop package", path: join(root, "extension", "public", "agent", "tabnexus-claude.mcpb"), installed: true, bundle: true },
+  { client: "Claude Code package", path: join(root, "agent", "integrations", "claude-code", "server", "index.mjs"), installed: true },
   { client: "Cursor adapter", path: join(root, "agent", "bridge", "tabnexus-mcp.mjs"), installed: true },
   { client: "VS Code adapter", path: join(root, "agent", "bridge", "tabnexus-mcp.mjs"), installed: true },
   { client: "TRAE adapter", path: join(root, "agent", "bridge", "tabnexus-mcp.mjs"), installed: true }

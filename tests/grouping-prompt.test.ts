@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildGroupingPrompt } from "../src/core/groupingPrompt";
-import type { GroupingRequest } from "../src/core/types";
+import { buildGroupingPrompt } from "../extension/src/core/groupingPrompt";
+import type { GroupingRequest } from "../extension/src/core/types";
 
 const base: GroupingRequest = {
   locale: "zh",

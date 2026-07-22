@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createWorkspaceExport, exportWorkspaceJson, exportWorkspaceMarkdown, safeExportFilename } from "../src/core/export";
-import { collectTabs, createGroup, createInitialAppState } from "../src/core/workspace";
+import { createWorkspaceExport, exportWorkspaceJson, exportWorkspaceMarkdown, safeExportFilename } from "../extension/src/core/export";
+import { collectTabs, createGroup, createInitialAppState } from "../extension/src/core/workspace";
 
 function workspaceFixture() {
   const state = createInitialAppState("en");

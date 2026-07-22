@@ -10,8 +10,8 @@ import {
   saveAgentActivity,
   saveRecentlyClosed,
   saveTabWorkbenchSelection
-} from "../src/core/storage";
-import { createInitialAppState } from "../src/core/workspace";
+} from "../extension/src/core/storage";
+import { createInitialAppState } from "../extension/src/core/workspace";
 
 describe("versioned local persistence", () => {
   beforeEach(() => localStorage.clear());

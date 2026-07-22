@@ -20,7 +20,7 @@ Do not include a real API key, private URL, browser title, exported workspace, o
 ## Security model
 
 - The MV3 extension uses `tabs`, `storage`, and `clipboardWrite`; it has no content scripts, `<all_urls>`, `webRequest`, `downloads`, or new-tab override.
-- Provider hosts are allowlisted in `public/manifest.json`.
+- Provider hosts are allowlisted in `extension/public/manifest.json`.
 - Workspaces and provider credentials are stored in `chrome.storage.local`. This is extension-local persistence, not operating-system-level encryption.
 - Provider keys are excluded from exports, fixtures, logs, Agent resources, and MCP tools.
 - The MCP bridge listens only on `127.0.0.1`, validates the extension connection, uses revision-safe writes, and requires explicit confirmation proof for destructive operations.

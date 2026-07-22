@@ -1,255 +1,196 @@
 <div align="center">
-  <img src="public/icons/icon128.png" width="88" alt="TabNexus 图标" />
+  <img src="extension/public/icons/icon128.png" width="88" alt="TabNexus 图标" />
   <h1>TabNexus</h1>
-  <p><strong>把散落的浏览器标签，变成可保存、可理解、可继续、可交给 AI Agent 的任务上下文。</strong></p>
-  <p>一个本地优先的 Chrome 任务工作台，为那些用浏览器思考、调研和推进工作的人而做。</p>
+  <p><strong>你开的不是标签页，是一件还没做完的事。<br/>TabNexus 把散乱 Tabs 变成你和 AI 都能接着用的任务上下文。</strong></p>
+  <p>本地优先的 Chrome 扩展 · AI API 按意图整理 · 可选 MCP Agent 协作</p>
 
   <p>
-    <a href="#why">为什么是 TabNexus</a> ·
-    <a href="#product">产品能力</a> ·
-    <a href="#start">两分钟开始</a> ·
-    <a href="#agent">Agent 进阶协作</a> ·
+    <a href="#why">为什么</a> ·
+    <a href="#what">它是什么</a> ·
+    <a href="#features">核心能力</a> ·
+    <a href="#start">两分钟上手</a> ·
+    <a href="#agent">连接 Agent</a> ·
     <a href="docs/README.en.md">English</a>
   </p>
 
   <p>
     <img alt="Chrome MV3" src="https://img.shields.io/badge/Chrome-Manifest_V3-4285F4?logo=googlechrome&logoColor=white" />
-    <img alt="本地优先" src="https://img.shields.io/badge/数据-本地优先-2F855A" />
+    <img alt="Workspace 本地存储" src="https://img.shields.io/badge/Workspace-local_storage-2F855A" />
     <img alt="MCP 工具" src="https://img.shields.io/badge/MCP-17_tools-6750D8" />
     <img alt="CI" src="https://github.com/KaichenCurry/TabNexus/actions/workflows/ci.yml/badge.svg" />
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-20232A" />
   </p>
 </div>
 
-<picture><img src="docs/assets/tabnexus-after.png" alt="TabNexus 工作区：标签被整理为可继续推进的任务上下文" /></picture>
+<picture><img src="docs/assets/tabnexus-after.png" alt="TabNexus 将标签整理为可继续推进的任务上下文" /></picture>
 
-<div align="center"><sub>同一批网页，被保存为带分组、状态和关系的 Workspace；原标签可以放心关闭，需要时随时恢复。</sub></div>
+<div align="center"><sub>把网页保存成带分组、备注、状态和关系的 Workspace。原标签放心关掉，需要时一键恢复。</sub></div>
 
 > [!IMPORTANT]
-> **当前为 v0.17.0 开发者预览版。** 已提供可直接加载的 Chrome 安装包；Chrome Web Store 版本尚未发布。
+> **当前为 v0.17.0 开发者预览版。** 已提供可直接加载的 Chrome 安装包，Chrome Web Store 版本尚未发布。→ [两分钟上手](#start)
 
 <a id="why"></a>
-## 你打开的不是 Tab，而是一项还没做完的任务
+## 😵 你不敢关的不是 Tab，而是没做完的任务
 
-假设你正在调研一家公司。你会先有一个目标，然后打开产品页、行业报告、竞品资料、技术博客和用户讨论，最后形成判断或报告。
+上一次打开 20 个标签页时，你大概不是在闲逛，而是在**调研一家公司、比较几个方案，或排查一个 Bug**。每张网页都是同一个目标的参考：
 
-```mermaid
+~~~mermaid
 flowchart LR
-    Intent["意图<br/>调研一家公司"] --> Tabs["资料<br/>十几个浏览器标签"]
-    Tabs --> Context["上下文<br/>分组 · 备注 · 关系 · 进度"]
-    Context --> Output["产出<br/>判断 · 报告 · 下一步"]
-```
+    Intent["🎯 意图<br/>调研一家公司"] --> Tabs["📑 Tabs<br/>产品 · 财报 · 竞品 · 评论"]
+    Tabs --> Context["🧠 上下文<br/>证据 · 备注 · 关系 · 进度"]
+    Context --> Output["✅ 产出<br/>判断 · 报告 · 决策"]
+~~~
 
-但浏览器通常只保留了中间那排标签。它记得**你打开了什么**，却不知道：
+浏览器记得你打开了什么，却不知道你为什么打开、哪些是证据、任务进行到哪一步。你怕的不是丢掉 URL，而是**连当时的思路一起丢掉**。
 
-- 为什么打开它们，它们共同服务于哪个目标；
-- 哪些是证据、竞品、结论或待办，彼此有什么关系；
-- 任务做到了哪里，下次回来应该从哪里继续。
+<picture><img src="docs/assets/tab-overload-hero.jpg" alt="大量浏览器标签堆积造成的多 Tab 焦虑" /></picture>
 
-于是标签越开越多。你不敢关，不是因为每个页面都重要，而是担心关掉以后，连同当时的思路一起丢失。
+Toby、OneTab、Workona 等传统 Tab 工具验证了保存与分组的需求，但仍很难保留任务意图、关系和进度。到了 AI 时代，标签更多了；想把资料交给 AI，你还要逐条复制链接、重讲背景，或让 Computer Use / Playwright 逐页操作——在这类上下文传递中通常更慢，也会消耗更多 token。
 
-<picture><img src="docs/assets/tab-overload-hero.jpg" alt="大量浏览器标签与任务窗口堆积造成的多 Tab 焦虑" /></picture>
+**TabNexus 的出发点只有一句：别再把 Tab 当 Tab 管，把它当任务上下文。**
 
-**TabNexus 的出发点很简单：Tab 不是待处理的浏览器垃圾，而是任务上下文的原材料。**
+<a id="what"></a>
+## ✨ TabNexus：把 Tabs 变成可继续的任务上下文
 
-### 为什么是现在？
+TabNexus 是一个 Chrome 扩展。它把一次散乱的浏览器会话收进持久的 **Workspace**，让你、浏览器和 AI 操作同一份上下文：
 
-AI 让这个问题变得更明显：Agent 会帮人查资料、AI 产出经常以网页呈现，人又在浏览器与 AI 工具之间来回切换。标签增长得更快，上下文却仍靠人脑维持。
-
-过去十年，Toby、OneTab、Workona 等产品已经证明“收纳和恢复标签”是真实需求。TabNexus 在此基础上继续追问：**这些标签为什么会被打开，它们如何形成一个任务，又怎样让人或 Agent 接着完成它？**
-
-## 从 Tab 管理到共享任务上下文
-
-TabNexus 不是另一个书签文件夹。它把临时的浏览器会话转成一个持久 Workspace，让用户、浏览器和 AI Agent 操作同一份结构化上下文。
-
-```mermaid
+~~~mermaid
 flowchart TB
-    Context["TabNexus Workspace<br/>网页 · 分组 · 备注 · 状态 · 关系 · 进度"]
-    User["用户<br/>设定目标与确认变更"] <--> Context
-    Browser["Chrome<br/>采集、关闭与恢复标签"] <--> Context
-    Agent["外部 AI Agent<br/>读取、补充与写回"] <--> Context
-    Model["可选模型 API<br/>按用户意图整理"] -.-> Context
-```
+    Context["📦 Workspace<br/>网页 · 分组 · 备注 · 状态 · 关系"]
+    User["👤 你<br/>设定目标 · 确认变更"] <--> Context
+    Browser["🌐 Chrome<br/>采集 · 关闭 · 恢复"] <--> Context
+    API["✨ AI API（默认）<br/>按意图分类"] <--> Context
+    Agent["🤖 MCP Agent（可选）<br/>读取 · 补充 · 写回"] <--> Context
+~~~
 
-| 常见方式 | 能解决什么 | 仍然需要人做什么 |
+| 方式 | 能做到 | 仍然缺少 |
 |---|---|---|
-| 书签、Tab Group、会话保存 | 收纳页面、恢复窗口 | 重新回忆目标、结构和进度 |
-| 按域名自动分组 | 回答“页面来自哪里” | 判断“我为什么打开它” |
-| 逐个复制链接给 AI | AI 能拿到 URL | 反复充当“人肉 API”，重新解释背景 |
-| Computer Use / Playwright 读取浏览器 | 能操作当前界面 | 逐页定位和读取，任务结构仍需临时重建 |
-| **TabNexus** | 保存并组织任务上下文，通过 MCP 交给 Agent | 用户只需决定目标并审核关键变更 |
+| 书签 / Tab Manager | 保存页面、恢复窗口 | 任务意图、结构和进度 |
+| 按域名自动分组 | 知道页面来自哪里 | 知道你为什么打开它 |
+| 复制链接 / 浏览器自动操作 | 把网页交给 AI | 高效、完整、可复用的上下文 |
+| **TabNexus** | **按意图整理，再通过一个接口继续** | **你只需定目标并审核关键变更** |
 
-> TabNexus 当前向 Agent 提供标题、URL、分组、备注、状态、关系等结构化上下文；它不会在后台抓取网页正文。
+AI 有两条独立路径，先满足普通用户，再服务进阶协作：
 
-## 先用 AI API 整理，需要时再连接 Agent
-
-**使用 TabNexus 不要求你先使用 Agent。** 对大多数用户，连接一个 AI API 就能完成按意图分类、结构建议和日常任务整理；当你希望 AI 进一步读取整个工作区、添加资料或写回成果时，再启用 MCP Agent 协作。
-
-| | ① Workspace 内的 AI 整理 | ② 外部 Agent 的 MCP 协作 |
+| 路径 | 适合谁 | 作用 |
 |---|---|---|
-| 适合谁 | 想更快整理标签的所有用户 | 已经使用 Agent、需要进一步自动化的用户 |
-| 作用 | 把散乱标签变成符合你意图的结构 | 让 Agent 接住这份上下文并继续工作 |
-| 使用方式 | 在 Workspace 的 AI 助手入口输入：`按研究阶段分组`、`把一周内的资料单独整理` | 在 Codex、Claude、Cursor 等 Agent 中直接读取或修改 Workspace |
-| 能力 | 建议分组、归属、关系和任务结构，应用前可预览与调整 | 搜索资料、添加卡片、调整结构、写回报告，安全地保存/恢复/关闭标签 |
-| 模型 | 可选 DeepSeek、OpenAI、Claude、Kimi、通义千问、MiniMax；无 Key 也可本地域名分组 | 使用 Agent 自己的模型；MCP 不读取 TabNexus 中保存的模型 Key |
+| **AI API（默认路径）** | 想快速整理标签的每个人 | 在 Workspace 内接入 DeepSeek 等模型，用自己的 Query 和意图分类；先预览，再应用 |
+| **MCP Agent（可选进阶）** | 需要继续研究、写作或编码的人 | 让支持 MCP 的 Agent 读取上下文、补充资料、写回报告并建议任务结构 |
 
-两条路径共享同一个 Workspace，但可以独立使用：**AI API 是面向所有人的整理助手，Agent 是有后续协作需求时再开启的进阶能力。**
+它适合研究者、产品经理、开发者，以及所有被几十个“不敢关”的标签困住的人。
 
-<a id="product"></a>
-## 产品能力
+<a id="features"></a>
+## 🧩 同一份上下文，三层能力
 
-这不是三个彼此孤立的功能，而是同一份任务上下文的三个阶段：**信息进得来、思路理得清、上下文流得动。**
+### 1️⃣ 标签与 Workspace：保存之后，放心清空标签栏
 
-### 1. 标签与 Workspace 管理：先放心关掉，再随时接着做
+从当前 Chrome 窗口勾选同一任务的网页，完成**采集、分组、保存**。保存后可以关闭原标签：卡片仍在本地 Workspace 中，随时恢复一张、一个分组或整个工作区。
 
-从当前 Chrome 窗口选择真正属于任务的标签，采集、分组并保存到独立 Workspace。保存和关闭是两个明确动作：你可以继续保留原页面，也可以清空标签栏；关闭不会删除工作区中的卡片。
+- 保存与关闭是两个明确动作，关闭标签不会删除卡片；
+- 支持多 Workspace、拖拽分组、备注、去重和 Markdown / JSON 导出；
+- 已打开的 URL 不会重复恢复，固定标签不会被批量关闭。
 
-- 清楚区分未保存且打开、已保存且打开、已保存但关闭、最近关闭未保存；
-- 支持多 Workspace、拖拽分组、备注、筛选、去重和 Markdown / JSON 导出；
-- 可恢复一张卡片、一个分组或整个 Workspace，已经打开的 URL 不会重复创建；
-- 固定标签不会被批量操作或 Agent 关闭。
+<picture><img src="docs/assets/tabnexus-before.png" alt="整理前：当前窗口中待保存的多个标签" /></picture>
 
-| 整理前：页面在，任务结构不在 | 整理后：标签可关闭，上下文仍在 |
-|---|---|
-| <picture><img src="docs/assets/tabnexus-before.png" alt="整理前：当前窗口中的 12 个未保存标签" /></picture> | <picture><img src="docs/assets/tabnexus-after.png" alt="整理后：12 个标签进入三个任务分组" /></picture> |
+### 2️⃣ 任务思路：卡片、关系与进度
 
-### 2. 任务思路管理：不只收藏资料，也看见关系和进度
+**卡片看板**用来分组、写备注和推进“待读 / 已读 / 已采用”；**流程 / 关系图**把证据、结论、依赖和下一步连成结构。位置与连线持续保存，下次回来，思路还在原地。
 
-同一份 Workspace 可以在**卡片看板**与**流程 / 关系图模式**之间切换。看板适合快速分组、记录备注和推进“待读 / 已读 / 已采用”；无限画布适合梳理证据、结论、依赖和下一步，卡片位置与连线会持续保存。
+这里也是 AI API 的主入口。你可以说“按市场 / 产品 / 技术 / 财务分类”，也可以说“按发现问题 → 比较方案 → 得出结论组织”。AI 先给出依据和变更预览，由你确认后生效。支持 DeepSeek、OpenAI、Claude、Kimi、通义千问和 MiniMax；没有 Key 也可拖拽或使用本地域名分组。
 
-这是大多数用户使用 AI 的主要入口。接入 DeepSeek、OpenAI、Claude、Kimi、通义千问或 MiniMax 的 API 后，你可以直接说明自己的 Query 和意图，例如按“市场 / 产品 / 技术 / 财务 / 观点”整理，或按“发现问题 / 比较方案 / 做出决策”组织。TabNexus 先展示分类依据和变更预览，再由你决定是否应用；不配置 API Key 时，仍可使用本地域名分组。
-
-| 卡片式工作区 | 关系与任务结构 |
+| 卡片看板 | 流程 / 关系图 |
 |---|---|
 | <picture><img src="docs/assets/tabnexus-workspace.png" alt="TabNexus 卡片工作区与当前标签操作台" /></picture> | <picture><img src="docs/assets/tabnexus-relationship-map.png" alt="TabNexus 无限关系图与任务结构" /></picture> |
 
-### 3. 进阶 Agent 协作：停止充当人肉 API
+### 3️⃣ Agent 协作：停止充当“人肉 API”
 
-当内置 AI 整理已经不能满足需求——例如你希望 Agent 继续调研、补充资料或写回报告——可以再连接本地 MCP。Codex、Claude、Cursor、VS Code 和 TRAE 能直接读取 TabNexus 中已经整理好的任务上下文，而不是让你再次复制十几个链接、重讲目标和最新进度。
+当任务需要继续调研、补资料或写报告时，Agent 通过本地 MCP 一次拿到已经整理好的分组、备注、关系和进度，不必让你复制十几个链接，也不必逐页操作浏览器。
 
-Agent 可以搜索 Workspace、添加网页或笔记、更新状态和分组、建议关系结构、写回报告，也可以在确认保护下操作当前标签。所有写入都带版本校验和操作记录，避免多个 Agent 静默覆盖较新的内容。
+Agent 可以搜索 Workspace、添加网页或笔记、更新状态与分组、建议关系结构并写回报告。关键写入支持版本校验并记录活动，关闭或删除等破坏性操作必须由你确认。
 
 | 连接常用 Agent | 查看 Agent 的读取与写回 |
 |---|---|
 | <picture><img src="docs/assets/tabnexus-agent-connect.png" alt="TabNexus 的 Agent 连接页面" /></picture> | <picture><img src="docs/assets/tabnexus-agent-activity.png" alt="TabNexus Agent 活动与写回记录" /></picture> |
 
-## 适合哪些人？
-
-| 如果你经常…… | TabNexus 可以…… |
-|---|---|
-| 做行业、公司、论文或竞品调研 | 把来源、证据、观点和结论放回同一研究上下文 |
-| 做产品规划和需求分析 | 按问题、方案、决策与进度组织参考资料 |
-| 不想手动按域名或固定主题整理 | 接入 AI API，按照自己的 Query 和意图分类 |
-| 一边开发，一边查文档、Issue 和实现案例 | 保存技术探索现场，再交给 Coding Agent 继续 |
-| 在多个任务之间频繁切换 | 清空浏览器噪音，同时保留每个任务的恢复点 |
-| 需要把浏览器资料交给 AI | 用一个 MCP 接口替代逐页复制和重复解释 |
-
 <a id="start"></a>
-## 两分钟开始：从安装到第一次整理
+## 🚀 两分钟安装，并完成第一次整理
 
-1. **安装扩展。** 下载并解压 **[TabNexus Chrome 安装包](https://github.com/KaichenCurry/TabNexus/releases/download/v0.17.0/TabNexus-Chrome-v0.17.0.zip)**；打开 `chrome://extensions`，开启**开发者模式**，点击**加载已解压的扩展程序**并选择解压后的文件夹。
-2. **保存一个任务。** 固定并打开 TabNexus，在右侧标签操作台勾选同一任务的网页，点击**保存**。现在即使关闭原标签，资料也仍在 Workspace 中。
-3. **按你的意图整理。** 手动拖拽即可使用；也可以在设置中选择 DeepSeek、OpenAI、Claude、Kimi、通义千问或 MiniMax，填入自己的 API Key，然后在 AI 助手中输入：`按照我的调研目标进行分类`。没有 Key 时可使用本地域名分组。
-4. **继续或暂时收起。** 在卡片看板或流程 / 关系图中标记进度；需要清爽界面时关闭原标签，之后可以恢复单张卡片、一个分组或整个 Workspace。
+1. **安装扩展：** 下载并解压 [TabNexus Chrome 安装包](https://github.com/KaichenCurry/TabNexus/releases/download/v0.17.0/TabNexus-Chrome-v0.17.0.zip)，打开 <code>chrome://extensions</code>，开启**开发者模式**并选择**加载已解压的扩展程序**。
+2. **保存一个任务：** 打开 TabNexus，勾选属于同一任务的网页并点击**保存**。现在可以放心关闭原标签。
+3. **按意图整理：** 直接拖拽，或在设置中填入模型 API Key，让 AI 助手“按照我的调研目标分类”。
+4. **继续推进：** 在看板或关系图中标记进度，需要时恢复卡片、分组或整个 Workspace。
 
-到这里已经可以完整使用 TabNexus，**不需要 Agent，也不需要 Node、pnpm 或终端**。只有当你想让 Agent 继续读取资料、补充上下文或写回报告时，再进行后面的 MCP 连接。
+到这里已经可以完整使用 TabNexus——**不需要 Agent，也不需要终端**。
 
 <details>
-<summary><strong>开发者：从源码构建</strong></summary>
+<summary><strong>从源码构建</strong></summary>
 
 需要 Node.js 22+ 与 pnpm 11。
 
-```bash
+~~~bash
 git clone https://github.com/KaichenCurry/TabNexus.git
 cd TabNexus
 corepack enable
 pnpm install --frozen-lockfile
 pnpm build
-```
+~~~
 
-然后在 `chrome://extensions` 中加载生成的 `dist` 目录。源码构建适合开发、测试和连接本地 Agent。
+然后在 <code>chrome://extensions</code> 中加载生成的 <code>dist</code> 目录。
+
 </details>
 
 <a id="agent"></a>
-## 进阶：连接 Agent
+## 🤖 需要时，再让 Agent 接手
 
-这是可选的进阶能力。完成上面的 Tab 管理后（AI API 仍然是可选项），如果还希望 Agent 直接接手 Workspace，再打开**设置 → 连接你常用的 Agent**，选择客户端并按页面提示操作。
-
-| 客户端 | 当前支持 | 接入方式 |
-|---|---:|---|
-| Codex | ✅ | 仓库插件包 |
-| Claude Desktop | ✅ | 自包含 `.mcpb` 扩展包 |
-| Claude Code | ✅ | 仓库 Marketplace 插件 |
-| Cursor | ✅ | 标准本地 MCP 配置 |
-| VS Code / Copilot Agent | ✅ | VS Code MCP 配置 |
-| TRAE Work | ✅ | 标准本地 MCP 配置 |
-| 扣子 Coze | 规划中 | 需要独立鉴权的远程 MCP 网关 |
-
-本地 MCP 当前提供 **17 个聚焦工具**，覆盖 Workspace、卡片、关系图、导出和浏览器标签操作。详细资料见[客户端适配说明](docs/AGENT_CLIENT_ADAPTERS.md)、[能力矩阵](docs/MCP_CAPABILITY_MATRIX.md)和[测试指南](docs/MCP_TESTING.md)。
-
-## 本地优先与安全边界
-
-- Workspace 与模型 Key 保存在 Chrome 本地存储；没有 TabNexus 账号和云端数据库。
-- 不使用内容脚本、`<all_urls>`、`webRequest`、`downloads` 或新标签页劫持。
-- AI 只在你主动调用时发送所选操作必要的卡片元数据，不发送备注和模型 Key。
-- MCP 只监听 `127.0.0.1`，不会向 Agent 暴露模型 Key。
-- 关闭和删除等破坏性操作需要明确确认；固定标签无法通过 MCP 关闭。
-- 导出不包含设置、凭据或临时 Chrome tabId。
-
-发现安全问题时，请阅读[安全策略](.github/SECURITY.md)并使用 GitHub 私密漏洞报告。不要在 Issue、截图、fixture 或导出中粘贴真实 API Key。
-
-## 项目状态
-
-v0.17.0 已经实现：
-
-- 多 Workspace 标签采集、保存、关闭、恢复、去重、备注、状态和导出；
-- 按用户 Query / 意图进行的多模型 AI 分类与可编辑预览；
-- 可持久化布局和连线的无限关系画布；
-- 覆盖工作区与标签操作台的本地多 Agent MCP；
-- 中文与英文产品界面。
-
-接下来重点：Chrome Web Store 分发、面向云端 Agent 的鉴权远程 MCP、更完整的无障碍与大型 Workspace 性能验证。完整进度见[实现状态](docs/IMPLEMENTATION_STATUS.md)，产品思考见 [PRD](docs/product/PRD.md)。
+基础整理到上一步就结束；有持续研究、写作或编码需求时，再打开**设置 → 连接你常用的 Agent**。本地 MCP 提供 **17 个聚焦工具**，覆盖 Workspace、卡片、关系图、导出与标签操作。
 
 <details>
-<summary><strong>技术架构与验证</strong></summary>
+<summary><strong>已支持的客户端与技术文档</strong></summary>
 
-```mermaid
-flowchart LR
-    Chrome["Chrome 当前窗口"] --> Extension["TabNexus MV3 扩展"]
-    Extension --> Storage["chrome.storage.local"]
-    Extension --> Provider["可选模型 API"]
-    Agent["Codex · Claude · Cursor · VS Code · TRAE"] --> MCP["本地 MCP Server<br/>127.0.0.1"]
-    MCP <--> Extension
-```
+| 客户端 | 状态 | 接入方式 |
+|---|:---:|---|
+| Codex | ✅ | 仓库插件包 |
+| Claude Desktop / Claude Code | ✅ | MCPB / Marketplace 插件 |
+| Cursor / VS Code / TRAE | ✅ | 本地 MCP 配置 |
+| 扣子 Coze | 规划中 | 鉴权远程 MCP 网关 |
 
-技术栈：React、TypeScript、Vite、Vitest、Playwright、Chrome Manifest V3、Model Context Protocol。
+[客户端适配说明](docs/AGENT_CLIENT_ADAPTERS.md) · [能力矩阵](docs/MCP_CAPABILITY_MATRIX.md) · [测试指南](docs/MCP_TESTING.md)
 
-```bash
-pnpm typecheck
-pnpm test
-pnpm test:e2e
-pnpm mcp:test
-pnpm check
-```
-
-当前自动化基线：106 项测试、17/17 MCP 工具、36/36 项确定性能力检查。
 </details>
 
-## 一起构建浏览器与 Agent 之间的上下文层
+## 🔒 本地优先，边界清晰
 
-TabNexus 选择开源，是因为浏览器上下文既私人又关键：数据边界应该可检查，Agent 接口应该可扩展，产品方向也值得由真正受 Tab 过载困扰的人共同塑造。
+- TabNexus 无账号、无自建云端；Workspace 和模型 Key 保存在 Chrome 本地存储；
+- 只有主动调用 AI 时，必要的卡片元数据才会发往所选模型服务，备注和模型 Key 不会发送；
+- MCP 只监听 <code>127.0.0.1</code>，不会向 Agent 暴露模型 Key；
+- 不使用内容脚本、<code>&lt;all_urls&gt;</code>、<code>webRequest</code>、下载权限或新标签页劫持；
+- 关闭、删除等破坏性操作需要明确确认，导出不含凭据。
 
-- 遇到问题或有功能建议：提交 [Issue](https://github.com/KaichenCurry/TabNexus/issues/new/choose)
-- 想讨论产品、Agent 工作流或使用场景：加入 [Discussions](https://github.com/KaichenCurry/TabNexus/discussions)
-- 想贡献代码、文档、模型适配或无障碍改进：阅读[贡献指南](.github/CONTRIBUTING.md)
-- 也可以直接联系：[currykchen@hotmail.com](mailto:currykchen@hotmail.com)
+发现安全问题请阅读[安全策略](.github/SECURITY.md)，并使用 GitHub 私密漏洞报告。
 
-## License
+## 🛠️ 已实现与下一步
 
-TabNexus 使用 [MIT License](LICENSE)。
+**v0.17.0 已实现：**多 Workspace 的采集 / 保存 / 恢复闭环、按意图的多模型 AI 分类与可编辑预览、持久化关系画布、17 工具本地 MCP、中英双语界面。自动化基线为 106 项测试、17/17 MCP 工具、36/36 确定性能力检查。
+
+**接下来：**Chrome Web Store 上架、面向云端 Agent 的鉴权远程 MCP、无障碍与大型 Workspace 性能。详见[实现状态](docs/IMPLEMENTATION_STATUS.md)和 [PRD](docs/product/PRD.md)。
+
+技术栈：React · TypeScript · Vite · Vitest · Playwright · Chrome Manifest V3 · Model Context Protocol。
+
+## 🌱 一起构建浏览器与 Agent 之间的上下文层
+
+浏览器上下文既私人又关键，所以数据边界应该可检查、Agent 接口应该可扩展，产品方向也应该由真正被标签困扰的人共同塑造。
+
+- 🐛 提交 [Issue](https://github.com/KaichenCurry/TabNexus/issues/new/choose)
+- 💬 加入 [Discussions](https://github.com/KaichenCurry/TabNexus/discussions)
+- 🔧 阅读[贡献指南](.github/CONTRIBUTING.md)
+- 📮 联系：[currykchen@hotmail.com](mailto:currykchen@hotmail.com)
+
+## 📄 License
+
+[MIT](LICENSE)
 
 ---
 
 <div align="center">
-  <strong>浏览器保存你打开了什么。TabNexus 保存你为什么打开、做到了哪里，以及接下来由谁继续。</strong>
+  <strong>浏览器记得你打开了什么。<br/>TabNexus 记得你为什么打开、做到了哪里，以及接下来由谁继续。</strong>
 </div>
