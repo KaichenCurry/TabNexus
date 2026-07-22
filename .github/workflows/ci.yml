@@ -43,12 +43,13 @@ jobs:
       - name: Test source build in Chromium
         run: pnpm exec playwright test --config config/playwright.config.ts
 
-      - name: Build portable Chrome package
-        run: pnpm release:chrome
+      - name: Build release artifacts
+        run: pnpm release:assets
 
       - name: Verify and unpack portable Chrome package
         run: |
           unzip -t artifacts/release/TabNexus-Chrome-v*.zip
+          tar -tzf artifacts/release/tabnexus-mcp-runtime-*.tgz
           mkdir -p .playwright/portable
           unzip -q artifacts/release/TabNexus-Chrome-v*.zip -d .playwright/portable
 

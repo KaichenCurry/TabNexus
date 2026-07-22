@@ -10,6 +10,7 @@ All notable changes to TabNexus will be documented here.
 
 - Removed the portable-build branch that sent Codex, Cursor, VS Code, Claude Code, and TRAE users to a generic GitHub anchor.
 - Added release-pinned MCP launch configuration so supported clients can install TabNexus without a source checkout or a machine-specific path.
+- Packaged the MCP bridge as a 13 KB dependency-free runtime archive, avoiding a full repository checkout and development dependency installation on first connect.
 - Wired Cursor, VS Code, and TRAE to their client-specific install flows; kept the packaged Claude Desktop extension; made Codex open its local settings with the launch command already copied.
 - Added portable-package regression coverage and bumped extension, Agent integration, documentation, and release artifacts to v1.0.2.
 

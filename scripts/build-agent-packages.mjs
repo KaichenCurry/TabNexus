@@ -89,6 +89,7 @@ const [manifest, server, icon, packageJson] = await Promise.all([
 ]);
 const serverVersion = server.toString("utf8").match(/const SERVER_VERSION = "([^"]+)"/)?.[1];
 if (!serverVersion) throw new Error("Unable to read MCP server version from agent/bridge/tabnexus-mcp.mjs");
+const releasePackageUrl = `https://github.com/KaichenCurry/TabNexus/releases/download/v${packageJson.version}/tabnexus-mcp-runtime-${packageJson.version}.tgz`;
 
 await mkdir(dirname(outputPath), { recursive: true });
 await mkdir(dirname(codexServerPath), { recursive: true });
@@ -109,7 +110,7 @@ await writeFile(standardConfigPath, `${JSON.stringify({
   mcpServers: {
     tabnexus: {
       command: "npx",
-      args: ["--yes", `github:KaichenCurry/TabNexus#v${packageJson.version}`],
+      args: ["--yes", releasePackageUrl],
       env: { TABNEXUS_AGENT_NAME: "Agent IDE", TABNEXUS_MCP_VERSION: serverVersion }
     }
   }
@@ -119,7 +120,7 @@ await writeFile(vsCodeConfigPath, `${JSON.stringify({
     tabnexus: {
       type: "stdio",
       command: "npx",
-      args: ["--yes", `github:KaichenCurry/TabNexus#v${packageJson.version}`],
+      args: ["--yes", releasePackageUrl],
       env: { TABNEXUS_AGENT_NAME: "VS Code", TABNEXUS_MCP_VERSION: serverVersion }
     }
   }

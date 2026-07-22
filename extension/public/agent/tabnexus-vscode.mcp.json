@@ -5,7 +5,7 @@
       "command": "npx",
       "args": [
         "--yes",
-        "github:KaichenCurry/TabNexus#v1.0.2"
+        "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.2/tabnexus-mcp-runtime-1.0.2.tgz"
       ],
       "env": {
         "TABNEXUS_AGENT_NAME": "VS Code",
