@@ -1,6 +1,6 @@
 {
   "name": "tabnexus",
-  "version": "0.17.1",
+  "version": "1.0.2",
   "description": "A local-first Chrome workspace for browser tabs, intent-first AI organization, and Agent collaboration through MCP.",
   "private": true,
   "license": "MIT",
@@ -21,6 +21,9 @@
     "mcp",
     "ai-agent"
   ],
+  "bin": {
+    "tabnexus-mcp": "agent/bridge/tabnexus-mcp.mjs"
+  },
   "engines": {
     "node": ">=22.13.0"
   },

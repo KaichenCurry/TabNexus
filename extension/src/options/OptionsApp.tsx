@@ -5,7 +5,9 @@ import {
   MCP_BRIDGE_VERSION,
   MCP_TOOL_COUNT,
   createClaudeCodeInstallPrompts,
+  createCodexLauncherCommand,
   createCursorInstallUrl,
+  createReleaseServerSource,
   createStandardMcpConfig,
   createTraeInstallUrl,
   createVsCodeInstallUrl,
@@ -154,17 +156,19 @@ export function OptionsApp() {
   };
 
   const selectedClient = selectedAgent ? AGENT_CLIENTS.find((client) => client.id === selectedAgent) ?? null : null;
-  const portableAgentRequiresSource = __TABNEXUS_PORTABLE_BUILD__
-    && selectedAgent !== null
-    && selectedAgent !== "claude_desktop"
-    && selectedAgent !== "coze";
-  const standardClientConfig = JSON.stringify(createStandardMcpConfig(__TABNEXUS_LOCAL_MCP_ENTRY__, "TRAE Work"), null, 2);
-  const vsCodeClientConfig = JSON.stringify(createVsCodeMcpConfig(__TABNEXUS_LOCAL_MCP_ENTRY__), null, 2);
-  const cursorInstallUrl = createCursorInstallUrl(__TABNEXUS_LOCAL_MCP_ENTRY__);
-  const vsCodeInstallUrl = createVsCodeInstallUrl(__TABNEXUS_LOCAL_MCP_ENTRY__);
-  const traeInstallUrl = createTraeInstallUrl(__TABNEXUS_LOCAL_MCP_ENTRY__);
-  const claudeCodePrompts = createClaudeCodeInstallPrompts(__TABNEXUS_REPO_ROOT__);
-  const codexInstallUrl = `codex://plugins/tabnexus?marketplacePath=${encodeURIComponent(__TABNEXUS_CODEX_MARKETPLACE__)}`;
+  const agentServerSource = __TABNEXUS_PORTABLE_BUILD__
+    ? createReleaseServerSource()
+    : __TABNEXUS_LOCAL_MCP_ENTRY__;
+  const standardClientConfig = JSON.stringify(createStandardMcpConfig(agentServerSource, "TRAE Work"), null, 2);
+  const vsCodeClientConfig = JSON.stringify(createVsCodeMcpConfig(agentServerSource), null, 2);
+  const cursorInstallUrl = createCursorInstallUrl(agentServerSource);
+  const vsCodeInstallUrl = createVsCodeInstallUrl(agentServerSource);
+  const traeInstallUrl = createTraeInstallUrl(agentServerSource);
+  const claudeCodePrompts = createClaudeCodeInstallPrompts(__TABNEXUS_PORTABLE_BUILD__ ? "KaichenCurry/TabNexus" : __TABNEXUS_REPO_ROOT__);
+  const codexInstallUrl = __TABNEXUS_PORTABLE_BUILD__
+    ? "codex://settings"
+    : `codex://plugins/tabnexus?marketplacePath=${encodeURIComponent(__TABNEXUS_CODEX_MARKETPLACE__)}`;
+  const codexLauncherCommand = createCodexLauncherCommand();
   const claudeBundleUrl = isExtensionRuntime
     ? chrome.runtime.getURL("agent/tabnexus-claude.mcpb")
     : "/agent/tabnexus-claude.mcpb";
@@ -214,9 +218,10 @@ export function OptionsApp() {
       setBridgeBusy(false);
     }
   };
-  const copyBridgeValue = async (value: string, label: "trae" | "vscode" | "claude_code_1" | "claude_code_2" | "read") => {
+  const copyBridgeValue = async (value: string, label: "codex" | "trae" | "vscode" | "claude_code_1" | "claude_code_2" | "read") => {
     await navigator.clipboard.writeText(value);
     const messages = {
+      codex: text("Codex 启动命令已复制。设置打开后进入 MCP Servers，新增 TabNexus 并粘贴即可。", "The Codex launch command is copied. In Settings, open MCP Servers, add TabNexus, and paste it."),
       trae: text("TRAE 配置已复制。打开 MCP 管理页，选择手动添加并粘贴。", "TRAE config copied. Open MCP management, choose manual setup, and paste it."),
       vscode: text("VS Code 配置已复制。若一键安装未打开，可粘贴到 MCP 用户配置。", "VS Code config copied. If one-click install did not open, paste it into the MCP user configuration."),
       claude_code_1: text("第 1 句已复制。粘贴到 Claude Code 对话并发送，然后再复制第 2 句。", "Step 1 copied. Paste it into Claude Code and send it, then copy step 2."),
@@ -233,6 +238,10 @@ export function OptionsApp() {
     await prepareAgentConnection();
     await copyBridgeValue(standardClientConfig, "trae");
   };
+  const prepareCodexConnection = async () => {
+    await prepareAgentConnection();
+    if (__TABNEXUS_PORTABLE_BUILD__) await copyBridgeValue(codexLauncherCommand, "codex");
+  };
 
   const clientDescription = (client: AgentClient) => ({
     codex: text("OpenAI 桌面端 / CLI", "OpenAI desktop / CLI"),
@@ -245,7 +254,9 @@ export function OptionsApp() {
   })[client];
 
   const setupDescription = (client: AgentClient) => ({
-    codex: text("Codex 打开后点击“安装”。", "When Codex opens, click Install."),
+    codex: __TABNEXUS_PORTABLE_BUILD__
+      ? text("会直接打开本机 Codex 设置，并复制 TabNexus 启动命令；在 MCP Servers 中新增并粘贴即可。", "This opens local Codex Settings and copies the TabNexus launch command. Add it under MCP Servers and paste.")
+      : text("Codex 打开后点击“安装”。", "When Codex opens, click Install."),
     claude_desktop: text("下载后双击 .mcpb 文件，再在 Claude 中确认安装。", "Double-click the downloaded .mcpb file, then confirm in Claude."),
     claude_code: text("不用退出 Claude Code。把下面两句依次粘贴到当前对话并发送。", "Stay in Claude Code. Paste and send the two prompts below, one at a time."),
     cursor: text("Cursor 打开安装页后点击“Install”。", "When Cursor opens the install page, click Install."),
@@ -254,10 +265,8 @@ export function OptionsApp() {
     coze: text("扣子目前没有官方本地 stdio MCP 客户端，不能直接读取这台电脑上的 Chrome 工作区。", "Coze currently has no official local stdio MCP client, so it cannot directly read this computer's Chrome workspace.")
   })[client];
 
-  const installMethodLabel = (client: AgentClient) => __TABNEXUS_PORTABLE_BUILD__ && client !== "claude_desktop" && client !== "coze"
-    ? text("源码版", "Source build")
-    : ({
-    codex: text("一键安装", "One-click"),
+  const installMethodLabel = (client: AgentClient) => ({
+    codex: __TABNEXUS_PORTABLE_BUILD__ ? text("打开设置", "Open settings") : text("一键安装", "One-click"),
     claude_desktop: text("扩展包", "Extension package"),
     claude_code: text("对话内安装", "Install in chat"),
     cursor: text("一键安装", "One-click"),
@@ -480,8 +489,8 @@ export function OptionsApp() {
               {__TABNEXUS_PORTABLE_BUILD__ && <div className="bridge-update-notice" role="note">
                 <span aria-hidden="true">✓</span>
                 <div>
-                  <strong>{text("两分钟安装包已可直接使用工作区", "The two-minute package is ready for workspace use")}</strong>
-                  <p>{text("Claude Desktop 可直接下载扩展包；Codex、Cursor 等本地 Agent 需要源码版完成一次连接配置。", "Claude Desktop can use the bundled extension; Codex, Cursor, and other local Agents need the source build for one-time connection setup.")}</p>
+                  <strong>{text("安装包已包含本机 Agent 接入", "Local Agent setup is included")}</strong>
+                  <p>{text("选择下方应用即可打开对应安装入口；无需下载源码，也不会再跳转到 GitHub 教程。", "Choose an app below to open its installer. No source checkout and no GitHub tutorial detour.")}</p>
                 </div>
               </div>}
               <div className="agent-picker-toolbar">
@@ -548,17 +557,7 @@ export function OptionsApp() {
                 <span className={`agent-method-chip ${selectedClient.availability}`}>{installMethodLabel(selectedAgent)}</span>
               </div>
 
-              {portableAgentRequiresSource ? (
-                <div className="agent-remote-panel">
-                  <span className="agent-remote-icon" aria-hidden="true">↗</span>
-                  <div>
-                    <span className="agent-card-kicker">{text("源码版连接", "SOURCE BUILD CONNECTION")}</span>
-                    <strong>{text(`连接 ${selectedClient.name} 需要源码版`, `The source build is required for ${selectedClient.name}`)}</strong>
-                    <p>{text("当前两分钟安装包已经可以完整管理 Chrome 标签；Agent 连接需要本机 MCP 文件，因此要从源码完成一次配置。", "The two-minute package already provides the full Chrome tab workspace. Agent setup needs the local MCP file, so it requires a one-time source setup.")}</p>
-                    <a className="button primary agent-install-button" href="https://github.com/KaichenCurry/TabNexus#agent-setup" target="_blank" rel="noreferrer">{text("查看 Agent 安装", "View Agent setup")}</a>
-                  </div>
-                </div>
-              ) : selectedAgent === "coze" ? (
+              {selectedAgent === "coze" ? (
                 <div className="agent-remote-panel">
                   <span className="agent-remote-icon" aria-hidden="true">↗</span>
                   <div>
@@ -583,7 +582,11 @@ export function OptionsApp() {
                     <span className="agent-card-kicker">{installStarted ? text("安装已打开", "INSTALLER OPENED") : text("下一步", "NEXT")}</span>
                     <strong>{selectedAgent === "claude_code" ? text("把两条指令发给 Claude Code", "Send two prompts to Claude Code") : text(`在 ${selectedClient.name} 中安装`, `Install in ${selectedClient.name}`)}</strong>
                     <p>{setupDescription(selectedAgent)}</p>
-                    {selectedAgent === "codex" && <a className="button primary agent-install-button" href={codexInstallUrl} onClick={() => void prepareAgentConnection()}>{bridgeNeedsUpdate ? text("更新 Codex 连接", "Update Codex connection") : text("在 Codex 中安装", "Install in Codex")}</a>}
+                    {selectedAgent === "codex" && <a className="button primary agent-install-button" href={codexInstallUrl} onClick={() => void prepareCodexConnection()}>{bridgeNeedsUpdate
+                      ? text("更新 Codex 连接", "Update Codex connection")
+                      : __TABNEXUS_PORTABLE_BUILD__
+                        ? text("打开 Codex 设置", "Open Codex settings")
+                        : text("在 Codex 中安装", "Install in Codex")}</a>}
                     {selectedAgent === "claude_desktop" && <a className="button primary agent-install-button" href={claudeBundleUrl} download="TabNexus.mcpb" onClick={() => void prepareAgentConnection()}>{bridgeNeedsUpdate ? text("下载新版 Claude 扩展", "Download updated Claude extension") : text("下载 Claude 扩展包", "Download Claude extension")}</a>}
                     {selectedAgent === "claude_code" && <div className="agent-prompt-install">
                       <button type="button" onClick={() => void prepareAgentConnection().then(() => copyBridgeValue(claudeCodePrompts[0], "claude_code_1"))}><span>1</span><code>{claudeCodePrompts[0]}</code><b>{text("复制", "Copy")}</b></button>

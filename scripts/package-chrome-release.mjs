@@ -79,7 +79,6 @@ async function collectFiles(directory) {
     if (item.isDirectory()) entries.push(...await collectFiles(absolute));
     else if (!item.name.endsWith(".map")) {
       const name = relative(dist, absolute);
-      if (name === "agent/tabnexus-standard.mcp.json" || name === "agent/tabnexus-vscode.mcp.json") continue;
       const data = await readFile(absolute);
       entries.push({
         name,

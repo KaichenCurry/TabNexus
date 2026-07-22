@@ -4,13 +4,22 @@ All notable changes to TabNexus will be documented here.
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-07-23
+
+### Agent installation hotfix
+
+- Removed the portable-build branch that sent Codex, Cursor, VS Code, Claude Code, and TRAE users to a generic GitHub anchor.
+- Added release-pinned MCP launch configuration so supported clients can install TabNexus without a source checkout or a machine-specific path.
+- Wired Cursor, VS Code, and TRAE to their client-specific install flows; kept the packaged Claude Desktop extension; made Codex open its local settings with the launch command already copied.
+- Added portable-package regression coverage and bumped extension, Agent integration, documentation, and release artifacts to v1.0.2.
+
 ## [0.17.1] - 2026-07-22
 
 ### Reliability and safety
 
 - Updated MiniMax and Kimi to their current chat-completion contracts and disabled unnecessary thinking for short structured requests where providers support it.
 - Hardened destructive Agent confirmations so negated or ambiguous phrases fail closed.
-- Corrected the AI metadata disclosure, documented the localhost process trust boundary, and fixed the Agent setup path from the portable package.
+- Corrected the AI metadata disclosure, documented the localhost process trust boundary, and added explicit portable-package Agent setup messaging.
 - Added packaged-extension Chromium E2E coverage to CI and aligned the documented Node.js requirement with locked dependencies.
 
 ### Validation

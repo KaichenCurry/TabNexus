@@ -28,7 +28,7 @@
 <div align="center"><sub>Save pages as a Workspace with groups, notes, states, and relationships. Close the originals with confidence; restore them in one click.</sub></div>
 
 > [!IMPORTANT]
-> **v0.17.1 is a developer preview.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
+> **Current version: v1.0.2.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
 
 <a id="why"></a>
 ## 😵 Your tab bar is not clutter. It is unfinished thinking you are afraid to lose.
@@ -140,7 +140,7 @@ Agents can search Workspaces, add pages or notes, update states and groups, prop
 <a id="start"></a>
 ## 🚀 Install in two minutes and organize your first task
 
-1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v0.17.1/TabNexus-Chrome-v0.17.1.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
+1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.2/TabNexus-Chrome-v1.0.2.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
 2. **Save one task:** open TabNexus, select pages that belong together, and click **Save**. You can now close the original tabs.
 3. **Choose how to organize:** local organization is the default. For AI, first choose a model in Settings, enter your API key, enable it, and then describe your intent.
 4. **Keep moving:** track progress on the board or relationship view; restore a card, group, or entire Workspace when needed.
@@ -169,17 +169,17 @@ Then load the generated <code>dist</code> directory at <code>chrome://extensions
 
 Open **Settings → Connect your Agents**. The local MCP exposes **17 focused tools** for Workspaces, cards, relationships, exports, and tab operations.
 
-**Install boundary:** the two-minute package includes the complete Workspace, and Claude Desktop can also download its bundled MCPB directly. Codex, Claude Code, Cursor, VS Code, and TRAE currently require the [source build](#source-build): load <code>dist</code>, then return to Settings and choose that Agent.
+**No source checkout required:** install the two-minute extension package, then choose your Agent in Settings. TabNexus opens that client's setup directly; Codex opens local Settings with the launch command copied, while Claude Desktop downloads a double-clickable extension. Developer clients require Node.js 22.13+ when the local MCP starts for the first time.
 
 <details>
 <summary><strong>Supported clients and technical docs</strong></summary>
 
 | Client | Status | Setup |
 |---|:---:|---|
-| Codex | ✅ | Source-build repository plugin |
+| Codex | ✅ | Open local Settings with config copied |
 | Claude Desktop | ✅ | MCPB bundled in the two-minute package |
-| Claude Code | ✅ | Source-build Marketplace plugin |
-| Cursor / VS Code / TRAE | ✅ | Local MCP configuration |
+| Claude Code | ✅ | Install the GitHub Marketplace plugin in chat |
+| Cursor / VS Code / TRAE | ✅ | Open the client installer / importer |
 | Coze | Planned | Authenticated remote MCP gateway |
 
 [Client adapters](AGENT_CLIENT_ADAPTERS.md) · [capability matrix](MCP_CAPABILITY_MATRIX.md) · [testing guide](MCP_TESTING.md)
@@ -198,7 +198,7 @@ For security issues, read the [security policy](../.github/SECURITY.md) and use 
 
 ## 🛠️ Shipped and next
 
-**Shipped in v0.17.1:** multi-Workspace collect / save / restore, intent-driven multi-model AI classification with editable previews, a persistent relationship canvas, a 17-tool local MCP, and a bilingual UI. The automated baseline is 189 tests, 17/17 MCP tools, and 36/36 deterministic capability checks.
+**Shipped in v1.0.2:** multi-Workspace collect / save / restore, intent-driven multi-model AI classification with editable previews, a persistent relationship canvas, a 17-tool local MCP, a bilingual UI, and source-free local Agent setup links. The automated baseline is 190 tests, 17/17 MCP tools, and 36/36 deterministic capability checks.
 
 **Next:** Chrome Web Store distribution, an authenticated remote MCP for cloud Agents, accessibility, and large-Workspace performance. See [implementation status](IMPLEMENTATION_STATUS.md) and the [PRD](product/PRD.md).
 

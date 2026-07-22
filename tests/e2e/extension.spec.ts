@@ -354,13 +354,23 @@ test("uses the correct Agent path for source and portable builds", async () => {
     const id = await extensionId();
     const settings = await context.newPage();
     await settings.goto(`chrome-extension://${id}/options.html`);
-    await expect(settings.getByText("两分钟安装包已可直接使用工作区")).toBeVisible();
+    await expect(settings.getByText("安装包已包含本机 Agent 接入")).toBeVisible();
     await settings.getByRole("button", { name: /Codex/ }).click();
-    await expect(settings.getByText("连接 Codex 需要源码版")).toBeVisible();
-    await expect(settings.getByRole("link", { name: "查看 Agent 安装" })).toHaveAttribute(
-      "href",
-      "https://github.com/KaichenCurry/TabNexus#agent-setup"
-    );
+    await expect(settings.getByRole("link", { name: "打开 Codex 设置" })).toHaveAttribute("href", "codex://settings");
+    await expect(settings.getByText(/直接打开本机 Codex 设置/)).toBeVisible();
+    await expect(settings.getByRole("link", { name: "查看 Agent 安装" })).toHaveCount(0);
+
+    await settings.getByRole("button", { name: /所有 Agent/ }).click();
+    await settings.getByRole("button", { name: /Cursor/ }).click();
+    const cursorHref = await settings.getByRole("link", { name: "在 Cursor 中安装" }).getAttribute("href");
+    expect(cursorHref).toMatch(/^https:\/\/cursor\.com\/en\/install-mcp\?/);
+    const encodedConfig = new URL(cursorHref!).searchParams.get("config") ?? "";
+    const cursorConfig = JSON.parse(Buffer.from(encodedConfig, "base64").toString("utf8"));
+    expect(cursorConfig).toMatchObject({
+      command: "npx",
+      args: ["--yes", "github:KaichenCurry/TabNexus#v1.0.2"]
+    });
+    expect(cursorHref).not.toContain("agent-setup");
     return;
   }
 
