@@ -4,7 +4,7 @@ Updated: 2026-07-22
 
 | Area | Status | Evidence |
 |---|---|---|
-| MV3 extension skeleton | Complete | `public/manifest.json`, module service worker, production `dist/` |
+| MV3 extension skeleton | Complete | `extension/public/manifest.json`, module service worker, production `dist/` |
 | Toolbar singleton workspace | Complete | Background action contract test |
 | Versioned local data and workspaces | Complete | Storage/workspace tests and reload E2E |
 | Adaptive bilingual workspace UI | Complete | Horizontal group board, compact cards with icon-only navigation, persisted 320px → 56px rail collapse, and 1440×900 visual QA |

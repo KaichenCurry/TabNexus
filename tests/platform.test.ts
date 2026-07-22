@@ -37,7 +37,7 @@ describe("Chrome tab contracts", () => {
   it("queries the current window and labels internal pages unsupported", async () => {
     const mock = chromeMock();
     vi.stubGlobal("chrome", mock);
-    const { queryCurrentWindowTabs } = await import("../src/core/platform");
+    const { queryCurrentWindowTabs } = await import("../extension/src/core/platform");
     const tabs = await queryCurrentWindowTabs();
     expect(mock.query).toHaveBeenCalledWith({ currentWindow: true });
     expect(tabs.map((tab) => tab.supported)).toEqual([true, false]);
@@ -46,7 +46,7 @@ describe("Chrome tab contracts", () => {
   it("restores only missing URLs and reports denied file access", async () => {
     const mock = chromeMock({ fileAccess: false });
     vi.stubGlobal("chrome", mock);
-    const { restoreUrls } = await import("../src/core/platform");
+    const { restoreUrls } = await import("../extension/src/core/platform");
     const result = await restoreUrls([
       "https://example.com/a#duplicate",
       "https://example.org/new",

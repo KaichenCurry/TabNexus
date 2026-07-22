@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { applyGroupingProposal, createDomainProposal, validateGroupingProposal } from "../src/core/grouping";
-import { collectTabs, createInitialAppState } from "../src/core/workspace";
-import type { OpenTab } from "../src/core/types";
+import { applyGroupingProposal, createDomainProposal, validateGroupingProposal } from "../extension/src/core/grouping";
+import { collectTabs, createInitialAppState } from "../extension/src/core/workspace";
+import type { OpenTab } from "../extension/src/core/types";
 
 const openTabs: OpenTab[] = [
   { id: 1, windowId: 1, title: "Docs", url: "https://docs.example.com/a", pinned: false, active: false, supported: true },

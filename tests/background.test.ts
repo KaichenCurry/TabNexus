@@ -26,7 +26,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     expect(actionHandler).toBeTypeOf("function");
     actionHandler?.();
     await vi.waitFor(() => expect(tabUpdate).toHaveBeenCalledWith(8, { active: true }));
@@ -57,7 +57,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     const response = await new Promise<unknown>((resolve) => {
       expect(messageHandler?.({
         type: "VALIDATE_KEY",
@@ -100,7 +100,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     const response = await new Promise<unknown>((resolve) => {
       messageHandler?.({
         type: "VALIDATE_KEY",
@@ -141,7 +141,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     const response = await new Promise<unknown>((resolve) => messageHandler?.({
       type: "VALIDATE_KEY",
       provider: "anthropic",
@@ -200,7 +200,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     const send = (request: unknown) => new Promise<any>((resolve) => messageHandler?.(request, {}, resolve));
     const context = await send({ type: "M3_AGENT_TOOL", payload: { tool: "read_workspace" } });
     expect(context.data).toMatchObject({
@@ -321,7 +321,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     const send = (request: unknown) => new Promise<any>((resolve) => messageHandler?.(request, {}, resolve));
 
     const initial = await send({ type: "M3_AGENT_TOOL", payload: { tool: "read_workspace" } });
@@ -404,7 +404,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     const send = (request: unknown) => new Promise<any>((resolve) => messageHandler?.(request, {}, resolve));
 
     const exported = await send({ type: "M3_AGENT_TOOL", payload: { tool: "export_workspace", input: { format: "json" } } });
@@ -499,7 +499,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     const send = (request: unknown) => new Promise<any>((resolve) => messageHandler?.(request, {}, resolve));
     const initial = await send({ type: "M3_AGENT_TOOL", payload: { tool: "read_workspace" } });
     const saved = await send({
@@ -695,7 +695,7 @@ describe("MV3 background action", () => {
         session: { setAccessLevel: vi.fn(async () => undefined) }
       }
     });
-    await import("../src/background");
+    await import("../extension/src/background");
     const responsePromise = new Promise<any>((resolve) => {
       messageHandler?.({ type: "M3_BRIDGE_CONNECT" }, {}, resolve);
     });

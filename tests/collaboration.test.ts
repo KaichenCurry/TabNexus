@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { COLLABORATION_TOOL_DEFINITIONS, executeCollaborationTool, workspaceRevision } from "../src/core/collaboration";
-import type { Workspace } from "../src/core/types";
+import { COLLABORATION_TOOL_DEFINITIONS, executeCollaborationTool, workspaceRevision } from "../extension/src/core/collaboration";
+import type { Workspace } from "../extension/src/core/types";
 
 function fixture(): Workspace {
   return {

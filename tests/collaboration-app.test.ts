@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { appStateRevision, deleteWorkspaceItems, manageWorkspaces, searchWorkspaceCards } from "../src/core/collaborationApp";
-import { workspaceRevision } from "../src/core/collaboration";
-import type { AppState } from "../src/core/types";
+import { appStateRevision, deleteWorkspaceItems, manageWorkspaces, searchWorkspaceCards } from "../extension/src/core/collaborationApp";
+import { workspaceRevision } from "../extension/src/core/collaboration";
+import type { AppState } from "../extension/src/core/types";
 
 function fixture(): AppState {
   return {

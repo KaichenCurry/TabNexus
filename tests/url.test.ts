@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { displayDomain, inferCardType, isSupportedUrl, normalizeUrl, registrableDomain } from "../src/core/url";
+import { displayDomain, inferCardType, isSupportedUrl, normalizeUrl, registrableDomain } from "../extension/src/core/url";
 
 describe("URL rules", () => {
   it("normalizes fragments, default ports, host case, and trailing slashes", () => {

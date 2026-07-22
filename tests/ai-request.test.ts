@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createGroupingRequest } from "../src/core/ai";
-import type { Workspace } from "../src/core/types";
+import { createGroupingRequest } from "../extension/src/core/ai";
+import type { Workspace } from "../extension/src/core/types";
 
 describe("AI grouping request", () => {
   it("includes the user instruction, existing group names, and title-only sources", () => {

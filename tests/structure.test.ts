@@ -3,9 +3,9 @@ import {
   applyStructureProposal,
   createLocalStructureProposal,
   validateStructureProposal
-} from "../src/core/structure";
-import { collectTabs, createGroup, createInitialAppState } from "../src/core/workspace";
-import type { OpenTab } from "../src/core/types";
+} from "../extension/src/core/structure";
+import { collectTabs, createGroup, createInitialAppState } from "../extension/src/core/workspace";
+import type { OpenTab } from "../extension/src/core/types";
 
 function tab(id: number): OpenTab {
   return {

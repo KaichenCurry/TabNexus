@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const manifest = JSON.parse(readFileSync("public/manifest.json", "utf8")) as Record<string, unknown>;
+const manifest = JSON.parse(readFileSync("extension/public/manifest.json", "utf8")) as Record<string, unknown>;
 const pluginMarketplace = JSON.parse(readFileSync(".agents/plugins/marketplace.json", "utf8"));
 const codexPlugin = JSON.parse(readFileSync("agent/plugins/tabnexus/.codex-plugin/plugin.json", "utf8"));
 const codexMcp = JSON.parse(readFileSync("agent/plugins/tabnexus/.mcp.json", "utf8"));

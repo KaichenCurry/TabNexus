@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { WorkspaceApp } from "../src/workspace/WorkspaceApp";
-import { OpenTabsRail } from "../src/workspace/OpenTabsRail";
-import { CardRow } from "../src/workspace/CardRow";
-import { AgentPlanModal, ProposalModal } from "../src/workspace/WorkspaceModals";
-import type { Card, OpenTab, Workspace } from "../src/core/types";
+import { WorkspaceApp } from "../extension/src/workspace/WorkspaceApp";
+import { OpenTabsRail } from "../extension/src/workspace/OpenTabsRail";
+import { CardRow } from "../extension/src/workspace/CardRow";
+import { AgentPlanModal, ProposalModal } from "../extension/src/workspace/WorkspaceModals";
+import type { Card, OpenTab, Workspace } from "../extension/src/core/types";
 
 describe("workspace UI", () => {
   beforeEach(() => localStorage.clear());

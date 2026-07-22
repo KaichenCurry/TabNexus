@@ -9,7 +9,7 @@ import {
   createTraeInstallUrl,
   createVsCodeInstallUrl,
   createVsCodeMcpConfig
-} from "../src/core/agentClients";
+} from "../extension/src/core/agentClients";
 
 const entry = "/Applications/TabNexus/bridge/tabnexus-mcp.mjs";
 

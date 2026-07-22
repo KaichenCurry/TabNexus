@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildTabWorkbenchContext, selectionForWorkbenchScope } from "../src/core/tabWorkbench";
-import type { BrowserTabContext, Workspace } from "../src/core/types";
+import { buildTabWorkbenchContext, selectionForWorkbenchScope } from "../extension/src/core/tabWorkbench";
+import type { BrowserTabContext, Workspace } from "../extension/src/core/types";
 
 const workspace: Workspace = {
   id: "ws",

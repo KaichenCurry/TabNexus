@@ -5,15 +5,15 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const outputPath = resolve(root, "public", "agent", "tabnexus-claude.mcpb");
+const outputPath = resolve(root, "extension", "public", "agent", "tabnexus-claude.mcpb");
 const codexServerPath = resolve(root, "agent", "plugins", "tabnexus", "server", "index.mjs");
 const legacyCodexServerPath = resolve(root, "agent", "integrations", "codex", "plugins", "tabnexus", "server", "index.mjs");
 const codexSkillsPath = resolve(root, "agent", "plugins", "tabnexus", "skills");
 const legacyCodexSkillsPath = resolve(root, "agent", "integrations", "codex", "plugins", "tabnexus", "skills");
 const codexIconPath = resolve(root, "agent", "plugins", "tabnexus", "assets", "icon.png");
 const claudeCodeServerPath = resolve(root, "agent", "integrations", "claude-code", "server", "index.mjs");
-const standardConfigPath = resolve(root, "public", "agent", "tabnexus-standard.mcp.json");
-const vsCodeConfigPath = resolve(root, "public", "agent", "tabnexus-vscode.mcp.json");
+const standardConfigPath = resolve(root, "extension", "public", "agent", "tabnexus-standard.mcp.json");
+const vsCodeConfigPath = resolve(root, "extension", "public", "agent", "tabnexus-vscode.mcp.json");
 const publicServerEntry = "<ABSOLUTE_PATH_TO_TABNEXUS>/agent/bridge/tabnexus-mcp.mjs";
 
 function crc32(buffer) {
@@ -85,7 +85,7 @@ function createStoredZip(entries) {
 const [manifest, server, icon] = await Promise.all([
   readFile(resolve(root, "agent", "integrations", "claude", "manifest.json")),
   readFile(resolve(root, "agent", "bridge", "tabnexus-mcp.mjs")),
-  readFile(resolve(root, "public", "icons", "icon128.png"))
+  readFile(resolve(root, "extension", "public", "icons", "icon128.png"))
 ]);
 const serverVersion = server.toString("utf8").match(/const SERVER_VERSION = "([^"]+)"/)?.[1];
 if (!serverVersion) throw new Error("Unable to read MCP server version from agent/bridge/tabnexus-mcp.mjs");
@@ -104,7 +104,7 @@ await writeFile(codexServerPath, server);
 await writeFile(legacyCodexServerPath, server);
 await cp(codexSkillsPath, legacyCodexSkillsPath, { recursive: true, force: true });
 await writeFile(claudeCodeServerPath, server);
-await copyFile(resolve(root, "public", "icons", "icon128.png"), codexIconPath);
+await copyFile(resolve(root, "extension", "public", "icons", "icon128.png"), codexIconPath);
 await writeFile(standardConfigPath, `${JSON.stringify({
   mcpServers: {
     tabnexus: {
