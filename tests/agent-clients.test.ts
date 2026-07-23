@@ -4,7 +4,6 @@ import {
   MCP_BRIDGE_VERSION,
   MCP_TOOL_COUNT,
   TABNEXUS_RELEASE_VERSION,
-  createCodexInstallPrompt,
   createCodexInstallUrl,
   createCodexLauncherCommand,
   createCursorInstallUrl,
@@ -65,7 +64,7 @@ describe("Agent client adapters", () => {
     const traeUrl = createTraeInstallUrl(entry);
     expect(cursorUrl).toMatch(/^https:\/\/cursor\.com\/en\/install-mcp\?name=tabnexus&config=/);
     expect(vsCodeUrl).toMatch(/^https:\/\/insiders\.vscode\.dev\/redirect\?url=vscode%3Amcp%2Finstall%3F/);
-    expect(traeUrl).toMatch(/^trae-cn:\/\/trae\.ai-ide\/mcp-import\?type=stdio&name=TabNexus&config=/);
+    expect(traeUrl).toMatch(/^solo:\/\/trae\.ai-ide\/mcp-import\?type=stdio&name=TabNexus&config=/);
 
     const cursorConfig = JSON.parse(Buffer.from(new URL(cursorUrl).searchParams.get("config") ?? "", "base64").toString("utf8"));
     expect(cursorConfig).toMatchObject({ command: "node", args: [entry], env: { TABNEXUS_AGENT_NAME: "Cursor", TABNEXUS_MCP_VERSION: "0.8.0" } });
@@ -76,20 +75,20 @@ describe("Agent client adapters", () => {
     expect(vsCodeConfig).toMatchObject({ name: "tabnexus", type: "stdio", command: "node", args: [entry] });
 
     const traeConfig = JSON.parse(Buffer.from(new URL(traeUrl).searchParams.get("config") ?? "", "base64").toString("utf8"));
-    expect(traeConfig).toMatchObject({ command: "node", args: [entry], env: { TABNEXUS_AGENT_NAME: "TRAE CN", TABNEXUS_MCP_VERSION: "0.8.0" } });
+    expect(traeConfig).toMatchObject({ command: "node", args: [entry], env: { TABNEXUS_AGENT_NAME: "TRAE Work CN", TABNEXUS_MCP_VERSION: "0.8.0" } });
   });
 
   it("creates path-free, release-pinned installers for the portable package", () => {
     const source = createReleaseServerSource();
     const config = createStandardMcpConfig(source, "Portable Agent").mcpServers.tabnexus;
-    expect(TABNEXUS_RELEASE_VERSION).toBe("1.0.3");
+    expect(TABNEXUS_RELEASE_VERSION).toBe("1.0.4");
     expect(config).toMatchObject({
       command: "npx",
-      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.3/tabnexus-mcp-runtime-1.0.3.tgz"],
+      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.4/tabnexus-mcp-runtime-1.0.4.tgz"],
       env: { TABNEXUS_AGENT_NAME: "Portable Agent", TABNEXUS_MCP_VERSION: "0.8.0" }
     });
     expect(JSON.stringify(config)).not.toContain("/Users/");
-    expect(createReleasePackageUrl()).toBe("https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.3/tabnexus-mcp-runtime-1.0.3.tgz");
+    expect(createReleasePackageUrl()).toBe("https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.4/tabnexus-mcp-runtime-1.0.4.tgz");
     expect(createCodexLauncherCommand()).toBe(`npx --yes ${createReleasePackageUrl()}`);
 
     const cursorUrl = createCursorInstallUrl(source);
@@ -97,12 +96,10 @@ describe("Agent client adapters", () => {
     expect(cursorConfig).toMatchObject({ command: "npx", args: ["--yes", createReleasePackageUrl()] });
   });
 
-  it("opens a prefilled Codex task that installs the marketplace plugin", () => {
-    const prompt = createCodexInstallPrompt();
-    expect(prompt).toContain("codex plugin marketplace add KaichenCurry/TabNexus --ref v1.0.3");
-    expect(prompt).toContain("codex plugin add tabnexus@tabnexus");
+  it("opens the native Codex plugin install flow without creating a task", () => {
     const url = createCodexInstallUrl();
-    expect(url).toMatch(/^codex:\/\/threads\/new\?prompt=/);
-    expect(decodeURIComponent(url.split("prompt=")[1])).toBe(prompt);
+    expect(url).toBe("codex://plugins/install/tabnexus?marketplace=tabnexus");
+    expect(url).not.toContain("threads/new");
+    expect(url).not.toContain("prompt=");
   });
 });

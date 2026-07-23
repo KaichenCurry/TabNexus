@@ -55,7 +55,7 @@ describe("settings UI", () => {
     fireEvent.click(screen.getByRole("button", { name: /所有 Agent/ }));
 
     fireEvent.click(screen.getByRole("button", { name: /TRAE Work/ }));
-    expect(screen.getByRole("link", { name: "在 TRAE CN 中安装" })).toHaveAttribute("href", expect.stringMatching(/^trae-cn:\/\//));
+    expect(screen.getByRole("link", { name: "在 TRAE Work CN 中安装" })).toHaveAttribute("href", expect.stringMatching(/^solo:\/\//));
     fireEvent.click(screen.getByRole("button", { name: /所有 Agent/ }));
 
     fireEvent.click(screen.getByRole("button", { name: /扣子 Coze/ }));

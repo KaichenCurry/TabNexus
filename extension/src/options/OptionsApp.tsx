@@ -142,7 +142,7 @@ export function OptionsApp() {
   const agentServerSource = __TABNEXUS_PORTABLE_BUILD__
     ? createReleaseServerSource()
     : __TABNEXUS_LOCAL_MCP_ENTRY__;
-  const standardClientConfig = JSON.stringify(createStandardMcpConfig(agentServerSource, "TRAE CN"), null, 2);
+  const standardClientConfig = JSON.stringify(createStandardMcpConfig(agentServerSource, "TRAE Work CN"), null, 2);
   const vsCodeClientConfig = JSON.stringify(createVsCodeMcpConfig(agentServerSource), null, 2);
   const cursorInstallUrl = createCursorInstallUrl(agentServerSource);
   const vsCodeInstallUrl = createVsCodeInstallUrl(agentServerSource);
@@ -231,17 +231,17 @@ export function OptionsApp() {
 
   const setupDescription = (client: AgentClient) => ({
     codex: __TABNEXUS_PORTABLE_BUILD__
-      ? text("会在 Codex 中新建一条安装任务。发送预填内容后，Codex 会自动添加 TabNexus 插件。", "This starts a prefilled install task in Codex. Send it and Codex will add the TabNexus plugin.")
+      ? text("会直接打开 Codex 的 TabNexus 插件安装页；确认后插件会出现在 Plugins 中。", "This opens the TabNexus install page in Codex directly. Confirm once and it appears in Plugins.")
       : text("Codex 打开后点击“安装”。", "When Codex opens, click Install."),
     claude_desktop: text("下载后双击 .mcpb 文件，再在 Claude 中确认安装。", "Double-click the downloaded .mcpb file, then confirm in Claude."),
     cursor: text("Cursor 打开安装页后点击“Install”。", "When Cursor opens the install page, click Install."),
     vscode: text("VS Code 打开 MCP 安装页后点击“Install”。", "When VS Code opens the MCP install page, click Install."),
-    trae: text("会直接打开 TRAE CN 的 MCP 导入窗口；核对后点击“确认”。", "This opens the TRAE CN MCP import window. Review it, then click Confirm."),
+    trae: text("会直接打开 TRAE Work CN 的 MCP 导入窗口；核对后点击“确认”。", "This opens the TRAE Work CN MCP import window. Review it, then click Confirm."),
     coze: text("扣子目前没有官方本地 stdio MCP 客户端，不能直接读取这台电脑上的 Chrome 工作区。", "Coze currently has no official local stdio MCP client, so it cannot directly read this computer's Chrome workspace.")
   })[client];
 
   const installMethodLabel = (client: AgentClient) => ({
-    codex: __TABNEXUS_PORTABLE_BUILD__ ? text("对话内安装", "Install in task") : text("一键安装", "One-click"),
+    codex: text("插件安装", "Plugin install"),
     claude_desktop: text("扩展包", "Extension package"),
     cursor: text("一键安装", "One-click"),
     vscode: text("一键安装", "One-click"),
@@ -257,7 +257,7 @@ export function OptionsApp() {
     claude_desktop: ["Claude", "Claude Desktop"],
     cursor: ["Cursor"],
     vscode: ["VS Code"],
-    trae: ["TRAE CN", "TRAE Work", "TRAE"],
+    trae: ["TRAE Work CN", "TRAE Work", "TRAE CN", "TRAE"],
     coze: ["扣子 Coze", "Coze"]
   } satisfies Record<AgentClient, string[]>)[selectedAgent] : [];
   const selectedAgentConnected = bridgeStatus.state === "connected" && selectedAgentConnectionNames.some((name) => connectedAgentNames.includes(name));
@@ -555,7 +555,7 @@ export function OptionsApp() {
                       <button className="text-button" type="button" onClick={() => void prepareAgentConnection().then(() => copyBridgeValue(vsCodeClientConfig, "vscode"))}>{text("复制配置", "Copy config")}</button>
                     </div>}
                     {selectedAgent === "trae" && <div className="agent-install-actions">
-                      <a className="button primary agent-install-button" href={traeInstallUrl} onClick={() => void prepareAgentConnection()}>{text("在 TRAE CN 中安装", "Install in TRAE CN")}</a>
+                      <a className="button primary agent-install-button" href={traeInstallUrl} onClick={() => void prepareAgentConnection()}>{text("在 TRAE Work CN 中安装", "Install in TRAE Work CN")}</a>
                       <button className="text-button" type="button" onClick={() => void copyTraeSetup()}>{text("无法打开？复制配置", "Copy config instead")}</button>
                     </div>}
                   </div>

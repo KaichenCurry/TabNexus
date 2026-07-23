@@ -30,7 +30,7 @@ export type AgentServerSource = string | {
 
 export const MCP_BRIDGE_VERSION = "0.8.0" as const;
 export const MCP_TOOL_COUNT = 17 as const;
-export const TABNEXUS_RELEASE_VERSION = "1.0.3" as const;
+export const TABNEXUS_RELEASE_VERSION = "1.0.4" as const;
 export const TABNEXUS_GITHUB_REPOSITORY = "KaichenCurry/TabNexus" as const;
 export const TABNEXUS_CODEX_MARKETPLACE = "tabnexus" as const;
 
@@ -69,10 +69,10 @@ export const AGENT_CLIENTS: readonly AgentClientDefinition[] = [
   },
   {
     id: "trae",
-    name: "TRAE CN",
+    name: "TRAE Work CN",
     icon: "T",
     availability: "local",
-    officialDocs: "https://docs.trae.cn/ide_mcp-server-install-links"
+    officialDocs: "https://work.trae.cn/"
   },
   {
     id: "coze",
@@ -142,22 +142,12 @@ export function createVsCodeInstallUrl(source: AgentServerSource) {
 }
 
 export function createTraeInstallUrl(source: AgentServerSource) {
-  const config = JSON.stringify(createAgentServerConfig(source, "TRAE CN"));
-  return `trae-cn://trae.ai-ide/mcp-import?type=stdio&name=TabNexus&config=${encodeURIComponent(utf8Base64(config))}`;
+  const config = JSON.stringify(createAgentServerConfig(source, "TRAE Work CN"));
+  return `solo://trae.ai-ide/mcp-import?type=stdio&name=TabNexus&config=${encodeURIComponent(utf8Base64(config))}`;
 }
 
-export function createCodexInstallPrompt(version: string = TABNEXUS_RELEASE_VERSION) {
-  return [
-    "请帮我安装 TabNexus Codex 插件，并完成以下操作：",
-    `1. 运行 codex plugin marketplace add ${TABNEXUS_GITHUB_REPOSITORY} --ref v${version}`,
-    `2. 运行 codex plugin add tabnexus@${TABNEXUS_CODEX_MARKETPLACE}`,
-    "3. 验证插件已出现在 Codex 的 Plugins 中，并告诉我安装结果。",
-    "这是我主动请求的本机插件安装；如需执行命令，请直接执行。"
-  ].join("\n");
-}
-
-export function createCodexInstallUrl(version: string = TABNEXUS_RELEASE_VERSION) {
-  return `codex://threads/new?prompt=${encodeURIComponent(createCodexInstallPrompt(version))}`;
+export function createCodexInstallUrl() {
+  return `codex://plugins/install/tabnexus?marketplace=${encodeURIComponent(TABNEXUS_CODEX_MARKETPLACE)}`;
 }
 
 export function createReleaseServerSource(version: string = TABNEXUS_RELEASE_VERSION): AgentServerSource {

@@ -6,11 +6,11 @@ TabNexus exposes one standards-based local stdio MCP server. Client adapters onl
 
 | Client | Local dogfood install | Public-release path | Official reference |
 |---|---|---|---|
-| Codex | Prefilled Codex install task | Codex plugin marketplace | [Codex plugins](https://learn.chatgpt.com/docs/build-plugins) |
+| Codex | Native `codex://plugins/install/...` flow | Codex plugin marketplace | [Codex plugins](https://learn.chatgpt.com/docs/build-plugins) |
 | Claude Desktop | Downloadable `.mcpb` desktop extension | Claude extension directory or signed `.mcpb` | [Claude Desktop local MCP extensions](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop) |
 | Cursor | Official Add to Cursor deep link | MCP directory / published package | [Cursor MCP](https://docs.cursor.com/context/model-context-protocol) |
 | VS Code | Official MCP install deep link | GitHub MCP Registry and VS Code MCP gallery | [VS Code MCP](https://code.visualstudio.com/docs/agent-customization/mcp-servers) |
-| TRAE CN | Official `trae-cn://.../mcp-import` deep link | TRAE MCP marketplace / published package | [TRAE CN MCP](https://docs.trae.cn/ide_mcp-server-install-links) |
+| TRAE Work CN | Native `solo://.../mcp-import` deep link | TRAE Work MCP marketplace / published package | [TRAE Work](https://work.trae.cn/) |
 | 扣子 Coze | Reserved, not enabled for local dogfood | Authenticated Streamable HTTP gateway | [Coze product and plugin surface](https://www.coze.cn/overview) |
 
 ## Why Coze is different
