@@ -4,6 +4,16 @@ All notable changes to TabNexus will be documented here.
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-07-23
+
+### First-run experience and Agent installation
+
+- Added a three-step first-run tutorial for tab management, intent-based AI organization, and local Agent collaboration, plus a permanent workspace tutorial entry.
+- Replaced the broken Codex general-settings link with a prefilled Codex installation task that adds the TabNexus marketplace and plugin.
+- Switched the TRAE installer to the official `trae-cn://` MCP import scheme and labeled the supported client as TRAE CN.
+- Removed Claude Code from the in-product client picker for now while retaining Claude Desktop, Cursor, VS Code, Codex, and TRAE CN.
+- Simplified AI provider setup to API key plus organization policy; compatible provider models are selected internally.
+
 ## [1.0.2] - 2026-07-23
 
 ### Agent installation hotfix

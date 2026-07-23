@@ -11,12 +11,12 @@ describe("settings UI", () => {
     expect(input).toHaveAttribute("type", "password");
     expect(screen.getByRole("checkbox")).toBeDisabled();
     expect(screen.getByText("未验证 · 本地模式")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "选择你的整理模型" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "选择你的 AI 服务" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "连接你常用的 Agent" })).toBeInTheDocument();
     expect(screen.getByText(/仅发送本次整理所需的任务元数据/)).toBeInTheDocument();
     expect(screen.getByText(/不发送网页正文或卡片备注/)).toBeInTheDocument();
     expect(screen.getByText("选择要连接的应用")).toBeInTheDocument();
-    expect(screen.getByText("6 个可用")).toBeInTheDocument();
+    expect(screen.getByText("5 个可用")).toBeInTheDocument();
     expect(screen.getByText("OpenAI")).toBeInTheDocument();
     expect(screen.getByText("Claude")).toBeInTheDocument();
     expect(screen.getByText("Kimi")).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe("settings UI", () => {
     expect(screen.queryByText(/install-native-host/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Codex/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Claude Desktop/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Claude Code/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Claude Code/ })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Cursor/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /VS Code/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /TRAE Work/ })).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe("settings UI", () => {
     fireEvent.click(screen.getByRole("button", { name: /所有 Agent/ }));
 
     fireEvent.click(screen.getByRole("button", { name: /TRAE Work/ }));
-    expect(screen.getByRole("link", { name: "在 TRAE 中安装" })).toHaveAttribute("href", expect.stringMatching(/^trae:\/\//));
+    expect(screen.getByRole("link", { name: "在 TRAE CN 中安装" })).toHaveAttribute("href", expect.stringMatching(/^trae-cn:\/\//));
     fireEvent.click(screen.getByRole("button", { name: /所有 Agent/ }));
 
     fireEvent.click(screen.getByRole("button", { name: /扣子 Coze/ }));
@@ -63,12 +63,13 @@ describe("settings UI", () => {
     expect(screen.queryByRole("button", { name: "检测连接" })).not.toBeInTheDocument();
   });
 
-  it("keeps independent model and key settings when switching AI providers", async () => {
+  it("keeps independent API keys while models stay internal", async () => {
     render(<OptionsApp />);
     const providers = await screen.findByLabelText("AI 供应商");
     fireEvent.click(within(providers).getByText("OpenAI").closest("button")!);
     const openAiKey = await screen.findByPlaceholderText("sk-proj-…");
-    expect(screen.getByDisplayValue("gpt-5.6-luna")).toBeInTheDocument();
+    expect(screen.queryByText("gpt-5.6-luna")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("模型")).not.toBeInTheDocument();
     fireEvent.change(openAiKey, { target: { value: "openai-local-key" } });
     fireEvent.click(within(providers).getByText("DeepSeek").closest("button")!);
     expect(await screen.findByPlaceholderText("sk-…")).toHaveValue("");

@@ -15,7 +15,8 @@ export const DEFAULT_SETTINGS: Settings = {
   deepSeekModel: "deepseek-v4-flash",
   deepSeekVerifiedAt: "",
   groupingPolicy: "suggestion",
-  agentBridgeEnabled: false
+  agentBridgeEnabled: false,
+  tutorialCompleted: false
 };
 
 export const GROUP_COLORS = [

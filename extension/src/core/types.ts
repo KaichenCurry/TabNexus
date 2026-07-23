@@ -165,6 +165,7 @@ export type Settings = {
   deepSeekVerifiedAt: string;
   groupingPolicy: GroupingPolicy;
   agentBridgeEnabled: boolean;
+  tutorialCompleted: boolean;
 };
 
 export type AgentSafePreferences = {

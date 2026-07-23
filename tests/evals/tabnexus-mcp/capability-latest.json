@@ -1,9 +1,9 @@
 {
   "scriptVersion": "1.0.0",
   "mcpVersion": "0.8.0",
-  "generatedAt": "2026-07-22T18:14:28.554Z",
+  "generatedAt": "2026-07-23T03:04:17.079Z",
   "pass": true,
-  "durationMs": 117,
+  "durationMs": 111,
   "totalChecks": 36,
   "passedChecks": 36,
   "expectedTools": [
@@ -50,13 +50,13 @@
       "args": {
         "detail": "summary"
       },
-      "at": "2026-07-22T18:14:28.527Z",
+      "at": "2026-07-23T03:04:17.053Z",
       "ok": true
     },
     {
       "tool": "read_tab_workbench",
       "args": {},
-      "at": "2026-07-22T18:14:28.530Z",
+      "at": "2026-07-23T03:04:17.055Z",
       "ok": true
     },
     {
@@ -64,7 +64,7 @@
       "args": {
         "detail": "summary"
       },
-      "at": "2026-07-22T18:14:28.531Z",
+      "at": "2026-07-23T03:04:17.056Z",
       "ok": true
     },
     {
@@ -74,7 +74,7 @@
         "includeNotes": false,
         "limit": 20
       },
-      "at": "2026-07-22T18:14:28.532Z",
+      "at": "2026-07-23T03:04:17.058Z",
       "ok": true
     },
     {
@@ -86,7 +86,7 @@
         "expectedRevision": "wsr_eval_0001",
         "operationId": "cap:add-one"
       },
-      "at": "2026-07-22T18:14:28.534Z",
+      "at": "2026-07-23T03:04:17.059Z",
       "ok": true
     },
     {
@@ -108,7 +108,7 @@
         "expectedRevision": "wsr_eval_0002",
         "operationId": "cap:add-batch"
       },
-      "at": "2026-07-22T18:14:28.534Z",
+      "at": "2026-07-23T03:04:17.059Z",
       "ok": true
     },
     {
@@ -120,7 +120,7 @@
         "expectedRevision": "wsr_eval_0003",
         "operationId": "cap:report"
       },
-      "at": "2026-07-22T18:14:28.535Z",
+      "at": "2026-07-23T03:04:17.060Z",
       "ok": true
     },
     {
@@ -137,7 +137,7 @@
         "expectedRevision": "wsr_eval_0004",
         "operationId": "cap:proposal"
       },
-      "at": "2026-07-22T18:14:28.536Z",
+      "at": "2026-07-23T03:04:17.061Z",
       "ok": true
     },
     {
@@ -187,7 +187,7 @@
           }
         ]
       },
-      "at": "2026-07-22T18:14:28.537Z",
+      "at": "2026-07-23T03:04:17.061Z",
       "ok": true
     },
     {
@@ -195,7 +195,7 @@
       "args": {
         "format": "markdown"
       },
-      "at": "2026-07-22T18:14:28.537Z",
+      "at": "2026-07-23T03:04:17.062Z",
       "ok": true
     },
     {
@@ -203,7 +203,7 @@
       "args": {
         "action": "read"
       },
-      "at": "2026-07-22T18:14:28.538Z",
+      "at": "2026-07-23T03:04:17.062Z",
       "ok": true
     },
     {
@@ -217,7 +217,7 @@
           "rightRailCollapsed": true
         }
       },
-      "at": "2026-07-22T18:14:28.538Z",
+      "at": "2026-07-23T03:04:17.063Z",
       "ok": true
     },
     {
@@ -225,7 +225,7 @@
       "args": {
         "action": "read"
       },
-      "at": "2026-07-22T18:14:28.539Z",
+      "at": "2026-07-23T03:04:17.063Z",
       "ok": true
     },
     {
@@ -237,7 +237,7 @@
         "confirm": true,
         "confirmationText": "I confirm clearing this test activity"
       },
-      "at": "2026-07-22T18:14:28.540Z",
+      "at": "2026-07-23T03:04:17.064Z",
       "ok": true
     },
     {
@@ -245,7 +245,7 @@
       "args": {
         "detail": "summary"
       },
-      "at": "2026-07-22T18:14:28.543Z",
+      "at": "2026-07-23T03:04:17.067Z",
       "ok": true
     },
     {
@@ -277,7 +277,7 @@
           }
         ]
       },
-      "at": "2026-07-22T18:14:28.544Z",
+      "at": "2026-07-23T03:04:17.067Z",
       "ok": true
     },
     {
@@ -294,7 +294,7 @@
         "confirm": true,
         "confirmationText": "I confirm deleting these test items"
       },
-      "at": "2026-07-22T18:14:28.544Z",
+      "at": "2026-07-23T03:04:17.068Z",
       "ok": true
     },
     {
@@ -308,13 +308,13 @@
         "confirm": true,
         "confirmationText": "I confirm deleting this test workspace"
       },
-      "at": "2026-07-22T18:14:28.545Z",
+      "at": "2026-07-23T03:04:17.069Z",
       "ok": true
     },
     {
       "tool": "read_tab_workbench",
       "args": {},
-      "at": "2026-07-22T18:14:28.546Z",
+      "at": "2026-07-23T03:04:17.070Z",
       "ok": true
     },
     {
@@ -346,7 +346,7 @@
           }
         ]
       },
-      "at": "2026-07-22T18:14:28.547Z",
+      "at": "2026-07-23T03:04:17.070Z",
       "ok": true
     },
     {
@@ -359,7 +359,7 @@
         "operationId": "cap:save-selection",
         "groupId": "group_research"
       },
-      "at": "2026-07-22T18:14:28.547Z",
+      "at": "2026-07-23T03:04:17.071Z",
       "ok": true
     },
     {
@@ -372,7 +372,7 @@
         "expectedRevision": "wsr_eval_0009",
         "operationId": "cap:open-card"
       },
-      "at": "2026-07-22T18:14:28.548Z",
+      "at": "2026-07-23T03:04:17.071Z",
       "ok": true
     },
     {
@@ -383,13 +383,13 @@
         "expectedRevision": "wsr_eval_0009",
         "operationId": "cap:focus-card"
       },
-      "at": "2026-07-22T18:14:28.548Z",
+      "at": "2026-07-23T03:04:17.072Z",
       "ok": true
     },
     {
       "tool": "read_tab_workbench",
       "args": {},
-      "at": "2026-07-22T18:14:28.549Z",
+      "at": "2026-07-23T03:04:17.072Z",
       "ok": true
     },
     {
@@ -403,7 +403,7 @@
         "confirm": true,
         "confirmationText": "I confirm dismissing this recovery entry"
       },
-      "at": "2026-07-22T18:14:28.549Z",
+      "at": "2026-07-23T03:04:17.073Z",
       "ok": true
     },
     {
@@ -423,7 +423,7 @@
           }
         ]
       },
-      "at": "2026-07-22T18:14:28.550Z",
+      "at": "2026-07-23T03:04:17.074Z",
       "ok": true
     },
     {
@@ -437,13 +437,13 @@
         "confirm": true,
         "confirmationText": "I confirm closing the selected test tabs"
       },
-      "at": "2026-07-22T18:14:28.551Z",
+      "at": "2026-07-23T03:04:17.075Z",
       "ok": true
     },
     {
       "tool": "read_tab_workbench",
       "args": {},
-      "at": "2026-07-22T18:14:28.551Z",
+      "at": "2026-07-23T03:04:17.076Z",
       "ok": true
     },
     {
@@ -456,7 +456,7 @@
         "operationId": "cap:unsafe-close",
         "confirm": false
       },
-      "at": "2026-07-22T18:14:28.552Z",
+      "at": "2026-07-23T03:04:17.077Z",
       "ok": false,
       "error": "Explicit confirmation is required."
     },
@@ -470,7 +470,7 @@
         ],
         "confirm": false
       },
-      "at": "2026-07-22T18:14:28.553Z",
+      "at": "2026-07-23T03:04:17.077Z",
       "ok": false,
       "error": "Explicit confirmation is required."
     },
@@ -482,7 +482,7 @@
         "operationId": "cap:unsafe-clear-activity",
         "confirm": false
       },
-      "at": "2026-07-22T18:14:28.553Z",
+      "at": "2026-07-23T03:04:17.078Z",
       "ok": false,
       "error": "Explicit confirmation is required."
     },
@@ -498,7 +498,7 @@
           }
         ]
       },
-      "at": "2026-07-22T18:14:28.554Z",
+      "at": "2026-07-23T03:04:17.078Z",
       "ok": false,
       "error": "Workspace changed; read the latest revision and retry."
     }
@@ -507,17 +507,17 @@
     {
       "name": "protocol:initialize",
       "pass": true,
-      "durationMs": 77
+      "durationMs": 71
     },
     {
       "name": "protocol:tools-list",
       "pass": true,
-      "durationMs": 4
+      "durationMs": 5
     },
     {
       "name": "protocol:prompts",
       "pass": true,
-      "durationMs": 3
+      "durationMs": 2
     },
     {
       "name": "protocol:workbench-prompt",
@@ -552,12 +552,12 @@
     {
       "name": "tool:add_cards",
       "pass": true,
-      "durationMs": 0
+      "durationMs": 1
     },
     {
       "name": "tool:write_report",
       "pass": true,
-      "durationMs": 1
+      "durationMs": 0
     },
     {
       "name": "tool:propose_structure",
@@ -567,22 +567,22 @@
     {
       "name": "tool:edit_workspace",
       "pass": true,
-      "durationMs": 1
+      "durationMs": 0
     },
     {
       "name": "tool:export_workspace",
       "pass": true,
-      "durationMs": 0
-    },
-    {
-      "name": "tool:manage_preferences",
-      "pass": true,
       "durationMs": 1
     },
     {
       "name": "tool:manage_preferences",
       "pass": true,
       "durationMs": 0
+    },
+    {
+      "name": "tool:manage_preferences",
+      "pass": true,
+      "durationMs": 1
     },
     {
       "name": "tool:manage_agent_activity",
@@ -592,7 +592,7 @@
     {
       "name": "tool:manage_agent_activity",
       "pass": true,
-      "durationMs": 3
+      "durationMs": 2
     },
     {
       "name": "tool:read_workspace",
@@ -602,31 +602,26 @@
     {
       "name": "tool:manage_workspaces",
       "pass": true,
-      "durationMs": 1
+      "durationMs": 0
     },
     {
       "name": "tool:delete_workspace_items",
       "pass": true,
-      "durationMs": 1
+      "durationMs": 2
     },
     {
       "name": "tool:delete_workspace_items",
       "pass": true,
-      "durationMs": 1
+      "durationMs": 0
     },
     {
       "name": "tool:read_tab_workbench",
       "pass": true,
-      "durationMs": 0
+      "durationMs": 1
     },
     {
       "name": "tool:manage_tab_workbench",
       "pass": true,
-      "durationMs": 1
-    },
-    {
-      "name": "tool:sync_browser_tabs",
-      "pass": true,
       "durationMs": 0
     },
     {
@@ -638,21 +633,26 @@
       "name": "tool:sync_browser_tabs",
       "pass": true,
       "durationMs": 1
+    },
+    {
+      "name": "tool:sync_browser_tabs",
+      "pass": true,
+      "durationMs": 0
     },
     {
       "name": "tool:read_tab_workbench",
       "pass": true,
-      "durationMs": 0
+      "durationMs": 1
     },
     {
       "name": "tool:dismiss_recent_tabs",
       "pass": true,
-      "durationMs": 1
+      "durationMs": 0
     },
     {
       "name": "tool:manage_tab_workbench",
       "pass": true,
-      "durationMs": 0
+      "durationMs": 1
     },
     {
       "name": "tool:close_browser_tabs",

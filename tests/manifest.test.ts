@@ -43,6 +43,7 @@ describe("MV3 manifest security surface", () => {
 
 describe("Codex plugin package", () => {
   it("uses the repository marketplace layout Codex can discover", () => {
+    expect(pluginMarketplace.name).toBe("tabnexus");
     expect(pluginMarketplace.plugins).toContainEqual(expect.objectContaining({
       name: "tabnexus",
       source: { source: "local", path: "./agent/plugins/tabnexus" }
@@ -64,9 +65,9 @@ describe("Claude Code plugin package", () => {
   it("uses the official marketplace and bundled MCP layout", () => {
     expect(claudeCodeMarketplace).toMatchObject({
       name: "tabnexus-local",
-      plugins: [expect.objectContaining({ name: "tabnexus", version: "1.0.2", source: "./agent/integrations/claude-code" })]
+      plugins: [expect.objectContaining({ name: "tabnexus", version: "1.0.3", source: "./agent/integrations/claude-code" })]
     });
-    expect(claudeCodePlugin).toMatchObject({ name: "tabnexus", version: "1.0.2" });
+    expect(claudeCodePlugin).toMatchObject({ name: "tabnexus", version: "1.0.3" });
     expect(claudeCodeMcp.mcpServers.tabnexus).toMatchObject({
       command: "node",
       args: ["${CLAUDE_PLUGIN_ROOT}/server/index.mjs"]

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TabNexus",
   "short_name": "TabNexus",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A local-first workspace for browser tabs and AI task context.",
   "minimum_chrome_version": "118",
   "incognito": "not_allowed",
