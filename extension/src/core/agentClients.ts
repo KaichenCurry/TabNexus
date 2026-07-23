@@ -1,7 +1,6 @@
 export type AgentClient =
   | "codex"
   | "claude_desktop"
-  | "claude_code"
   | "cursor"
   | "vscode"
   | "trae"
@@ -31,8 +30,9 @@ export type AgentServerSource = string | {
 
 export const MCP_BRIDGE_VERSION = "0.8.0" as const;
 export const MCP_TOOL_COUNT = 17 as const;
-export const TABNEXUS_RELEASE_VERSION = "1.0.2" as const;
+export const TABNEXUS_RELEASE_VERSION = "1.0.3" as const;
 export const TABNEXUS_GITHUB_REPOSITORY = "KaichenCurry/TabNexus" as const;
+export const TABNEXUS_CODEX_MARKETPLACE = "tabnexus" as const;
 
 export function createReleasePackageUrl(version: string = TABNEXUS_RELEASE_VERSION) {
   return `https://github.com/${TABNEXUS_GITHUB_REPOSITORY}/releases/download/v${version}/tabnexus-mcp-runtime-${version}.tgz`;
@@ -54,13 +54,6 @@ export const AGENT_CLIENTS: readonly AgentClientDefinition[] = [
     officialDocs: "https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop"
   },
   {
-    id: "claude_code",
-    name: "Claude Code",
-    icon: "⌘",
-    availability: "local",
-    officialDocs: "https://code.claude.com/docs/en/mcp"
-  },
-  {
     id: "cursor",
     name: "Cursor",
     icon: "⌁",
@@ -76,10 +69,10 @@ export const AGENT_CLIENTS: readonly AgentClientDefinition[] = [
   },
   {
     id: "trae",
-    name: "TRAE Work",
+    name: "TRAE CN",
     icon: "T",
     availability: "local",
-    officialDocs: "https://docs.trae.ai/ide/model-context-protocol"
+    officialDocs: "https://docs.trae.cn/ide_mcp-server-install-links"
   },
   {
     id: "coze",
@@ -149,15 +142,22 @@ export function createVsCodeInstallUrl(source: AgentServerSource) {
 }
 
 export function createTraeInstallUrl(source: AgentServerSource) {
-  const config = JSON.stringify(createAgentServerConfig(source, "TRAE Work"));
-  return `trae://trae.ai-ide/mcp-import?type=stdio&name=TabNexus&config=${encodeURIComponent(utf8Base64(config))}`;
+  const config = JSON.stringify(createAgentServerConfig(source, "TRAE CN"));
+  return `trae-cn://trae.ai-ide/mcp-import?type=stdio&name=TabNexus&config=${encodeURIComponent(utf8Base64(config))}`;
 }
 
-export function createClaudeCodeInstallPrompts(repositoryRoot: string) {
+export function createCodexInstallPrompt(version: string = TABNEXUS_RELEASE_VERSION) {
   return [
-    `/plugin marketplace add ${repositoryRoot}`,
-    "/plugin install tabnexus@tabnexus-local"
-  ] as const;
+    "请帮我安装 TabNexus Codex 插件，并完成以下操作：",
+    `1. 运行 codex plugin marketplace add ${TABNEXUS_GITHUB_REPOSITORY} --ref v${version}`,
+    `2. 运行 codex plugin add tabnexus@${TABNEXUS_CODEX_MARKETPLACE}`,
+    "3. 验证插件已出现在 Codex 的 Plugins 中，并告诉我安装结果。",
+    "这是我主动请求的本机插件安装；如需执行命令，请直接执行。"
+  ].join("\n");
+}
+
+export function createCodexInstallUrl(version: string = TABNEXUS_RELEASE_VERSION) {
+  return `codex://threads/new?prompt=${encodeURIComponent(createCodexInstallPrompt(version))}`;
 }
 
 export function createReleaseServerSource(version: string = TABNEXUS_RELEASE_VERSION): AgentServerSource {

@@ -109,7 +109,8 @@ export async function loadSettings(): Promise<Settings> {
     groupingPolicy: ["automatic", "suggestion", "domain"].includes(stored?.groupingPolicy ?? "")
       ? stored!.groupingPolicy!
       : "suggestion",
-    agentBridgeEnabled: Boolean(stored?.agentBridgeEnabled)
+    agentBridgeEnabled: Boolean(stored?.agentBridgeEnabled),
+    tutorialCompleted: Boolean(stored?.tutorialCompleted)
   };
 }
 

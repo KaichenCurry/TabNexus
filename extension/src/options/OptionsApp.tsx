@@ -4,8 +4,7 @@ import {
   AGENT_CLIENTS,
   MCP_BRIDGE_VERSION,
   MCP_TOOL_COUNT,
-  createClaudeCodeInstallPrompts,
-  createCodexLauncherCommand,
+  createCodexInstallUrl,
   createCursorInstallUrl,
   createReleaseServerSource,
   createStandardMcpConfig,
@@ -17,7 +16,7 @@ import {
 import { AI_PROVIDERS, AI_PROVIDER_IDS } from "../core/aiProviders";
 import { isFileAccessAllowed, isExtensionRuntime, openExtensionDetails, sendBackgroundRequest } from "../core/platform";
 import { loadSettings, saveSettings } from "../core/storage";
-import type { AiProviderConfig, AiProviderId, BridgeConnectionStatus, DeepSeekErrorCode, GroupingPolicy, Settings } from "../core/types";
+import type { AiProviderId, BridgeConnectionStatus, DeepSeekErrorCode, GroupingPolicy, Settings } from "../core/types";
 
 export function OptionsApp() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -73,8 +72,8 @@ export function OptionsApp() {
       case "balance": return text(`${activeProvider.name} 账户余额不足`, `The ${activeProvider.name} account has insufficient balance`);
       case "rate_limit": return text("请求过于频繁，请稍后重试", "Too many requests. Try again shortly");
       case "server": return text(`${activeProvider.name} 服务暂时异常，请稍后重试`, `${activeProvider.name} is temporarily unavailable`);
-      case "model": return text(`当前账户无法使用 ${activeProviderConfig.model}`, `${activeProviderConfig.model} is unavailable for this account`);
-      case "invalid_request": return text(`${activeProvider.name} 拒绝了请求参数，请检查模型名称`, `${activeProvider.name} rejected the request. Check the model name`);
+      case "model": return text(`${activeProvider.name} 当前无法使用，请稍后重试或联系服务商`, `${activeProvider.name} is unavailable. Try again later or contact the provider`);
+      case "invalid_request": return text(`${activeProvider.name} 拒绝了本次请求，请确认 API key 权限`, `${activeProvider.name} rejected the request. Check the API key permissions`);
       case "invalid_response": return text(`${activeProvider.name} 返回了无法解析的结果，请重试`, `${activeProvider.name} returned an invalid response. Try again`);
       default: return detail || text("连接失败，请重试", "Connection failed. Try again");
     }
@@ -88,22 +87,6 @@ export function OptionsApp() {
     await saveSettings(next);
     setSaveState("saved");
     window.setTimeout(() => setSaveState("idle"), 1_500);
-  };
-
-  const updateProviderConfig = async (provider: AiProviderId, patch: Partial<AiProviderConfig>) => {
-    const nextConfig = { ...settings.aiProviderConfigs[provider], ...patch };
-    const invalidatesVerification = "apiKey" in patch || "model" in patch || patch.verifiedAt === "";
-    const legacyPatch = provider === "deepseek" ? {
-      deepSeekApiKey: nextConfig.apiKey,
-      deepSeekModel: "deepseek-v4-flash" as const,
-      deepSeekVerifiedAt: nextConfig.verifiedAt,
-      deepSeekEnabled: invalidatesVerification ? false : settings.aiEnabled
-    } : {};
-    await update({
-      aiProviderConfigs: { ...settings.aiProviderConfigs, [provider]: nextConfig },
-      ...(invalidatesVerification ? { aiEnabled: false } : {}),
-      ...legacyPatch
-    });
   };
 
   const selectProvider = async (provider: AiProviderId) => {
@@ -159,16 +142,14 @@ export function OptionsApp() {
   const agentServerSource = __TABNEXUS_PORTABLE_BUILD__
     ? createReleaseServerSource()
     : __TABNEXUS_LOCAL_MCP_ENTRY__;
-  const standardClientConfig = JSON.stringify(createStandardMcpConfig(agentServerSource, "TRAE Work"), null, 2);
+  const standardClientConfig = JSON.stringify(createStandardMcpConfig(agentServerSource, "TRAE CN"), null, 2);
   const vsCodeClientConfig = JSON.stringify(createVsCodeMcpConfig(agentServerSource), null, 2);
   const cursorInstallUrl = createCursorInstallUrl(agentServerSource);
   const vsCodeInstallUrl = createVsCodeInstallUrl(agentServerSource);
   const traeInstallUrl = createTraeInstallUrl(agentServerSource);
-  const claudeCodePrompts = createClaudeCodeInstallPrompts(__TABNEXUS_PORTABLE_BUILD__ ? "KaichenCurry/TabNexus" : __TABNEXUS_REPO_ROOT__);
   const codexInstallUrl = __TABNEXUS_PORTABLE_BUILD__
-    ? "codex://settings"
+    ? createCodexInstallUrl()
     : `codex://plugins/tabnexus?marketplacePath=${encodeURIComponent(__TABNEXUS_CODEX_MARKETPLACE__)}`;
-  const codexLauncherCommand = createCodexLauncherCommand();
   const claudeBundleUrl = isExtensionRuntime
     ? chrome.runtime.getURL("agent/tabnexus-claude.mcpb")
     : "/agent/tabnexus-claude.mcpb";
@@ -218,14 +199,11 @@ export function OptionsApp() {
       setBridgeBusy(false);
     }
   };
-  const copyBridgeValue = async (value: string, label: "codex" | "trae" | "vscode" | "claude_code_1" | "claude_code_2" | "read") => {
+  const copyBridgeValue = async (value: string, label: "trae" | "vscode" | "read") => {
     await navigator.clipboard.writeText(value);
     const messages = {
-      codex: text("Codex 启动命令已复制。设置打开后进入 MCP Servers，新增 TabNexus 并粘贴即可。", "The Codex launch command is copied. In Settings, open MCP Servers, add TabNexus, and paste it."),
       trae: text("TRAE 配置已复制。打开 MCP 管理页，选择手动添加并粘贴。", "TRAE config copied. Open MCP management, choose manual setup, and paste it."),
       vscode: text("VS Code 配置已复制。若一键安装未打开，可粘贴到 MCP 用户配置。", "VS Code config copied. If one-click install did not open, paste it into the MCP user configuration."),
-      claude_code_1: text("第 1 句已复制。粘贴到 Claude Code 对话并发送，然后再复制第 2 句。", "Step 1 copied. Paste it into Claude Code and send it, then copy step 2."),
-      claude_code_2: text("第 2 句已复制。粘贴并发送，安装完成后新建对话。", "Step 2 copied. Paste and send it, then start a new chat after installation."),
       read: text("测试问题已复制。回到 AI 助手，新建对话并粘贴。", "Test question copied. Return to your AI assistant, start a new chat, and paste it.")
     };
     setBridgeMessage(messages[label]);
@@ -240,35 +218,31 @@ export function OptionsApp() {
   };
   const prepareCodexConnection = async () => {
     await prepareAgentConnection();
-    if (__TABNEXUS_PORTABLE_BUILD__) await copyBridgeValue(codexLauncherCommand, "codex");
   };
 
   const clientDescription = (client: AgentClient) => ({
     codex: text("OpenAI 桌面端 / CLI", "OpenAI desktop / CLI"),
     claude_desktop: text("桌面扩展包", "Desktop extension"),
-    claude_code: text("Claude 编程 Agent", "Claude coding agent"),
     cursor: text("代码编辑器", "Code editor"),
     vscode: text("GitHub Copilot Agent", "GitHub Copilot Agent"),
-    trae: text("IDE / SOLO", "IDE / SOLO"),
+    trae: text("TRAE Work 中国版", "TRAE Work China"),
     coze: text("远程连接 · 待发布", "Remote connector · upcoming")
   })[client];
 
   const setupDescription = (client: AgentClient) => ({
     codex: __TABNEXUS_PORTABLE_BUILD__
-      ? text("会直接打开本机 Codex 设置，并复制 TabNexus 启动命令；在 MCP Servers 中新增并粘贴即可。", "This opens local Codex Settings and copies the TabNexus launch command. Add it under MCP Servers and paste.")
+      ? text("会在 Codex 中新建一条安装任务。发送预填内容后，Codex 会自动添加 TabNexus 插件。", "This starts a prefilled install task in Codex. Send it and Codex will add the TabNexus plugin.")
       : text("Codex 打开后点击“安装”。", "When Codex opens, click Install."),
     claude_desktop: text("下载后双击 .mcpb 文件，再在 Claude 中确认安装。", "Double-click the downloaded .mcpb file, then confirm in Claude."),
-    claude_code: text("不用退出 Claude Code。把下面两句依次粘贴到当前对话并发送。", "Stay in Claude Code. Paste and send the two prompts below, one at a time."),
     cursor: text("Cursor 打开安装页后点击“Install”。", "When Cursor opens the install page, click Install."),
     vscode: text("VS Code 打开 MCP 安装页后点击“Install”。", "When VS Code opens the MCP install page, click Install."),
-    trae: text("TRAE 打开导入窗口后核对配置，再点击“添加”。", "Review the configuration in TRAE, then click Add."),
+    trae: text("会直接打开 TRAE CN 的 MCP 导入窗口；核对后点击“确认”。", "This opens the TRAE CN MCP import window. Review it, then click Confirm."),
     coze: text("扣子目前没有官方本地 stdio MCP 客户端，不能直接读取这台电脑上的 Chrome 工作区。", "Coze currently has no official local stdio MCP client, so it cannot directly read this computer's Chrome workspace.")
   })[client];
 
   const installMethodLabel = (client: AgentClient) => ({
-    codex: __TABNEXUS_PORTABLE_BUILD__ ? text("打开设置", "Open settings") : text("一键安装", "One-click"),
+    codex: __TABNEXUS_PORTABLE_BUILD__ ? text("对话内安装", "Install in task") : text("一键安装", "One-click"),
     claude_desktop: text("扩展包", "Extension package"),
-    claude_code: text("对话内安装", "Install in chat"),
     cursor: text("一键安装", "One-click"),
     vscode: text("一键安装", "One-click"),
     trae: text("一键导入", "One-click import"),
@@ -281,10 +255,9 @@ export function OptionsApp() {
   const selectedAgentConnectionNames = selectedAgent ? ({
     codex: ["Codex"],
     claude_desktop: ["Claude", "Claude Desktop"],
-    claude_code: ["Claude Code"],
     cursor: ["Cursor"],
     vscode: ["VS Code"],
-    trae: ["TRAE Work", "TRAE"],
+    trae: ["TRAE CN", "TRAE Work", "TRAE"],
     coze: ["扣子 Coze", "Coze"]
   } satisfies Record<AgentClient, string[]>)[selectedAgent] : [];
   const selectedAgentConnected = bridgeStatus.state === "connected" && selectedAgentConnectionNames.some((name) => connectedAgentNames.includes(name));
@@ -320,8 +293,8 @@ export function OptionsApp() {
 
         <div className="settings-section-heading">
           <span>01 · {text("工作台智能", "WORKSPACE AI")}</span>
-          <h2>{text("选择你的整理模型", "Choose your organizing model")}</h2>
-          <p>{text("用于标签分类、整理指令和关系建议；与下方的外部 Agent 连接互不影响。", "Powers tab grouping, organizing instructions, and relationship suggestions; independent from external Agent connections below.")}</p>
+          <h2>{text("选择你的 AI 服务", "Choose your AI service")}</h2>
+          <p>{text("选择服务商并填写 API key 即可；TabNexus 会自动使用适配模型，无需额外配置。", "Choose a provider and enter its API key. TabNexus automatically uses a compatible model, with no extra setup.")}</p>
         </div>
 
         <section className="settings-card vertical ai-provider-settings-card">
@@ -340,7 +313,7 @@ export function OptionsApp() {
                   onClick={() => void selectProvider(providerId)}
                 >
                   <span className="provider-mark">{provider.mark}</span>
-                  <span><strong>{provider.name}</strong><small>{configured ? text("已保存密钥", "Key saved") : provider.defaultModel}</small></span>
+                  <span><strong>{provider.name}</strong><small>{configured ? text("已保存密钥", "Key saved") : text("填写 API key", "Add API key")}</small></span>
                   <i aria-hidden="true">{selected ? "✓" : ""}</i>
                 </button>
               );
@@ -352,7 +325,7 @@ export function OptionsApp() {
               <div className="provider-config-identity">
                 <span className="provider-mark large" style={{ "--provider-accent": activeProvider.accent } as CSSProperties}>{activeProvider.mark}</span>
                 <div>
-                  <small>{text("当前整理模型", "ACTIVE ORGANIZING MODEL")}</small>
+                  <small>{text("当前 AI 服务", "ACTIVE AI SERVICE")}</small>
                   <div className="setting-heading-with-state">
                     <h3>{activeProvider.name}</h3>
                     <span className={`ai-config-state ${aiReady && aiVerified ? "connected" : aiReady ? "configured" : "local"}`}>
@@ -414,18 +387,6 @@ export function OptionsApp() {
                 {keyState !== "idle" && <small className={keyState === "valid" ? "field-success" : keyState === "invalid" ? "field-error" : ""}>{keyMessage}</small>}
               </label>
               <label className="field">
-                <span>{text("模型", "Model")}</span>
-                <input
-                  list={`${settings.aiProvider}-models`}
-                  value={activeProviderConfig.model}
-                  spellCheck={false}
-                  onChange={(event) => void updateProviderConfig(settings.aiProvider, { model: event.target.value, verifiedAt: "" })}
-                />
-                <datalist id={`${settings.aiProvider}-models`}>
-                  {activeProvider.suggestedModels.map((model) => <option key={model} value={model} />)}
-                </datalist>
-              </label>
-              <label className="field">
                 <span>{text("应用方式", "Apply changes")}</span>
                 <select value={settings.groupingPolicy} onChange={(event) => void update({ groupingPolicy: event.target.value as GroupingPolicy })}>
                   <option value="suggestion">{text("先看预览，再确认", "Preview before applying")}</option>
@@ -437,7 +398,7 @@ export function OptionsApp() {
 
             <div className="provider-config-footer">
               <span>✓</span>
-              <p><strong>{text("只在你主动整理时调用", "Called only when you organize")}</strong>{text("仅发送本次整理所需的任务元数据（如 ID、标题、URL、类型、分组、进度和时间）；不发送网页正文或卡片备注。密钥保存在本机扩展存储中，并非操作系统级加密。", "Only task metadata required for this organization (such as IDs, titles, URLs, types, groups, progress, and timestamps) is sent; page bodies and card notes are not. Keys stay in local extension storage and are not OS-level encrypted.")}</p>
+              <p><strong>{text("自动选用适配模型，只在你主动整理时调用", "Compatible model selected automatically and called only when you organize")}</strong>{text("仅发送本次整理所需的任务元数据（如 ID、标题、URL、类型、分组、进度和时间）；不发送网页正文或卡片备注。密钥保存在本机扩展存储中，并非操作系统级加密。", "Only task metadata required for this organization (such as IDs, titles, URLs, types, groups, progress, and timestamps) is sent; page bodies and card notes are not. Keys stay in local extension storage and are not OS-level encrypted.")}</p>
               <span className="provider-flow-hint">{text("选择标签 → 描述意图 → 预览 → 应用", "Select tabs → Describe intent → Preview → Apply")}</span>
             </div>
           </div>
@@ -504,7 +465,7 @@ export function OptionsApp() {
                 </div>}
               </div>
               <div className="agent-app-group">
-                <div className="agent-app-group-title"><span>{text("桌面与 IDE", "DESKTOP & IDE")}</span><b>{text("6 个可用", "6 available")}</b></div>
+                <div className="agent-app-group-title"><span>{text("桌面与 IDE", "DESKTOP & IDE")}</span><b>{text("5 个可用", "5 available")}</b></div>
                 <div className="agent-client-grid">
                   {AGENT_CLIENTS.filter(({ availability }) => availability === "local").map(({ id, icon, name, availability }) => (
                     <button
@@ -580,25 +541,21 @@ export function OptionsApp() {
                 <div className="agent-connect-grid">
                   <div className="agent-connect-action-card">
                     <span className="agent-card-kicker">{installStarted ? text("安装已打开", "INSTALLER OPENED") : text("下一步", "NEXT")}</span>
-                    <strong>{selectedAgent === "claude_code" ? text("把两条指令发给 Claude Code", "Send two prompts to Claude Code") : text(`在 ${selectedClient.name} 中安装`, `Install in ${selectedClient.name}`)}</strong>
+                    <strong>{text(`在 ${selectedClient.name} 中安装`, `Install in ${selectedClient.name}`)}</strong>
                     <p>{setupDescription(selectedAgent)}</p>
                     {selectedAgent === "codex" && <a className="button primary agent-install-button" href={codexInstallUrl} onClick={() => void prepareCodexConnection()}>{bridgeNeedsUpdate
                       ? text("更新 Codex 连接", "Update Codex connection")
                       : __TABNEXUS_PORTABLE_BUILD__
-                        ? text("打开 Codex 设置", "Open Codex settings")
+                        ? text("在 Codex 中安装", "Install in Codex")
                         : text("在 Codex 中安装", "Install in Codex")}</a>}
                     {selectedAgent === "claude_desktop" && <a className="button primary agent-install-button" href={claudeBundleUrl} download="TabNexus.mcpb" onClick={() => void prepareAgentConnection()}>{bridgeNeedsUpdate ? text("下载新版 Claude 扩展", "Download updated Claude extension") : text("下载 Claude 扩展包", "Download Claude extension")}</a>}
-                    {selectedAgent === "claude_code" && <div className="agent-prompt-install">
-                      <button type="button" onClick={() => void prepareAgentConnection().then(() => copyBridgeValue(claudeCodePrompts[0], "claude_code_1"))}><span>1</span><code>{claudeCodePrompts[0]}</code><b>{text("复制", "Copy")}</b></button>
-                      <button type="button" onClick={() => void prepareAgentConnection().then(() => copyBridgeValue(claudeCodePrompts[1], "claude_code_2"))}><span>2</span><code>{claudeCodePrompts[1]}</code><b>{text("复制", "Copy")}</b></button>
-                    </div>}
                     {selectedAgent === "cursor" && <a className="button primary agent-install-button" href={cursorInstallUrl} target="_blank" rel="noreferrer" onClick={() => void prepareAgentConnection()}>{text("在 Cursor 中安装", "Install in Cursor")}</a>}
                     {selectedAgent === "vscode" && <div className="agent-install-actions">
                       <a className="button primary agent-install-button" href={vsCodeInstallUrl} target="_blank" rel="noreferrer" onClick={() => void prepareAgentConnection()}>{text("在 VS Code 中安装", "Install in VS Code")}</a>
                       <button className="text-button" type="button" onClick={() => void prepareAgentConnection().then(() => copyBridgeValue(vsCodeClientConfig, "vscode"))}>{text("复制配置", "Copy config")}</button>
                     </div>}
                     {selectedAgent === "trae" && <div className="agent-install-actions">
-                      <a className="button primary agent-install-button" href={traeInstallUrl} onClick={() => void prepareAgentConnection()}>{text("在 TRAE 中安装", "Install in TRAE")}</a>
+                      <a className="button primary agent-install-button" href={traeInstallUrl} onClick={() => void prepareAgentConnection()}>{text("在 TRAE CN 中安装", "Install in TRAE CN")}</a>
                       <button className="text-button" type="button" onClick={() => void copyTraeSetup()}>{text("无法打开？复制配置", "Copy config instead")}</button>
                     </div>}
                   </div>

@@ -9,6 +9,22 @@ import type { Card, OpenTab, Workspace } from "../extension/src/core/types";
 describe("workspace UI", () => {
   beforeEach(() => localStorage.clear());
 
+  it("shows the three-part tutorial once and keeps a permanent reopen button", async () => {
+    render(<WorkspaceApp />);
+    const tutorial = await screen.findByRole("dialog", { name: "先保存，再放心关闭" });
+    expect(within(tutorial).getByText("基础 · 标签管理")).toBeInTheDocument();
+    fireEvent.click(within(tutorial).getByRole("button", { name: /AI 整理/ }));
+    expect(await screen.findByRole("dialog", { name: "按你的意图整理，不被固定分类限制" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /本地 Agent/ }));
+    expect(await screen.findByRole("dialog", { name: "让 Agent 直接接着你的浏览任务做" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "不再显示" }));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: /Agent 直接接着/ })).not.toBeInTheDocument());
+    await waitFor(() => expect(localStorage.getItem("tabnexus.settings.v1")).toContain('"tutorialCompleted":true'));
+
+    fireEvent.click(screen.getByRole("button", { name: "教程" }));
+    expect(await screen.findByRole("dialog", { name: "先保存，再放心关闭" })).toBeInTheDocument();
+  });
+
   it("uses a multi-select tab workbench, saves regular tabs, and keeps the center for groups", async () => {
     const { container } = render(<WorkspaceApp />);
     expect(await screen.findByRole("heading", { name: "标签操作台" })).toBeInTheDocument();

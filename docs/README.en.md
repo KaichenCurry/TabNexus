@@ -28,7 +28,7 @@
 <div align="center"><sub>Save pages as a Workspace with groups, notes, states, and relationships. Close the originals with confidence; restore them in one click.</sub></div>
 
 > [!IMPORTANT]
-> **Current version: v1.0.2.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
+> **Current version: v1.0.3.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
 
 <a id="why"></a>
 ## 😵 Your tab bar is not clutter. It is unfinished thinking you are afraid to lose.
@@ -110,7 +110,7 @@ Domain grouping tells you where a page came from. It cannot tell you why you ope
 Your selected model interprets the role each page plays, proposes groups, and can separately suggest relationship structure. The default workflow shows a preview first; you decide whether to apply it.
 
 > [!IMPORTANT]
-> **TabNexus uses local organization by default. To use AI organization, you must first choose a provider under Settings → Choose your organizing model, enter your own valid API key and model, and enable AI. Otherwise intent-aware AI organization is unavailable, the system stays in local mode, and no external model is called.**
+> **TabNexus uses local organization by default. To use AI organization, choose a provider under Settings → Choose your AI service, enter a valid API key, and enable it; TabNexus selects a compatible model automatically. Without setup, it stays local and calls no external service.**
 >
 > Without an API configuration, capture, save, restore, manual and local-domain grouping, cards, relationships, and progress all remain fully available.
 
@@ -140,9 +140,9 @@ Agents can search Workspaces, add pages or notes, update states and groups, prop
 <a id="start"></a>
 ## 🚀 Install in two minutes and organize your first task
 
-1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.2/TabNexus-Chrome-v1.0.2.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
+1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.3/TabNexus-Chrome-v1.0.3.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
 2. **Save one task:** open TabNexus, select pages that belong together, and click **Save**. You can now close the original tabs.
-3. **Choose how to organize:** local organization is the default. For AI, first choose a model in Settings, enter your API key, enable it, and then describe your intent.
+3. **Choose how to organize:** local organization is the default. For AI, first choose a provider in Settings, enter your API key, enable it, and then describe your intent.
 4. **Keep moving:** track progress on the board or relationship view; restore a card, group, or entire Workspace when needed.
 
 That is the complete everyday workflow—**no Agent and no terminal required.**
@@ -169,17 +169,16 @@ Then load the generated <code>dist</code> directory at <code>chrome://extensions
 
 Open **Settings → Connect your Agents**. The local MCP exposes **17 focused tools** for Workspaces, cards, relationships, exports, and tab operations.
 
-**No source checkout required:** install the two-minute extension package, then choose your Agent in Settings. TabNexus opens that client's setup directly; Codex opens local Settings with the launch command copied, while Claude Desktop downloads a double-clickable extension. Developer clients require Node.js 22.13+ when the local MCP starts for the first time.
+**No source checkout required:** install the two-minute extension package, then choose your Agent in Settings. TabNexus opens that client's setup directly: Codex starts a prefilled install task, TRAE CN opens its MCP import dialog, and Claude Desktop downloads a double-clickable extension. Developer clients require Node.js 22.13+ when the local MCP starts for the first time.
 
 <details>
 <summary><strong>Supported clients and technical docs</strong></summary>
 
 | Client | Status | Setup |
 |---|:---:|---|
-| Codex | ✅ | Open local Settings with config copied |
+| Codex | ✅ | Open a prefilled task that adds the TabNexus plugin |
 | Claude Desktop | ✅ | MCPB bundled in the two-minute package |
-| Claude Code | ✅ | Install the GitHub Marketplace plugin in chat |
-| Cursor / VS Code / TRAE | ✅ | Open the client installer / importer |
+| Cursor / VS Code / TRAE CN | ✅ | Open the client installer / importer |
 | Coze | Planned | Authenticated remote MCP gateway |
 
 [Client adapters](AGENT_CLIENT_ADAPTERS.md) · [capability matrix](MCP_CAPABILITY_MATRIX.md) · [testing guide](MCP_TESTING.md)
@@ -198,7 +197,7 @@ For security issues, read the [security policy](../.github/SECURITY.md) and use 
 
 ## 🛠️ Shipped and next
 
-**Shipped in v1.0.2:** multi-Workspace collect / save / restore, intent-driven multi-model AI classification with editable previews, a persistent relationship canvas, a 17-tool local MCP, a bilingual UI, and source-free local Agent setup links. The automated baseline is 190 tests, 17/17 MCP tools, and 36/36 deterministic capability checks.
+**Shipped in v1.0.3:** multi-Workspace collect / save / restore, intent-driven multi-model AI classification with editable previews, a persistent relationship canvas, a 17-tool local MCP, a bilingual UI, first-run guidance, and source-free local Agent setup links. The automated baseline is 191 tests, 17/17 MCP tools, and 36/36 deterministic capability checks.
 
 **Next:** Chrome Web Store distribution, an authenticated remote MCP for cloud Agents, accessibility, and large-Workspace performance. See [implementation status](IMPLEMENTATION_STATUS.md) and the [PRD](product/PRD.md).
 

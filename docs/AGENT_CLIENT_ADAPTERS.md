@@ -1,17 +1,16 @@
 # TabNexus Agent client adapters
 
-Updated: 2026-07-22
+Updated: 2026-07-23
 
 TabNexus exposes one standards-based local stdio MCP server. Client adapters only package or install that same server in the format each Agent officially supports; they do not fork the tool implementation.
 
 | Client | Local dogfood install | Public-release path | Official reference |
 |---|---|---|---|
-| Codex | Repository marketplace plugin deep link | Codex plugin marketplace | [Codex MCP and plugins](https://learn.chatgpt.com/docs/extend/mcp) |
+| Codex | Prefilled Codex install task | Codex plugin marketplace | [Codex plugins](https://learn.chatgpt.com/docs/build-plugins) |
 | Claude Desktop | Downloadable `.mcpb` desktop extension | Claude extension directory or signed `.mcpb` | [Claude Desktop local MCP extensions](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop) |
-| Claude Code | Claude Code plugin marketplace, installed from inside its chat | GitHub-hosted Claude plugin marketplace | [Claude Code MCP](https://code.claude.com/docs/en/mcp) |
 | Cursor | Official Add to Cursor deep link | MCP directory / published package | [Cursor MCP](https://docs.cursor.com/context/model-context-protocol) |
 | VS Code | Official MCP install deep link | GitHub MCP Registry and VS Code MCP gallery | [VS Code MCP](https://code.visualstudio.com/docs/agent-customization/mcp-servers) |
-| TRAE Work | Official `trae://.../mcp-import` deep link | TRAE MCP marketplace / published package | [TRAE MCP](https://docs.trae.ai/ide/model-context-protocol) |
+| TRAE CN | Official `trae-cn://.../mcp-import` deep link | TRAE MCP marketplace / published package | [TRAE CN MCP](https://docs.trae.cn/ide_mcp-server-install-links) |
 | 扣子 Coze | Reserved, not enabled for local dogfood | Authenticated Streamable HTTP gateway | [Coze product and plugin surface](https://www.coze.cn/overview) |
 
 ## Why Coze is different

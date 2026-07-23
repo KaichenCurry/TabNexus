@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "tabnexus",
   "display_name": "TabNexus",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Use TabNexus browser workspaces and current Chrome tabs from Claude.",
   "long_description": "A local-first bridge between Claude and the TabNexus Chrome extension. Search across workspaces, manage workspace lifecycle, save or restore Chrome tabs, batch-add sources, and edit classification, metadata, mind-map layout, and relationships. The bridge never reads your model API keys.",
   "author": {

@@ -5,40 +5,40 @@
 - Result: PASS
 - Checks: 36/36
 - Successful tools: 17/17
-- Duration: 117 ms
+- Duration: 111 ms
 
 | Check | Result | Duration |
 |---|---:|---:|
-| protocol:initialize | PASS | 77 ms |
-| protocol:tools-list | PASS | 4 ms |
-| protocol:prompts | PASS | 3 ms |
+| protocol:initialize | PASS | 71 ms |
+| protocol:tools-list | PASS | 5 ms |
+| protocol:prompts | PASS | 2 ms |
 | protocol:workbench-prompt | PASS | 0 ms |
 | protocol:resources-list | PASS | 3 ms |
 | protocol:workbench-resource | PASS | 1 ms |
 | tool:read_workspace | PASS | 2 ms |
 | tool:search_cards | PASS | 1 ms |
 | tool:add_card | PASS | 1 ms |
-| tool:add_cards | PASS | 0 ms |
-| tool:write_report | PASS | 1 ms |
+| tool:add_cards | PASS | 1 ms |
+| tool:write_report | PASS | 0 ms |
 | tool:propose_structure | PASS | 1 ms |
-| tool:edit_workspace | PASS | 1 ms |
-| tool:export_workspace | PASS | 0 ms |
-| tool:manage_preferences | PASS | 1 ms |
+| tool:edit_workspace | PASS | 0 ms |
+| tool:export_workspace | PASS | 1 ms |
 | tool:manage_preferences | PASS | 0 ms |
+| tool:manage_preferences | PASS | 1 ms |
 | tool:manage_agent_activity | PASS | 1 ms |
-| tool:manage_agent_activity | PASS | 3 ms |
+| tool:manage_agent_activity | PASS | 2 ms |
 | tool:read_workspace | PASS | 1 ms |
-| tool:manage_workspaces | PASS | 1 ms |
-| tool:delete_workspace_items | PASS | 1 ms |
-| tool:delete_workspace_items | PASS | 1 ms |
-| tool:read_tab_workbench | PASS | 0 ms |
-| tool:manage_tab_workbench | PASS | 1 ms |
-| tool:sync_browser_tabs | PASS | 0 ms |
-| tool:sync_browser_tabs | PASS | 1 ms |
-| tool:sync_browser_tabs | PASS | 1 ms |
-| tool:read_tab_workbench | PASS | 0 ms |
-| tool:dismiss_recent_tabs | PASS | 1 ms |
+| tool:manage_workspaces | PASS | 0 ms |
+| tool:delete_workspace_items | PASS | 2 ms |
+| tool:delete_workspace_items | PASS | 0 ms |
+| tool:read_tab_workbench | PASS | 1 ms |
 | tool:manage_tab_workbench | PASS | 0 ms |
+| tool:sync_browser_tabs | PASS | 1 ms |
+| tool:sync_browser_tabs | PASS | 1 ms |
+| tool:sync_browser_tabs | PASS | 0 ms |
+| tool:read_tab_workbench | PASS | 1 ms |
+| tool:dismiss_recent_tabs | PASS | 0 ms |
+| tool:manage_tab_workbench | PASS | 1 ms |
 | tool:close_browser_tabs | PASS | 1 ms |
 | tool:read_tab_workbench | PASS | 1 ms |
 | guard:close_browser_tabs:confirm | PASS | 1 ms |

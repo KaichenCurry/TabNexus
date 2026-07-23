@@ -80,6 +80,7 @@ import { message } from "../i18n";
 import { GroupPanel } from "./GroupPanel";
 import { FlowCanvas } from "./FlowCanvas";
 import { OpenTabsRail, type SelectionPayload } from "./OpenTabsRail";
+import { TutorialDialog } from "./TutorialDialog";
 import {
   AgentActivityModal,
   AgentPlanModal,
@@ -130,6 +131,7 @@ export function WorkspaceApp() {
     groupId: "all" | string;
   }>({ status: "all", type: "all", groupId: "all" });
   const [aiLoading, setAiLoading] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const toastTimer = useRef<number | undefined>(undefined);
   const previousTabs = useRef<OpenTab[] | null>(null);
 
@@ -174,6 +176,7 @@ export function WorkspaceApp() {
       ]);
       if (cancelled) return;
       setSettings(loadedSettings);
+      if (!loadedSettings.tutorialCompleted) setTutorialOpen(true);
       setAppState(loadedState);
       setUndo(loadedUndo && loadedState.workspaces[loadedUndo.workspaceId] ? loadedUndo : null);
       setRecentlyClosed(loadedRecentlyClosed);
@@ -292,6 +295,11 @@ export function WorkspaceApp() {
     const next = { ...settings, ...patch };
     setSettings(next);
     await saveSettings(next);
+  };
+
+  const dismissTutorial = async () => {
+    setTutorialOpen(false);
+    await changeSettings({ tutorialCompleted: true });
   };
 
   const changeTabWorkbenchSelection = async (selection: { tabIds: number[]; cardIds: string[] }) => {
@@ -943,6 +951,15 @@ export function WorkspaceApp() {
             </div>
           </div>
           <div className="toolbar utility-toolbar">
+            <button
+              className="button tutorial-trigger"
+              type="button"
+              aria-label={locale === "zh" ? "教程" : "Tour"}
+              title={locale === "zh" ? "打开使用教程" : "Open product tour"}
+              onClick={() => setTutorialOpen(true)}
+            >
+              <span aria-hidden="true">?</span>
+            </button>
             <div className="view-switch" role="group" aria-label={t("viewSwitch")}>
               <button
                 type="button"
@@ -1210,6 +1227,14 @@ export function WorkspaceApp() {
         collapsed={settings.rightRailCollapsed}
         onCollapsedChange={(rightRailCollapsed) => void changeSettings({ rightRailCollapsed })}
       />
+
+      {tutorialOpen && (
+        <TutorialDialog
+          locale={locale}
+          onDismiss={() => void dismissTutorial()}
+          onOpenSettings={() => void openOptions()}
+        />
+      )}
 
       {noteCard && modal?.type === "note" && (
         <NoteModal

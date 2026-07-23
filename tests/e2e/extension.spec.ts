@@ -43,6 +43,17 @@ test.beforeEach(async () => {
     contentType: "text/html",
     body: `<title>${new URL(route.request().url()).pathname.slice(1)}</title><h1>TabNexus E2E fixture</h1>`
   }));
+  const id = await extensionId();
+  const setup = await context.newPage();
+  await setup.goto(`chrome-extension://${id}/options.html`);
+  await setup.evaluate(async () => {
+    await chrome.storage.local.set({
+      "tabnexus.settings.v1": {
+        tutorialCompleted: true
+      }
+    });
+  });
+  await setup.close();
 });
 
 test.afterEach(async () => {
@@ -187,7 +198,8 @@ test("the Agent composer analyzes exactly the tabs checked in the right rail", a
         deepSeekVerifiedAt: "2026-07-21T00:00:00.000Z",
         deepSeekModel: "deepseek-v4-flash",
         groupingPolicy: "suggestion",
-        aiComposerCollapsed: true
+        aiComposerCollapsed: true,
+        tutorialCompleted: true
       }
     });
   });
@@ -247,7 +259,8 @@ test("the Agent previews, saves, and closes exactly the checked rail tabs", asyn
         deepSeekVerifiedAt: "2026-07-21T00:00:00.000Z",
         deepSeekModel: "deepseek-v4-flash",
         groupingPolicy: "suggestion",
-        aiComposerCollapsed: true
+        aiComposerCollapsed: true,
+        tutorialCompleted: true
       }
     });
   });
@@ -356,8 +369,10 @@ test("uses the correct Agent path for source and portable builds", async () => {
     await settings.goto(`chrome-extension://${id}/options.html`);
     await expect(settings.getByText("安装包已包含本机 Agent 接入")).toBeVisible();
     await settings.getByRole("button", { name: /Codex/ }).click();
-    await expect(settings.getByRole("link", { name: "打开 Codex 设置" })).toHaveAttribute("href", "codex://settings");
-    await expect(settings.getByText(/直接打开本机 Codex 设置/)).toBeVisible();
+    const codexHref = await settings.getByRole("link", { name: "在 Codex 中安装" }).getAttribute("href");
+    expect(codexHref).toMatch(/^codex:\/\/threads\/new\?prompt=/);
+    expect(decodeURIComponent(codexHref!.split("prompt=")[1])).toContain("codex plugin add tabnexus@tabnexus");
+    await expect(settings.getByText(/会在 Codex 中新建一条安装任务/)).toBeVisible();
     await expect(settings.getByRole("link", { name: "查看 Agent 安装" })).toHaveCount(0);
 
     await settings.getByRole("button", { name: /所有 Agent/ }).click();
@@ -368,7 +383,7 @@ test("uses the correct Agent path for source and portable builds", async () => {
     const cursorConfig = JSON.parse(Buffer.from(encodedConfig, "base64").toString("utf8"));
     expect(cursorConfig).toMatchObject({
       command: "npx",
-      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.2/tabnexus-mcp-runtime-1.0.2.tgz"]
+      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.3/tabnexus-mcp-runtime-1.0.3.tgz"]
     });
     expect(cursorHref).not.toContain("agent-setup");
     return;

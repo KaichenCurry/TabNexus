@@ -1,6 +1,6 @@
 # TabNexus MCP 本地测试指南
 
-MCP 在 Codex、Claude Desktop、Claude Code、Cursor、VS Code 或 TRAE Work 的对话中使用。TabNexus 不会增加第二个聊天框，普通用户也不需要打开终端。扣子 Coze 入口暂时只保留远程适配状态，不能连接本机 Chrome。
+MCP 在 Codex、Claude Desktop、Cursor、VS Code 或 TRAE CN 的对话中使用。TabNexus 不会增加第二个聊天框，普通用户也不需要打开终端。扣子 Coze 入口暂时只保留远程适配状态，不能连接本机 Chrome。
 
 ```text
 你在自己的 Agent 中输入自然语言
@@ -12,7 +12,7 @@ Chrome 扩展提供工作区和当前窗口标签
 Agent 读取上下文，或把资料与报告写回 TabNexus
 ```
 
-设置中选择的 AI 模型只负责 TabNexus 内部的即时整理。外部 Agent 不会调用模型 API，也读不到任何模型密钥。
+设置中选择的 AI 服务只负责 TabNexus 内部的即时整理。外部 Agent 不会调用模型 API，也读不到任何模型密钥。
 
 ## 一键自动测试（开发者）
 
@@ -45,15 +45,14 @@ node scripts/test-mcp-capabilities.mjs --server agent/bridge/tabnexus-mcp.mjs --
 
 1. 打开 TabNexus **设置 → 连接你常用的 Agent**，选择第一个要连接的助手。需要时可以返回列表继续安装其他 Agent。
 2. 点击页面里唯一的蓝色安装按钮：
-   - **Codex**：点击“在 Codex 中安装”，Codex 打开后点“安装”。
+   - **Codex**：点击“在 Codex 中安装”，发送自动填好的安装任务；Codex 会添加 TabNexus 插件并反馈结果。
    - **Claude Desktop**：下载安装包，双击后在 Claude 中点“安装”。
-   - **Claude Code**：把页面给出的两句 `/plugin` 指令依次粘贴到 Claude Code 对话。
    - **Cursor**：点击“在 Cursor 中安装”，Cursor 打开后点“Install”。
    - **VS Code**：点击“在 VS Code 中安装”，VS Code 打开后点“Install”。
-   - **TRAE Work**：点击“在 TRAE 中安装”，核对导入内容后点“添加”。
+   - **TRAE CN**：点击“在 TRAE CN 中安装”，核对导入内容后点“确认”。
 3. 在助手中新建一个对话，回到 TabNexus 点击“检测连接”，再点击“连接后试一句”复制测试问题并粘贴到新对话。
 
-当前源码安装中，Codex、Claude Desktop 和 Claude Code 包已经包含连接程序；Cursor、VS Code 和 TRAE Work 的入口会使用执行 `pnpm build` 时的本地项目路径。因此请在最终保存位置完成构建，不要在构建后移动仓库。
+当前源码安装中，Codex 和 Claude Desktop 包已经包含连接程序；Cursor、VS Code 和 TRAE CN 的入口会使用执行 `pnpm build` 时的本地项目路径。因此请在最终保存位置完成构建，不要在构建后移动仓库。
 
 本仓库使用 Codex 标准本地市场结构：`.agents/plugins/marketplace.json` 与 `agent/plugins/tabnexus/`。开发机只需由维护流程注册一次仓库市场；这台测试机已经完成注册，普通测试不需要再运行命令。公开发布后由插件市场接管这一步。
 
