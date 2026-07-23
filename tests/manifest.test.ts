@@ -48,7 +48,12 @@ describe("Codex plugin package", () => {
       name: "tabnexus",
       source: { source: "local", path: "./agent/plugins/tabnexus" }
     }));
-    expect(codexPlugin).toMatchObject({ name: "tabnexus", mcpServers: "./.mcp.json", skills: "./skills/" });
+    expect(codexPlugin).toMatchObject({
+      name: "tabnexus",
+      version: "1.0.4+codex.20260723000000",
+      mcpServers: "./.mcp.json",
+      skills: "./skills/"
+    });
     expect(codexMcp.mcpServers.tabnexus).toMatchObject({
       command: "node",
       args: ["./server/index.mjs"],
