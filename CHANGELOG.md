@@ -4,6 +4,15 @@ All notable changes to TabNexus will be documented here.
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-07-23
+
+### Direct Agent install hotfix
+
+- Replaced the Codex prefilled chat task with the native `codex://plugins/install/...` plugin installation flow.
+- Removed every prompt and command-based Codex installation instruction from the product UI.
+- Corrected the supported ByteDance client name to TRAE Work CN and switched its installer from the TRAE IDE protocol to the app's registered `solo://.../mcp-import` route.
+- Added regression coverage that rejects Codex chat prompts and the TRAE IDE protocol.
+
 ## [1.0.3] - 2026-07-23
 
 ### First-run experience and Agent installation

@@ -1,6 +1,6 @@
 {
   "name": "tabnexus",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Search, manage, and edit TabNexus workspaces and Chrome tabs from Claude Code.",
   "author": {
     "name": "TabNexus"

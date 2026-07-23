@@ -1,6 +1,6 @@
 # TabNexus MCP capability matrix
 
-Status: v1.0.3 / MCP bridge 0.8.0
+Status: v1.0.4 / MCP bridge 0.8.0
 
 All adapters must pass the same runtime contract: MCP `0.8.0`, exactly 17 tools, four prompts, and subscribed versioned resources. `npm run bridge:audit` verifies both release packages and installed local copies; it does not infer capability parity from configuration files alone.
 

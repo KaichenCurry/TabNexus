@@ -43,13 +43,13 @@ const STEPS = [
     zh: {
       eyebrow: "协作 · 本地 Agent",
       title: "让 Agent 直接接着你的浏览任务做",
-      body: "把 TabNexus 安装到 Codex、Claude Desktop、Cursor、VS Code 或 TRAE CN。Agent 可以读取上下文、整理工作区、操作标签并把报告写回来。",
+      body: "把 TabNexus 安装到 Codex、Claude Desktop、Cursor、VS Code 或 TRAE Work CN。Agent 可以读取上下文、整理工作区、操作标签并把报告写回来。",
       points: ["工作区上下文无需反复粘贴", "17 项 MCP 能力覆盖主要操作", "本地连接，不经过 TabNexus 云端"]
     },
     en: {
       eyebrow: "COLLABORATION · LOCAL AGENTS",
       title: "Let an Agent continue your browsing task",
-      body: "Add TabNexus to Codex, Claude Desktop, Cursor, VS Code, or TRAE CN. Agents can read context, organize workspaces, operate tabs, and write reports back.",
+      body: "Add TabNexus to Codex, Claude Desktop, Cursor, VS Code, or TRAE Work CN. Agents can read context, organize workspaces, operate tabs, and write reports back.",
       points: ["No repeated context copy-and-paste", "17 MCP tools cover core operations", "Local connection, no TabNexus cloud"]
     }
   }
