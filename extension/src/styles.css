@@ -1380,6 +1380,21 @@ body { min-width: 920px; background: var(--canvas); }
 .tutorial-agent-workspace small { display: block; color: #6b7fac; font-size: 7px; font-weight: 850; letter-spacing: .12em; }
 .tutorial-agent-workspace strong { display: block; margin: 6px 0 5px; color: #29364e; font-size: 14px; }
 .tutorial-agent-workspace p { margin: 0; color: #7a8493; font-size: 8.5px; }
+.tutorial-agent-actions {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto;
+  align-items: center;
+  gap: 9px;
+  margin: -7px 0 15px;
+  padding: 10px 12px;
+  border: 1px solid #dce3ef;
+  border-radius: 13px;
+  background: #f7f9fd;
+}
+.tutorial-agent-actions > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.tutorial-agent-actions strong { color: #2d3950; font-size: 10px; }
+.tutorial-agent-actions span { color: #7b8595; font-size: 8px; }
+.tutorial-agent-actions .button { min-height: 31px; padding: 7px 11px; font-size: 8.5px; }
 .tutorial-benefits { display: flex; flex-wrap: wrap; gap: 7px 15px; margin: 0; padding: 0; list-style: none; }
 .tutorial-benefits li { display: flex; align-items: center; gap: 6px; color: #667184; font-size: 9px; }
 .tutorial-benefits li span { width: 16px; height: 16px; display: grid; place-items: center; border-radius: 50%; background: #e8f4ec; color: #37805a; font-size: 7px; font-weight: 850; }

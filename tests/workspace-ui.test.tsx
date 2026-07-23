@@ -17,6 +17,11 @@ describe("workspace UI", () => {
     expect(await screen.findByRole("dialog", { name: "按你的意图整理，不被固定分类限制" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /本地 Agent/ }));
     expect(await screen.findByRole("dialog", { name: "让 Agent 直接接着你的浏览任务做" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "下载 Codex 安装器" })).toHaveAttribute(
+      "href",
+      "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/TabNexus-Codex-Setup-v1.0.5.dmg"
+    );
+    expect(screen.getByRole("button", { name: "查看全部 Agent" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "不再显示" }));
     await waitFor(() => expect(screen.queryByRole("dialog", { name: /Agent 直接接着/ })).not.toBeInTheDocument());
     await waitFor(() => expect(localStorage.getItem("tabnexus.settings.v1")).toContain('"tutorialCompleted":true'));

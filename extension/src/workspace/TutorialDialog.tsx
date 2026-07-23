@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createCodexInstallerDownloadUrl } from "../core/agentClients";
 import type { Locale } from "../core/types";
 
 type TutorialDialogProps = {
@@ -59,6 +60,7 @@ export function TutorialDialog({ locale, onDismiss, onOpenSettings }: TutorialDi
   const [step, setStep] = useState(0);
   const content = STEPS[step][locale];
   const zh = locale === "zh";
+  const codexInstallerUrl = createCodexInstallerDownloadUrl();
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -136,6 +138,17 @@ export function TutorialDialog({ locale, onDismiss, onOpenSettings }: TutorialDi
             )}
           </div>
 
+          {step === 2 && (
+            <div className="tutorial-agent-actions">
+              <div>
+                <strong>{zh ? "使用 Codex？直接安装" : "Using Codex? Install directly"}</strong>
+                <span>{zh ? "macOS · 安装一次 · 无需终端或 Query" : "macOS · One-time setup · No terminal or prompt"}</span>
+              </div>
+              <a className="button primary" href={codexInstallerUrl} target="_blank" rel="noreferrer">{zh ? "下载 Codex 安装器" : "Download Codex installer"}</a>
+              <button className="button secondary" type="button" onClick={openSettings}>{zh ? "查看全部 Agent" : "View all Agents"}</button>
+            </div>
+          )}
+
           <ul className="tutorial-benefits">
             {content.points.map((point) => <li key={point}><span>✓</span>{point}</li>)}
           </ul>
@@ -147,7 +160,7 @@ export function TutorialDialog({ locale, onDismiss, onOpenSettings }: TutorialDi
               {step > 0 && <button className="button secondary" type="button" onClick={() => setStep((value) => value - 1)}>{zh ? "上一步" : "Back"}</button>}
               {step < STEPS.length - 1
                 ? <button className="button primary" type="button" onClick={() => setStep((value) => value + 1)}>{zh ? "下一步" : "Next"} →</button>
-                : <button className="button primary" type="button" onClick={openSettings}>{zh ? "连接我的 Agent" : "Connect my Agent"} →</button>}
+                : <button className="button primary" type="button" onClick={onDismiss}>{zh ? "开始使用" : "Start using"} →</button>}
             </div>
           </footer>
         </div>

@@ -369,9 +369,10 @@ test("uses the correct Agent path for source and portable builds", async () => {
     await settings.goto(`chrome-extension://${id}/options.html`);
     await expect(settings.getByText("安装包已包含本机 Agent 接入")).toBeVisible();
     await settings.getByRole("button", { name: /Codex/ }).click();
-    const codexHref = await settings.getByRole("link", { name: "在 Codex 中安装" }).getAttribute("href");
-    expect(codexHref).toBe("codex://plugins/install/tabnexus?marketplace=tabnexus");
-    await expect(settings.getByText(/直接打开 Codex 的 TabNexus 插件安装页/)).toBeVisible();
+    const codexHref = await settings.getByRole("link", { name: "下载 Codex 安装器" }).getAttribute("href");
+    expect(codexHref).toBe("https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/TabNexus-Codex-Setup-v1.0.5.dmg");
+    await expect(settings.getByText(/自动添加插件源、安装 TabNexus/)).toBeVisible();
+    await expect(settings.getByRole("link", { name: "已经安装？在 Codex 中打开" })).toHaveAttribute("href", "codex://plugins/tabnexus@tabnexus?source=manage");
     await expect(settings.getByRole("link", { name: "查看 Agent 安装" })).toHaveCount(0);
 
     await settings.getByRole("button", { name: /所有 Agent/ }).click();
@@ -382,7 +383,7 @@ test("uses the correct Agent path for source and portable builds", async () => {
     const cursorConfig = JSON.parse(Buffer.from(encodedConfig, "base64").toString("utf8"));
     expect(cursorConfig).toMatchObject({
       command: "npx",
-      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.4/tabnexus-mcp-runtime-1.0.4.tgz"]
+      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/tabnexus-mcp-runtime-1.0.5.tgz"]
     });
     expect(cursorHref).not.toContain("agent-setup");
     return;
