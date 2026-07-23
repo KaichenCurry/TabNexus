@@ -4,6 +4,16 @@ All notable changes to TabNexus will be documented here.
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-07-23
+
+### Verified Codex one-click installer
+
+- Replaced the invalid public Codex marketplace deep link with a standalone macOS installer downloaded from the GitHub Release.
+- The installer uses Codex's official bundled CLI to refresh the TabNexus Marketplace, install `tabnexus@tabnexus`, and verify that the plugin is installed and enabled before offering to open it in Codex.
+- Added a headless isolated-install mode and verified the packaged DMG against a clean temporary Codex configuration.
+- Added the Codex installer directly to the first-run tutorial and permanent tutorial entry, while keeping the full Agent chooser in Settings.
+- Added optional Developer ID signing and notarization support to the release pipeline; unsigned local builds are explicitly marked as development artifacts.
+
 ## [1.0.4] - 2026-07-23
 
 ### Direct Agent install hotfix

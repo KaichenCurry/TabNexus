@@ -50,7 +50,7 @@ describe("Codex plugin package", () => {
     }));
     expect(codexPlugin).toMatchObject({
       name: "tabnexus",
-      version: "1.0.4+codex.20260723000000",
+      version: "1.0.5+codex.20260723000000",
       mcpServers: "./.mcp.json",
       skills: "./skills/"
     });
@@ -70,9 +70,9 @@ describe("Claude Code plugin package", () => {
   it("uses the official marketplace and bundled MCP layout", () => {
     expect(claudeCodeMarketplace).toMatchObject({
       name: "tabnexus-local",
-      plugins: [expect.objectContaining({ name: "tabnexus", version: "1.0.4", source: "./agent/integrations/claude-code" })]
+      plugins: [expect.objectContaining({ name: "tabnexus", version: "1.0.5", source: "./agent/integrations/claude-code" })]
     });
-    expect(claudeCodePlugin).toMatchObject({ name: "tabnexus", version: "1.0.4" });
+    expect(claudeCodePlugin).toMatchObject({ name: "tabnexus", version: "1.0.5" });
     expect(claudeCodeMcp.mcpServers.tabnexus).toMatchObject({
       command: "node",
       args: ["${CLAUDE_PLUGIN_ROOT}/server/index.mjs"]

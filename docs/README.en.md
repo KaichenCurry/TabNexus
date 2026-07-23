@@ -28,7 +28,7 @@
 <div align="center"><sub>Save pages as a Workspace with groups, notes, states, and relationships. Close the originals with confidence; restore them in one click.</sub></div>
 
 > [!IMPORTANT]
-> **Current version: v1.0.4.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
+> **Current version: v1.0.5.** A loadable Chrome package is available; Chrome Web Store distribution is coming. → [2-minute start](#start)
 
 <a id="why"></a>
 ## 😵 Your tab bar is not clutter. It is unfinished thinking you are afraid to lose.
@@ -140,7 +140,7 @@ Agents can search Workspaces, add pages or notes, update states and groups, prop
 <a id="start"></a>
 ## 🚀 Install in two minutes and organize your first task
 
-1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.4/TabNexus-Chrome-v1.0.4.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
+1. **Install:** download and unzip the [TabNexus Chrome package](https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/TabNexus-Chrome-v1.0.5.zip), open <code>chrome://extensions</code>, enable **Developer mode**, and choose **Load unpacked**.
 2. **Save one task:** open TabNexus, select pages that belong together, and click **Save**. You can now close the original tabs.
 3. **Choose how to organize:** local organization is the default. For AI, first choose a provider in Settings, enter your API key, enable it, and then describe your intent.
 4. **Keep moving:** track progress on the board or relationship view; restore a card, group, or entire Workspace when needed.
@@ -169,14 +169,14 @@ Then load the generated <code>dist</code> directory at <code>chrome://extensions
 
 Open **Settings → Connect your Agents**. The local MCP exposes **17 focused tools** for Workspaces, cards, relationships, exports, and tab operations.
 
-**No source checkout required:** install the two-minute extension package, then choose your Agent in Settings. TabNexus opens that client's setup directly: Codex opens the native plugin installer, TRAE Work CN opens its MCP import dialog, and Claude Desktop downloads a double-clickable extension. Developer clients require Node.js 22.13+ when the local MCP starts for the first time.
+**No source checkout required:** install the two-minute extension package, then choose your client in the tutorial's third step or under **Settings → Connect your Agents**. Codex downloads a one-time macOS installer that registers the TabNexus Marketplace, installs the plugin, verifies the result, and opens Codex—without a terminal or prompt. TRAE Work CN opens its MCP import dialog, while Claude Desktop downloads a double-clickable extension. Cursor, VS Code, and TRAE Work CN require Node.js 22.13+ when the local MCP starts for the first time.
 
 <details>
 <summary><strong>Supported clients and technical docs</strong></summary>
 
 | Client | Status | Setup |
 |---|:---:|---|
-| Codex | ✅ | Open the native TabNexus plugin install page |
+| Codex | ✅ | Download and open the one-time macOS installer |
 | Claude Desktop | ✅ | MCPB bundled in the two-minute package |
 | Cursor / VS Code / TRAE Work CN | ✅ | Open the client installer / importer |
 | Coze | Planned | Authenticated remote MCP gateway |
@@ -197,7 +197,7 @@ For security issues, read the [security policy](../.github/SECURITY.md) and use 
 
 ## 🛠️ Shipped and next
 
-**Shipped in v1.0.4:** multi-Workspace collect / save / restore, intent-driven multi-model AI classification with editable previews, a persistent relationship canvas, a 17-tool local MCP, a bilingual UI, first-run guidance, and source-free local Agent setup links. The automated baseline is 191 tests, 17/17 MCP tools, and 36/36 deterministic capability checks.
+**Shipped in v1.0.5:** multi-Workspace collect / save / restore, intent-driven multi-model AI classification with editable previews, a persistent relationship canvas, a 17-tool local MCP, a bilingual UI, first-run guidance, and source-free local Agent setup. Codex now uses a dedicated one-click installer that registers the Marketplace, installs the plugin, and verifies the result.
 
 **Next:** Chrome Web Store distribution, an authenticated remote MCP for cloud Agents, accessibility, and large-Workspace performance. See [implementation status](IMPLEMENTATION_STATUS.md) and the [PRD](product/PRD.md).
 
