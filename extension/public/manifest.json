@@ -24,7 +24,8 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Open TabNexus",
+    "default_title": "TabNexus",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

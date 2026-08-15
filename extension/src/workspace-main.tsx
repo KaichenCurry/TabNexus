@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { WorkspaceApp } from "./workspace/WorkspaceApp";
+import { TaskApp } from "./v2/app/TaskApp";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <WorkspaceApp />
+    <TaskApp />
   </StrictMode>
 );

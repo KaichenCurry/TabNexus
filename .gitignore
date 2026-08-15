@@ -14,3 +14,7 @@ artifacts/
 *.zip
 /tests/evals/tabnexus-mcp/runs/
 /TabNexus Workspace (单文件分享版).html
+
+# DSH plugin build artifacts
+agent/dsh/plugin/node_modules/
+agent/dsh/plugin/package-lock.json

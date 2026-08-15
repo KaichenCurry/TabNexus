@@ -1,0 +1,60 @@
+/*
+ * TabNexus v2 设计令牌 —— v2 组件的唯一样式来源。
+ * 规则：v2 组件禁止硬编码颜色/字号/圆角/间距，一律引用本文件令牌。
+ * 验收线：全局字号 ≤ 6 种；主色唯一；圆角 ≤ 4 种；正文 ≥ 12px。
+ */
+:root {
+  /* 主色：全局唯一强调色（主 CTA / 链接 / 选中态） */
+  --tn-primary: #304f93;
+  --tn-primary-hover: #28447d;
+  --tn-primary-soft: #eef1f8;
+
+  /* 辅助色：AI/Agent 专属紫色；语义色仅用于状态 */
+  --tn-accent: #7a6edc;
+  --tn-danger: #d6455e;
+  --tn-success: #3f9d6a;
+  --tn-warning: #b7791f;
+
+  /* 灰阶 5 档 */
+  --tn-gray-50: #fafbfc;
+  --tn-gray-100: #f2f4f6;
+  --tn-gray-200: #e5e8ed;
+  --tn-gray-400: #8a93a3;
+  --tn-gray-700: #1b2430;
+
+  /* 字号 5 档（正文最小 12px，废除 7px 级） */
+  --tn-text-xs: 12px;
+  --tn-text-sm: 13px;
+  --tn-text-md: 14px;
+  --tn-text-lg: 16px;
+  --tn-text-xl: 20px;
+
+  /* 字重 3 级 */
+  --tn-weight-strong: 600;
+  --tn-weight-medium: 500;
+  --tn-weight-regular: 400;
+
+  /* 圆角 3 档 */
+  --tn-radius-sm: 6px;
+  --tn-radius-md: 10px;
+  --tn-radius-lg: 14px;
+
+  /* 间距：4px 栅格 */
+  --tn-space-1: 4px;
+  --tn-space-2: 8px;
+  --tn-space-3: 12px;
+  --tn-space-4: 16px;
+  --tn-space-5: 24px;
+
+  /* 阴影：极淡，最多一层 */
+  --tn-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --tn-shadow-pop: 0 4px 12px rgba(27, 36, 48, 0.08);
+
+  /* 章节色：受限调色板（与旧 GROUP_COLORS 对齐，不再随机） */
+  --tn-section-1: #e8833a;
+  --tn-section-2: #7a6edc;
+  --tn-section-3: #3379d6;
+  --tn-section-4: #3f9d6a;
+  --tn-section-5: #d6455e;
+  --tn-section-6: #20a39e;
+}

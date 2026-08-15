@@ -2,7 +2,7 @@ export const SCHEMA_VERSION = 1 as const;
 
 export type Locale = "zh" | "en";
 export type CardType = "web" | "note" | "html" | "report" | "agent";
-export type CardStatus = "unread" | "read" | "adopted";
+export type CardStatus = "unread" | "read" | "adopted" | "excluded";
 export type CardSource = "user" | "ai" | "agent";
 export type GroupingPolicy = "automatic" | "suggestion" | "domain";
 export type WorkspaceView = "board" | "flow";
@@ -33,6 +33,8 @@ export type Card = {
   favicon?: string;
   note: string;
   status: CardStatus;
+  /** 排除原因：P1"为什么不要"的一等字段（v2，status=excluded 时有意义） */
+  excludedReason?: string;
   groupId: string | null;
   source: CardSource;
   savedAt?: string;
@@ -48,6 +50,14 @@ export type Group = {
   cardIds: string[];
 };
 
+export type WorkspaceV2Meta = {
+  goal: string;
+  nextStep: string;
+  conclusion: string;
+  summary?: string;
+  archivedAt?: string;
+};
+
 export type Workspace = {
   id: string;
   name: string;
@@ -57,6 +67,8 @@ export type Workspace = {
   groups: Record<string, Group>;
   cards: Record<string, Card>;
   edges: Edge[];
+  /** v2 任务元数据（加性字段；旧数据无此字段时按空处理） */
+  v2?: WorkspaceV2Meta;
 };
 
 export type WorkspaceIndexItem = {
@@ -87,9 +99,11 @@ export type WorkspaceContextSummary = {
     source: CardSource;
     savedAt?: string;
     lastAccessedAt?: string;
+    excludedReason?: string;
     noteLength: number;
   }>;
   edges: Edge[];
+  v2?: WorkspaceV2Meta;
 };
 
 export type BrowserTabContext = {
@@ -166,6 +180,8 @@ export type Settings = {
   groupingPolicy: GroupingPolicy;
   agentBridgeEnabled: boolean;
   tutorialCompleted: boolean;
+  /** v2 任务文档外壳开关（R1 期间默认 false；R1.10 翻转为 true 并退役旧壳） */
+  v2ShellEnabled: boolean;
 };
 
 export type AgentSafePreferences = {
@@ -222,7 +238,7 @@ export type ProposalAssignment = {
 };
 
 export type GroupingProposal = {
-  source: "ai" | "domain";
+  source: "ai" | "domain" | "local";
   groups: ProposalGroup[];
   assignments: ProposalAssignment[];
   summary?: string;
@@ -277,6 +293,26 @@ export type StructureProposal = {
 };
 
 export type AgentScope = "workspace" | "selection";
+
+/** AI 一键总结（v2 任务链"结"）请求与结果：只传元数据，永不传正文 */
+export type SummarizeRequest = {
+  locale: Locale;
+  taskName: string;
+  goal: string;
+  sections: Array<{ name: string; pageTitles: string[] }>;
+  pages: Array<{
+    title: string;
+    note: string;
+    status: CardStatus;
+    excludedReason?: string;
+  }>;
+};
+
+export type SummarizeResult = {
+  summary: string;
+  conclusion: string;
+  nextStep: string;
+};
 
 export type AgentAction =
   | {
@@ -521,7 +557,7 @@ export type WorkspaceEditAction =
   | { type: "create_group"; groupId?: string; name: string; color?: string }
   | { type: "rename_group"; groupId: string; name: string; color?: string }
   | { type: "move_cards"; cardIds: string[]; targetGroupId: string | null; position?: number }
-  | { type: "update_card"; cardId: string; title?: string; url?: string | null; note?: string; status?: CardStatus; cardType?: CardType }
+  | { type: "update_card"; cardId: string; title?: string; url?: string | null; note?: string; status?: CardStatus; cardType?: CardType; excludedReason?: string | null }
   | { type: "reorder_groups"; groupIds: string[] }
   | { type: "reorder_cards"; groupId: string; cardIds: string[] }
   | { type: "position_cards"; positions: Array<{ cardId: string; x: number; y: number }> }
@@ -729,6 +765,13 @@ export type BackgroundRequest =
       apiKey: string;
       model: string;
       payload: AgentCommandRequest;
+    }
+  | {
+      type: "SUMMARIZE_TASK";
+      provider: AiProviderId;
+      apiKey: string;
+      model: string;
+      payload: SummarizeRequest;
     }
   | {
       type: "M3_AGENT_TOOL";
