@@ -1,5 +1,7 @@
 # TabNexus × DSH 插件生态
 
+> **📌 独立版（零 Chrome 依赖）已发布到专用仓库：[KaichenCurry/TabNexus-DSH](https://github.com/KaichenCurry/TabNexus-DSH)（topic: dsh-plugin）。DSH 用户请优先使用独立版：装完即用，无需先装 Chrome 扩展。本目录保留扩展增强版（浏览器采集能力）与预设/技能。**
+
 > **「一切皆插件 —— 那浏览器里那 50 个 Tab，也该是。」**
 > TabNexus for DSH：把浏览器里散落的任务上下文，变成 Harness 可直接调用的插件化记忆。
 > 诚邀全球 Harness 开发者共建 DSH 插件生态。

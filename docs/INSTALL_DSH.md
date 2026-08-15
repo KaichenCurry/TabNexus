@@ -1,5 +1,7 @@
 # TabNexus DSH 插件 · 安装教程
 
+> **📌 推荐：独立版（零 Chrome 依赖）** → [KaichenCurry/TabNexus-DSH](https://github.com/KaichenCurry/TabNexus-DSH)（topic: dsh-plugin，装完即用，内置全局工作区）。本文档为扩展增强版（需要 Chrome 扩展，解锁浏览器采集）。
+
 > **「一切皆插件 —— 那浏览器里那 50 个 Tab，也该是。」**
 > 装上后，你的任何 DSH 会话都拥有 17 个 `mcp__tabnexus__*` 工具，并在界面右上角出现 TabNexus 工作区面板。
 
