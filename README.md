@@ -111,7 +111,7 @@ Workspace 不是一个网页仓库，而是一件任务的现场：它保留页�
 
 点「**让 Agent 继续**」：一键生成 **Context Packet**（目标、章节、页面、备注、状态、排除原因、下一步、结论——明示"不会提供：网页正文、API Key、其他任务"），复制进 DSH / Codex / Claude，Agent 从你停下的地方继续，并把结论、补页与结构建议写回任务（版本校验 + 幂等 + 破坏性确认 + 活动留痕）。
 
-**DSH 插件生态 Agent 已交付**：`dsh plugin add` 一条命令装好 `dsh-plugin-tabnexus`（17 个 `mcp__tabnexus__*` 工具 + 界面内工作区面板），任何 DSH 会话即成为 Tab Agent。完整安装教程见 [DSH 安装教程](docs/INSTALL_DSH.md)。
+**DSH 插件生态 Agent 已交付**：`dsh plugin add` 一条命令装好 `dsh-plugin-tabnexus`（17 个 `mcp__tabnexus__*` 工具 + 界面内快速面板 + **「⛶ 全屏」全局工作区**——与 Chrome 插件同款：任务头/进度/章节/页面操作 + 收件口），任何 DSH 会话即成为 Tab Agent。注意：DSH 插件需要 Chrome 扩展作为浏览器操作层（采集/存储/开关标签）。完整安装教程见 [DSH 安装教程](docs/INSTALL_DSH.md)。
 
 > **「一切皆插件 —— 那浏览器里那 50 个 Tab，也该是。」** 诚邀全球 Harness 开发者共建 DSH 插件生态。接入指南见 [agent/dsh/README.md](agent/dsh/README.md) 与 [agent/dsh/VERIFICATION.md](agent/dsh/VERIFICATION.md)。
 

@@ -5,7 +5,7 @@
 
 ## 前置条件（一次性）
 
-1. 已安装 [TabNexus Chrome 扩展](INSTALL_CHROME.md)（v2.0.0）；
+1. **必须安装 [TabNexus Chrome 扩展](INSTALL_CHROME.md)（v2.0.0）**——Chrome 扩展是"手"：采集标签、本地存储、开关页面都发生在浏览器里，DSH 插件是"脑与界面"。两者各装一次，之后日常操作全部在 DSH 里完成；
 2. 扩展内：设置 → 连接你常用的 Agent → 启用**「本机 Agent 连接」**；
 3. 本机 Node.js ≥ 22.13（DSH 本身已带）。
 
@@ -35,7 +35,7 @@ dsh plugin --profile web add "$(pwd)"
 ## 验证安装
 
 1. DSH 页面右上角（session log 按钮正下方）出现 **TabNexus 工作区** 徽章；
-2. 点击徽章 → 工作区面板打开（任务/章节/页面/状态/移动/收件口），绿点=扩展已连接；
+2. 点击徽章 → 快速面板打开；点面板右上角 **「⛶ 全屏」** → 打开**全局工作区**（与 Chrome 插件同款完整视图：任务头+进度条+章节+页面操作 + 右侧收件口，可切换状态/移动章节/删除/收进任务/保存并关闭）；
 3. 任意会话里说：**"读一下我的当前任务，告诉我做到哪了、还缺什么。"**——回复即来自你的真实浏览器任务。
 
 ## 可选增强：Agent 预设与技能
@@ -57,7 +57,7 @@ cp <repo>/agent/dsh/skills/tabnexus/SKILL.md ~/.agents/skills/tabnexus/
 
 | 问题 | 解法 |
 |---|---|
-| 工具报 "TabNexus is not connected" | 打开扩展一次，并在扩展设置启用「本机 Agent 连接」 |
+| 工具报 "TabNexus is not connected" | 未装/未开 Chrome 扩展，或未启用「本机 Agent 连接」——按前置条件第 1、2 步检查 |
 | 面板空白/加载失败 | 面板右上角「刷新」；确认扩展已启用桥接 |
 | 设置里看不到插件 | `dsh plugin add` 后必须**重启 DSH** |
 | 徽章挡住按钮 | 徽章/面板均不拦截点击（pointer-events 透明），可放心 |

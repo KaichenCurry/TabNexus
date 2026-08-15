@@ -54,6 +54,18 @@ font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1B2430;overflow:hidden}
 #tn-dsh-panel .tn-toast{position:absolute;left:12px;right:12px;bottom:8px;background:#1B2430;color:#fff;border-radius:8px;padding:6px 12px;font-size:11px}
 #tn-dsh-panel .tn-disco{padding:16px 12px;text-align:center}
 #tn-dsh-panel .tn-disco p{margin:0 0 8px;color:#8A93A3;font-size:12px}
+#tn-dsh-ws{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;background:#FAFBFC;
+font:13px/1.6 system-ui,-apple-system,sans-serif;color:#1B2430}
+#tn-dsh-ws .ws-head{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid #E5E8ED;background:#fff}
+#tn-dsh-ws .ws-head strong{font-size:16px}
+#tn-dsh-ws .ws-head .tn-meta{color:#8A93A3;font-size:12px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tn-dsh-ws .ws-body{flex:1;display:flex;gap:16px;padding:16px 20px;overflow:hidden}
+#tn-dsh-ws .ws-main{flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+#tn-dsh-ws .ws-side{width:340px;flex:none;overflow-y:auto;border-left:1px solid #E5E8ED;padding-left:16px;display:flex;flex-direction:column;gap:10px}
+#tn-dsh-ws .ws-title{font-size:20px;font-weight:600;margin:0}
+#tn-dsh-ws .ws-goal{margin:0;color:#1B2430}
+#tn-dsh-ws .ws-side h4{margin:0;font-size:13px}
+@media (max-width: 900px){#tn-dsh-ws .ws-body{flex-direction:column}#tn-dsh-ws .ws-side{width:auto;border-left:none;border-top:1px solid #E5E8ED;padding-left:0;padding-top:12px}}
 `;
 		const ANCHOR_LABEL_RE = /session\s*log|会话轨迹|会话日志|轨迹|日志/i;
 		const STATUS_CYCLE = {
@@ -96,6 +108,7 @@ font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1B2430;overflow:hidden}
 			document.body.appendChild(chip);
 			let disposed = false;
 			let panel = null;
+			let workspace = null;
 			let activeTab = "task";
 			let snapshot = null;
 			let busy = false;
@@ -110,12 +123,13 @@ font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1B2430;overflow:hidden}
 				return response.json();
 			};
 			const toast = (message) => {
-				if (!panel) return;
-				panel.querySelector(".tn-toast")?.remove();
+				const host = workspace ?? panel;
+				if (!host) return;
+				host.querySelector(".tn-toast")?.remove();
 				const node = document.createElement("div");
 				node.className = "tn-toast";
 				node.textContent = message;
-				panel.appendChild(node);
+				host.appendChild(node);
 				if (toastTimer) clearTimeout(toastTimer);
 				toastTimer = setTimeout(() => node.remove(), 3200);
 			};
@@ -172,6 +186,7 @@ font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1B2430;overflow:hidden}
 			const operationId = () => `dsh_panel_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 			const selectedTabs = () => [...panel?.querySelectorAll("input[type=checkbox][data-tab]") ?? []].filter((input) => input.checked).map((input) => Number(input.dataset.tab));
 			const render = () => {
+				renderWorkspace();
 				if (!panel) return;
 				const head = panel.querySelector(".tn-head .tn-meta");
 				const body = panel.querySelector(".tn-body");
@@ -403,12 +418,250 @@ font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1B2430;overflow:hidden}
 				panel?.remove();
 				panel = null;
 			};
+			const closeWorkspace = () => {
+				workspace?.remove();
+				workspace = null;
+			};
+			const openWorkspace = () => {
+				closeWorkspace();
+				workspace = document.createElement("div");
+				workspace.id = "tn-dsh-ws";
+				workspace.innerHTML = `
+      <div class="ws-head"><strong>TabNexus</strong><span class="tn-meta">…</span>
+        <button class="tn-btn" data-refresh>刷新</button>
+        <button class="tn-btn" data-close>✕ 关闭</button></div>
+      <div class="ws-body">
+        <div class="ws-main"><div class="tn-empty">加载中…</div></div>
+        <div class="ws-side"><h4>收件口</h4><div class="tn-empty">加载中…</div></div>
+      </div>`;
+				document.body.appendChild(workspace);
+				workspace.querySelector("[data-refresh]").addEventListener("click", () => void fetchSnapshot());
+				workspace.querySelector("[data-close]").addEventListener("click", closeWorkspace);
+				fetchSnapshot();
+			};
+			const renderWorkspace = () => {
+				if (!workspace) return;
+				const head = workspace.querySelector(".ws-head .tn-meta");
+				const main = workspace.querySelector(".ws-main");
+				const side = workspace.querySelector(".ws-side");
+				if (!head || !main || !side) return;
+				if (snapshot?.error) {
+					head.textContent = snapshot.error;
+					main.innerHTML = `<div class="tn-disco"><p>${escapeHtml(snapshot.error)}</p><p>1. 安装并打开 TabNexus Chrome 扩展<br/>2. 扩展设置 → 连接你常用的 Agent → 启用「本机 Agent 连接」<br/>3. 点「刷新」</p></div>`;
+					side.innerHTML = `<h4>收件口</h4><div class="tn-empty">扩展未连接</div>`;
+					return;
+				}
+				const ws = snapshot?.workspace;
+				if (!ws) {
+					main.innerHTML = `<div class="tn-empty">加载中…</div>`;
+					return;
+				}
+				const cards = ws.cards ?? {};
+				const groups = ws.groups ?? {};
+				const order = ws.groupOrder ?? [];
+				const counted = Object.values(cards).filter((card) => card.status !== "excluded");
+				const read = counted.filter((card) => card.status === "read" || card.status === "adopted").length;
+				const adopted = counted.filter((card) => card.status === "adopted").length;
+				head.textContent = ws.name ?? "";
+				main.innerHTML = "";
+				const title = Object.assign(document.createElement("h1"), {
+					className: "ws-title",
+					textContent: ws.name ?? ""
+				});
+				main.appendChild(title);
+				if (ws.v2?.goal) {
+					const goal = Object.assign(document.createElement("p"), {
+						className: "ws-goal",
+						textContent: `🎯 ${ws.v2.goal}`
+					});
+					main.appendChild(goal);
+				}
+				const progress = document.createElement("div");
+				progress.className = "tn-progress";
+				const track = document.createElement("div");
+				track.className = "tn-track";
+				const fill = document.createElement("div");
+				fill.className = "tn-fill";
+				fill.style.width = `${counted.length > 0 ? Math.round(read / counted.length * 100) : 0}%`;
+				track.appendChild(fill);
+				const num = document.createElement("span");
+				num.className = "tn-num";
+				num.textContent = `${read}/${counted.length} 已读 · ⭐${adopted}`;
+				progress.append(track, num);
+				main.appendChild(progress);
+				const assigned = /* @__PURE__ */ new Set();
+				for (const groupId of order) {
+					const group = groups[groupId];
+					if (!group) continue;
+					group.cardIds.forEach((cardId) => assigned.add(cardId));
+					main.appendChild(wsSectionNode(group.name, group.cardIds.map((cardId) => cards[cardId]).filter((card) => Boolean(card))));
+				}
+				const unassigned = Object.values(cards).filter((card) => !assigned.has(card.id));
+				if (unassigned.length > 0) {
+					const node = wsSectionNode("未归类", unassigned);
+					node.style.borderStyle = "dashed";
+					main.appendChild(node);
+				}
+				const addRow = document.createElement("div");
+				addRow.className = "tn-actions flat";
+				const addInput = Object.assign(document.createElement("input"), {
+					className: "tn-move",
+					placeholder: "新章节名…"
+				});
+				addInput.style.flex = "1";
+				addInput.style.maxWidth = "none";
+				const addButton = Object.assign(document.createElement("button"), {
+					className: "tn-btn primary",
+					textContent: "＋ 新建章节"
+				});
+				addButton.addEventListener("click", () => {
+					const name = addInput.value.trim();
+					if (!name) return toast("先输入章节名");
+					action("edit_workspace", {
+						expectedRevision: snapshot?.revision ?? "",
+						operationId: operationId(),
+						actions: [{
+							type: "create_group",
+							groupId: `panel_${Date.now().toString(36)}`,
+							name,
+							color: "#7A6EDC"
+						}]
+					}, true);
+				});
+				addRow.append(addInput, addButton);
+				main.appendChild(addRow);
+				side.innerHTML = "<h4>收件口</h4>";
+				const openTabs = (snapshot?.workbench?.openTabs ?? []).filter((tab) => !tab.savedCardId);
+				const savedCount = (snapshot?.workbench?.openTabs ?? []).filter((tab) => tab.savedCardId).length;
+				const goal = Object.assign(document.createElement("p"), {
+					className: "tn-goal",
+					textContent: `当前窗口 · 未保存 ${openTabs.length}${savedCount ? ` · 已保存 ${savedCount}` : ""}`
+				});
+				side.appendChild(goal);
+				for (const tab of openTabs) {
+					const row = document.createElement("label");
+					row.className = "tn-inbox-item";
+					row.innerHTML = `<input type="checkbox" data-tab="${tab.tabId}"><span class="tn-pg-title">${escapeHtml(tab.title)}</span><span class="tn-pg-domain">${escapeHtml(domainOf(tab.url))}</span>${tab.pinned ? "📌" : ""}`;
+					side.appendChild(row);
+				}
+				if (openTabs.length === 0) side.appendChild(Object.assign(document.createElement("div"), {
+					className: "tn-empty",
+					textContent: "当前窗口没有未保存的页面"
+				}));
+				const actions = document.createElement("div");
+				actions.className = "tn-actions flat";
+				const collect = Object.assign(document.createElement("button"), {
+					className: "tn-btn primary",
+					textContent: "收进任务"
+				});
+				collect.addEventListener("click", () => {
+					const tabIds = selectedTabs();
+					if (tabIds.length === 0) return toast("先勾选页面");
+					action("sync_browser_tabs", {
+						action: "save_tabs",
+						tabIds,
+						expectedRevision: snapshot?.revision ?? "",
+						operationId: operationId()
+					}, true);
+				});
+				const saveClose = Object.assign(document.createElement("button"), {
+					className: "tn-btn",
+					textContent: "保存并关闭"
+				});
+				saveClose.addEventListener("click", () => {
+					const tabIds = selectedTabs();
+					if (tabIds.length === 0) return toast("先勾选页面");
+					if (!window.confirm(`保存并关闭这 ${tabIds.length} 个标签？（固定标签不会关闭）`)) return;
+					action("close_browser_tabs", {
+						tabIds,
+						saveBeforeClose: true,
+						expectedRevision: snapshot?.revision ?? "",
+						operationId: operationId(),
+						confirm: true,
+						confirmationText: "用户确认：保存并关闭所选标签"
+					}, true);
+				});
+				actions.append(collect, saveClose);
+				side.appendChild(actions);
+			};
+			const wsSectionNode = (name, pages) => {
+				const node = document.createElement("div");
+				node.className = "tn-section";
+				const head = document.createElement("div");
+				head.className = "tn-sec-head";
+				head.innerHTML = `<span>${escapeHtml(name)}</span><em>${pages.length}</em>`;
+				node.appendChild(head);
+				for (const page of pages) {
+					const row = document.createElement("div");
+					row.className = `tn-page st-${page.status ?? "unread"}`;
+					const st = Object.assign(document.createElement("button"), {
+						className: "tn-status-pill tn-st",
+						title: "切换状态：待读→已读→已采用",
+						textContent: STATUS_GLYPH[page.status ?? "unread"] ?? "○"
+					});
+					st.addEventListener("click", () => {
+						const next = STATUS_CYCLE[page.status ?? "unread"] ?? "read";
+						action("edit_workspace", {
+							expectedRevision: snapshot?.revision ?? "",
+							operationId: operationId(),
+							actions: [{
+								type: "update_card",
+								cardId: page.id,
+								status: next
+							}]
+						}, true);
+					});
+					const title = document.createElement("span");
+					title.className = "tn-pg-title";
+					title.textContent = page.title;
+					title.title = page.excludedReason ? `排除原因：${page.excludedReason}` : "打开原页";
+					if (page.url) title.addEventListener("click", () => window.open(page.url, "_blank", "noopener"));
+					const domain = document.createElement("span");
+					domain.className = "tn-pg-domain";
+					domain.textContent = domainOf(page.url);
+					const move = document.createElement("select");
+					move.className = "tn-move";
+					const moveGroups = snapshot?.workspace?.groups ?? {};
+					move.innerHTML = `<option value="__current">移动到…</option><option value="__null">未归类</option>${(snapshot?.workspace?.groupOrder ?? []).map((groupId) => moveGroups[groupId]).filter((group) => Boolean(group)).map((group) => `<option value="${group.id}">${escapeHtml(group.name)}</option>`).join("")}`;
+					move.addEventListener("change", () => {
+						if (move.value === "__current") return;
+						action("edit_workspace", {
+							expectedRevision: snapshot?.revision ?? "",
+							operationId: operationId(),
+							actions: [{
+								type: "move_cards",
+								cardIds: [page.id],
+								targetGroupId: move.value === "__null" ? null : move.value
+							}]
+						}, true);
+					});
+					const del = Object.assign(document.createElement("button"), {
+						className: "tn-x",
+						textContent: "×",
+						title: "删除页面"
+					});
+					del.addEventListener("click", () => {
+						if (!window.confirm(`删除「${page.title}」？此操作不可撤销。`)) return;
+						action("delete_workspace_items", {
+							expectedRevision: snapshot?.revision ?? "",
+							operationId: operationId(),
+							cardIds: [page.id],
+							confirm: true,
+							confirmationText: "用户确认删除"
+						}, true);
+					});
+					row.append(st, title, domain, move, del);
+					node.appendChild(row);
+				}
+				return node;
+			};
 			const openPanel = () => {
 				if (panel) return;
 				panel = document.createElement("div");
 				panel.id = "tn-dsh-panel";
 				panel.innerHTML = `
       <div class="tn-head"><strong>TabNexus 工作区</strong><span class="tn-meta">…</span>
+        <button class="tn-btn" data-fullscreen title="打开全局工作区">⛶ 全屏</button>
         <button class="tn-btn" data-refresh>刷新</button>
         <button class="tn-btn" data-close>×</button></div>
       <div class="tn-tabs">
@@ -418,6 +671,7 @@ font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1B2430;overflow:hidden}
 				document.body.appendChild(panel);
 				panel.querySelector("[data-refresh]").addEventListener("click", () => void fetchSnapshot());
 				panel.querySelector("[data-close]").addEventListener("click", closePanel);
+				panel.querySelector("[data-fullscreen]").addEventListener("click", openWorkspace);
 				panel.querySelectorAll(".tn-tab").forEach((tab) => {
 					tab.addEventListener("click", () => {
 						activeTab = tab.dataset.tab === "inbox" ? "inbox" : "task";
@@ -436,7 +690,10 @@ font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1B2430;overflow:hidden}
 				if (panel && !panel.contains(event.target) && !chip.contains(event.target)) closePanel();
 			});
 			const onKey = (event) => {
-				if (event.key === "Escape") closePanel();
+				if (event.key === "Escape") {
+					if (workspace) closeWorkspace();
+					else closePanel();
+				}
 			};
 			document.addEventListener("keydown", onKey);
 			let anchorTimer = null;
@@ -461,6 +718,7 @@ font:12px/1.5 system-ui,-apple-system,sans-serif;color:#1B2430;overflow:hidden}
 				observer.disconnect();
 				window.removeEventListener("resize", place);
 				document.removeEventListener("keydown", onKey);
+				closeWorkspace();
 				closePanel();
 				chip.remove();
 				style.remove();
