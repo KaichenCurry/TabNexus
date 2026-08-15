@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TabNexus",
   "short_name": "TabNexus",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A local-first workspace for browser tabs and AI task context.",
   "minimum_chrome_version": "118",
   "incognito": "not_allowed",
@@ -24,7 +24,8 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Open TabNexus",
+    "default_title": "TabNexus",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

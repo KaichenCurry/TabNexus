@@ -1,4 +1,4 @@
-import { executeCollaborationTool, workspaceRevision } from "./core/collaboration";
+import { executeCollaborationTool, stableStringify, workspaceRevision } from "./core/collaboration";
 import { appStateRevision, deleteWorkspaceItems, manageWorkspaces, searchWorkspaceCards, workspaceIndex } from "./core/collaborationApp";
 import {
   clearAgentActivity,
@@ -38,6 +38,8 @@ import type {
   GroupingProposal,
   Settings,
   StructureProposal,
+  SummarizeRequest,
+  SummarizeResult,
   TabWorkbenchContext,
   TabWorkbenchSelection,
   OpenTab,
@@ -301,6 +303,30 @@ async function planAgentActions(
   return response.ok ? { ok: true, data: response.data as AgentPlan } : response;
 }
 
+function summarizePrompt(payload: SummarizeRequest): string {
+  const language = payload.locale === "zh" ? "Simplified Chinese" : "English";
+  return [
+    "You summarize a saved browser-task context. You only see titles, notes and statuses — never page bodies.",
+    "Respect exclusions: pages marked excluded were rejected by the user; do not cite their conclusions.",
+    `Write in ${language}. Return JSON only with this shape:`,
+    '{"summary":"2-4 sentence structured summary (goal, key evidence, gaps)","conclusion":"one-paragraph draft conclusion","nextStep":"one concrete next action"}',
+    "Task context:",
+    JSON.stringify(payload)
+  ].join("\n");
+}
+
+async function summarizeTask(
+  request: Extract<BackgroundRequest, { type: "SUMMARIZE_TASK" }>
+): Promise<BackgroundResponse<SummarizeResult>> {
+  const response = await requestJsonCompletion(
+    request,
+    "You are a careful task-context summarizer. Output valid JSON only.",
+    summarizePrompt(request.payload),
+    2_000
+  );
+  return response.ok ? { ok: true, data: response.data as SummarizeResult } : response;
+}
+
 function activitySummary(payload: CollaborationToolRequest, locale: "zh" | "en"): string {
   const zh = locale === "zh";
   switch (payload.tool) {
@@ -344,7 +370,7 @@ function collaborationOperationId(payload: CollaborationToolRequest): string | u
 
 function hashContext(prefix: string, value: unknown): string {
   let hash = 0x811c9dc5;
-  for (const character of JSON.stringify(value)) {
+  for (const character of stableStringify(value)) {
     hash ^= character.charCodeAt(0);
     hash = Math.imul(hash, 0x01000193);
   }
@@ -1234,6 +1260,7 @@ chrome.runtime.onMessage.addListener((request: BackgroundRequest, _sender, sendR
     case "CLUSTER_TABS": task = clusterTabs(request); break;
     case "SUGGEST_STRUCTURE": task = suggestStructure(request); break;
     case "PLAN_AGENT_ACTIONS": task = planAgentActions(request); break;
+    case "SUMMARIZE_TASK": task = summarizeTask(request); break;
     case "M3_AGENT_TOOL": task = runCollaborationTool(request); break;
     case "M3_BRIDGE_CONNECT": task = connectAgentBridge().then((data) => ({ ok: true, data })); break;
     case "M3_BRIDGE_DISCONNECT": task = Promise.resolve({ ok: true, data: disconnectAgentBridge() }); break;

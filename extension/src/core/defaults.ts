@@ -16,7 +16,9 @@ export const DEFAULT_SETTINGS: Settings = {
   deepSeekVerifiedAt: "",
   groupingPolicy: "suggestion",
   agentBridgeEnabled: false,
-  tutorialCompleted: false
+  tutorialCompleted: false,
+  /** v2 任务文档外壳（R1.10 起默认启用；旧壳已退役） */
+  v2ShellEnabled: true
 };
 
 export const GROUP_COLORS = [

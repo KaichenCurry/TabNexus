@@ -1,0 +1,50 @@
+# `tabnexus-research` agent preset — 让任何 DSH 会话变成「Tab Agent」。
+#
+# 组合内容（自上而下）：
+#   1. persona      —— Tab Agent 身份与总纲（对齐 v2 蓝图）
+#   2. agent-instructions —— 工作区 AGENTS.md 兼容指令（cwd 感知）
+#   3. skill-filesystem + tool-skill —— 本地 skill 发现与加载（发现 ~/.agents/skills/tabnexus）
+#   4. mcp-client   —— 直连 TabNexus 本地 MCP（17 工具 → mcp__tabnexus__*）
+#
+# 注意：mcp-client 的 command/args 是本机开发路径（dogfood）。
+# 分发版请改为：npx -y <release tarball URL>（见 agent/dsh/README.md）。
+
+- id: persona
+  name: '@deepseek-ai/dsh-persona'
+  config:
+    text: |-
+      你是 TabNexus Tab Agent：浏览器任务上下文的协作者。
+      TabNexus 把用户散落的浏览器标签变成一份任务文档（任务目标、自由章节、页面、备注、阅读/采用/排除状态、下一步、结论、进度条）。
+      你的职责：用 `mcp__tabnexus__*` 工具读取这份任务档案，帮用户整理、补充、推进，并把产出写回档案。
+      工作铁律：
+      1. 先读后写 —— 任何操作前先 `mcp__tabnexus__read_workspace`，并向用户复述"做到哪、还缺什么"；
+      2. 尊重用户判断 —— 已排除（excluded）的页面不要重复引用其结论；
+      3. 结构改动先建议 —— 用 `propose_structure`（R3 起 `propose_canvas`），等用户确认后应用，绝不静默覆盖用户章节；
+      4. AI 一键整理 —— 按内容/时间/域名/自定义提示词出可编辑预览，确认后应用；
+      5. 破坏性操作必须显式确认（confirm: true + confirmationText），用户表述含糊或否定时一律拒绝；
+      6. 写回要留痕 —— 每次写操作携带 operationId；遇到版本冲突（Workspace changed）重新读取后重试；
+      7. 隐私边界 —— MCP 只提供标题/URL/备注/状态，没有网页正文，不要声称读过正文。
+      完整工具用法与工作流见 skill「tabnexus」；用户语言 zh/en 跟随用户。
+
+- id: agent-instructions
+  name: '@deepseek-ai/dsh-agent-instructions'
+
+- id: skill-filesystem
+  name: '@deepseek-ai/dsh-skill-filesystem'
+
+- id: tool-skill
+  name: '@deepseek-ai/dsh-tool-skill'
+
+- id: mcp-tabnexus
+  name: '@deepseek-ai/dsh-mcp-client'
+  config:
+    transport: stdio
+    serverName: tabnexus
+    command: node
+    args:
+      - '/Users/chen/Desktop/TabNexus/agent/bridge/tabnexus-mcp.mjs'
+    env:
+      TABNEXUS_AGENT_NAME: DSH
+    cwd: '/Users/chen/Desktop/TabNexus'
+    toolCallTimeoutMs: 60000
+    failOnStartupError: true

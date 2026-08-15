@@ -110,7 +110,8 @@ export async function loadSettings(): Promise<Settings> {
       ? stored!.groupingPolicy!
       : "suggestion",
     agentBridgeEnabled: Boolean(stored?.agentBridgeEnabled),
-    tutorialCompleted: Boolean(stored?.tutorialCompleted)
+    tutorialCompleted: Boolean(stored?.tutorialCompleted),
+    v2ShellEnabled: Boolean(stored?.v2ShellEnabled)
   };
 }
 

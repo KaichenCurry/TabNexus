@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "--yes",
-        "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.4/tabnexus-mcp-runtime-1.0.4.tgz"
+        "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/tabnexus-mcp-runtime-1.0.5.tgz"
       ],
       "env": {
         "TABNEXUS_AGENT_NAME": "Agent IDE",

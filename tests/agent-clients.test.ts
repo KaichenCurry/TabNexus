@@ -4,7 +4,8 @@ import {
   MCP_BRIDGE_VERSION,
   MCP_TOOL_COUNT,
   TABNEXUS_RELEASE_VERSION,
-  createCodexInstallUrl,
+  createCodexInstallerDownloadUrl,
+  createCodexPluginUrl,
   createCodexLauncherCommand,
   createCursorInstallUrl,
   createReleasePackageUrl,
@@ -81,14 +82,14 @@ describe("Agent client adapters", () => {
   it("creates path-free, release-pinned installers for the portable package", () => {
     const source = createReleaseServerSource();
     const config = createStandardMcpConfig(source, "Portable Agent").mcpServers.tabnexus;
-    expect(TABNEXUS_RELEASE_VERSION).toBe("1.0.4");
+    expect(TABNEXUS_RELEASE_VERSION).toBe("1.0.5");
     expect(config).toMatchObject({
       command: "npx",
-      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.4/tabnexus-mcp-runtime-1.0.4.tgz"],
+      args: ["--yes", "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/tabnexus-mcp-runtime-1.0.5.tgz"],
       env: { TABNEXUS_AGENT_NAME: "Portable Agent", TABNEXUS_MCP_VERSION: "0.8.0" }
     });
     expect(JSON.stringify(config)).not.toContain("/Users/");
-    expect(createReleasePackageUrl()).toBe("https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.4/tabnexus-mcp-runtime-1.0.4.tgz");
+    expect(createReleasePackageUrl()).toBe("https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/tabnexus-mcp-runtime-1.0.5.tgz");
     expect(createCodexLauncherCommand()).toBe(`npx --yes ${createReleasePackageUrl()}`);
 
     const cursorUrl = createCursorInstallUrl(source);
@@ -96,9 +97,12 @@ describe("Agent client adapters", () => {
     expect(cursorConfig).toMatchObject({ command: "npx", args: ["--yes", createReleasePackageUrl()] });
   });
 
-  it("opens the native Codex plugin install flow without creating a task", () => {
-    const url = createCodexInstallUrl();
-    expect(url).toBe("codex://plugins/install/tabnexus?marketplace=tabnexus");
+  it("publishes a one-click Codex installer and a separate installed-plugin destination", () => {
+    expect(createCodexInstallerDownloadUrl()).toBe(
+      "https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/TabNexus-Codex-Setup-v1.0.5.dmg"
+    );
+    const url = createCodexPluginUrl();
+    expect(url).toBe("codex://plugins/tabnexus@tabnexus?source=manage");
     expect(url).not.toContain("threads/new");
     expect(url).not.toContain("prompt=");
   });

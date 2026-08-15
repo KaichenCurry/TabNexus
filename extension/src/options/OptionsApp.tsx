@@ -4,7 +4,8 @@ import {
   AGENT_CLIENTS,
   MCP_BRIDGE_VERSION,
   MCP_TOOL_COUNT,
-  createCodexInstallUrl,
+  createCodexInstallerDownloadUrl,
+  createCodexPluginUrl,
   createCursorInstallUrl,
   createReleaseServerSource,
   createStandardMcpConfig,
@@ -148,8 +149,9 @@ export function OptionsApp() {
   const vsCodeInstallUrl = createVsCodeInstallUrl(agentServerSource);
   const traeInstallUrl = createTraeInstallUrl(agentServerSource);
   const codexInstallUrl = __TABNEXUS_PORTABLE_BUILD__
-    ? createCodexInstallUrl()
+    ? createCodexInstallerDownloadUrl()
     : `codex://plugins/tabnexus?marketplacePath=${encodeURIComponent(__TABNEXUS_CODEX_MARKETPLACE__)}`;
+  const codexPluginUrl = createCodexPluginUrl();
   const claudeBundleUrl = isExtensionRuntime
     ? chrome.runtime.getURL("agent/tabnexus-claude.mcpb")
     : "/agent/tabnexus-claude.mcpb";
@@ -231,7 +233,7 @@ export function OptionsApp() {
 
   const setupDescription = (client: AgentClient) => ({
     codex: __TABNEXUS_PORTABLE_BUILD__
-      ? text("会直接打开 Codex 的 TabNexus 插件安装页；确认后插件会出现在 Plugins 中。", "This opens the TabNexus install page in Codex directly. Confirm once and it appears in Plugins.")
+      ? text("下载后双击打开一次。安装器会自动添加插件源、安装 TabNexus，并在完成后打开 Codex；不需要终端或输入 Query。", "Download and open it once. The installer adds the marketplace, installs TabNexus, and opens Codex when finished—no terminal or prompt required.")
       : text("Codex 打开后点击“安装”。", "When Codex opens, click Install."),
     claude_desktop: text("下载后双击 .mcpb 文件，再在 Claude 中确认安装。", "Double-click the downloaded .mcpb file, then confirm in Claude."),
     cursor: text("Cursor 打开安装页后点击“Install”。", "When Cursor opens the install page, click Install."),
@@ -241,7 +243,7 @@ export function OptionsApp() {
   })[client];
 
   const installMethodLabel = (client: AgentClient) => ({
-    codex: text("插件安装", "Plugin install"),
+    codex: __TABNEXUS_PORTABLE_BUILD__ ? text("一键安装器", "One-click installer") : text("插件安装", "Plugin install"),
     claude_desktop: text("扩展包", "Extension package"),
     cursor: text("一键安装", "One-click"),
     vscode: text("一键安装", "One-click"),
@@ -451,7 +453,7 @@ export function OptionsApp() {
                 <span aria-hidden="true">✓</span>
                 <div>
                   <strong>{text("安装包已包含本机 Agent 接入", "Local Agent setup is included")}</strong>
-                  <p>{text("选择下方应用即可打开对应安装入口；无需下载源码，也不会再跳转到 GitHub 教程。", "Choose an app below to open its installer. No source checkout and no GitHub tutorial detour.")}</p>
+                  <p>{text("Codex 使用一次性安装器；Cursor、VS Code 和 TRAE Work CN 使用各自的原生导入入口。无需下载源码，也不会跳转到 GitHub 教程。", "Codex uses a one-time installer; Cursor, VS Code, and TRAE Work CN use their native import flows. No source checkout or GitHub tutorial detour.")}</p>
                 </div>
               </div>}
               <div className="agent-picker-toolbar">
@@ -543,11 +545,20 @@ export function OptionsApp() {
                     <span className="agent-card-kicker">{installStarted ? text("安装已打开", "INSTALLER OPENED") : text("下一步", "NEXT")}</span>
                     <strong>{text(`在 ${selectedClient.name} 中安装`, `Install in ${selectedClient.name}`)}</strong>
                     <p>{setupDescription(selectedAgent)}</p>
-                    {selectedAgent === "codex" && <a className="button primary agent-install-button" href={codexInstallUrl} onClick={() => void prepareCodexConnection()}>{bridgeNeedsUpdate
-                      ? text("更新 Codex 连接", "Update Codex connection")
-                      : __TABNEXUS_PORTABLE_BUILD__
-                        ? text("在 Codex 中安装", "Install in Codex")
-                        : text("在 Codex 中安装", "Install in Codex")}</a>}
+                    {selectedAgent === "codex" && <div className="agent-install-actions">
+                      <a
+                        className="button primary agent-install-button"
+                        href={codexInstallUrl}
+                        target={__TABNEXUS_PORTABLE_BUILD__ ? "_blank" : undefined}
+                        rel={__TABNEXUS_PORTABLE_BUILD__ ? "noreferrer" : undefined}
+                        onClick={() => void prepareCodexConnection()}
+                      >{bridgeNeedsUpdate
+                        ? text("下载新版 Codex 安装器", "Download updated Codex installer")
+                        : __TABNEXUS_PORTABLE_BUILD__
+                          ? text("下载 Codex 安装器", "Download Codex installer")
+                          : text("在 Codex 中安装", "Install in Codex")}</a>
+                      {__TABNEXUS_PORTABLE_BUILD__ && <a className="text-button" href={codexPluginUrl}>{text("已经安装？在 Codex 中打开", "Already installed? Open in Codex")}</a>}
+                    </div>}
                     {selectedAgent === "claude_desktop" && <a className="button primary agent-install-button" href={claudeBundleUrl} download="TabNexus.mcpb" onClick={() => void prepareAgentConnection()}>{bridgeNeedsUpdate ? text("下载新版 Claude 扩展", "Download updated Claude extension") : text("下载 Claude 扩展包", "Download Claude extension")}</a>}
                     {selectedAgent === "cursor" && <a className="button primary agent-install-button" href={cursorInstallUrl} target="_blank" rel="noreferrer" onClick={() => void prepareAgentConnection()}>{text("在 Cursor 中安装", "Install in Cursor")}</a>}
                     {selectedAgent === "vscode" && <div className="agent-install-actions">

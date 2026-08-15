@@ -30,7 +30,7 @@ export type AgentServerSource = string | {
 
 export const MCP_BRIDGE_VERSION = "0.8.0" as const;
 export const MCP_TOOL_COUNT = 17 as const;
-export const TABNEXUS_RELEASE_VERSION = "1.0.4" as const;
+export const TABNEXUS_RELEASE_VERSION = "1.0.5" as const;
 export const TABNEXUS_GITHUB_REPOSITORY = "KaichenCurry/TabNexus" as const;
 export const TABNEXUS_CODEX_MARKETPLACE = "tabnexus" as const;
 
@@ -146,8 +146,12 @@ export function createTraeInstallUrl(source: AgentServerSource) {
   return `solo://trae.ai-ide/mcp-import?type=stdio&name=TabNexus&config=${encodeURIComponent(utf8Base64(config))}`;
 }
 
-export function createCodexInstallUrl() {
-  return `codex://plugins/install/tabnexus?marketplace=${encodeURIComponent(TABNEXUS_CODEX_MARKETPLACE)}`;
+export function createCodexInstallerDownloadUrl(version: string = TABNEXUS_RELEASE_VERSION) {
+  return `https://github.com/${TABNEXUS_GITHUB_REPOSITORY}/releases/download/v${version}/TabNexus-Codex-Setup-v${version}.dmg`;
+}
+
+export function createCodexPluginUrl() {
+  return `codex://plugins/tabnexus@${encodeURIComponent(TABNEXUS_CODEX_MARKETPLACE)}?source=manage`;
 }
 
 export function createReleaseServerSource(version: string = TABNEXUS_RELEASE_VERSION): AgentServerSource {

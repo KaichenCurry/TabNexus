@@ -180,7 +180,8 @@ export const COLLABORATION_TOOL_DEFINITIONS = [
               title: { type: "string", maxLength: 240 },
               url: { type: ["string", "null"] },
               note: { type: "string", maxLength: 20000 },
-              status: { type: "string", enum: ["unread", "read", "adopted"] },
+              status: { type: "string", enum: ["unread", "read", "adopted", "excluded"] },
+              excludedReason: { type: ["string", "null"], maxLength: 2000 },
               cardType: { type: "string", enum: ["web", "note", "html", "report", "agent"] },
               position: { type: "integer", minimum: 0 },
               groupIds: { type: "array", maxItems: 100, items: { type: "string" } },
@@ -414,8 +415,24 @@ export const COLLABORATION_TOOL_DEFINITIONS = [
   }
 ] as const;
 
+/**
+ * 键序无关的稳定序列化：对象键递归按字母序排列。
+ * chrome.storage 往返后对象键序会漂移（字母序），而 revision 哈希对键序敏感——
+ * 同一内容必须永远产生同一哈希，因此哈希输入必须用稳定序列化。
+ */
+export function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map((item) => stableStringify(item)).join(",")}]`;
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .filter(([, entryValue]) => entryValue !== undefined)
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+    return `{${entries.map(([key, entryValue]) => `${JSON.stringify(key)}:${stableStringify(entryValue)}`).join(",")}}`;
+  }
+  return JSON.stringify(value) ?? "null";
+}
+
 function revisionPayload(workspace: Workspace): string {
-  return JSON.stringify({
+  return stableStringify({
     id: workspace.id,
     name: workspace.name,
     groupOrder: workspace.groupOrder,
@@ -466,10 +483,12 @@ export function summarizeWorkspace(workspace: Workspace): WorkspaceContextSummar
         source: card.source,
         savedAt: card.savedAt,
         lastAccessedAt: card.lastAccessedAt,
+        excludedReason: card.excludedReason,
         noteLength: card.note.length
       }];
     }),
-    edges: workspace.edges.map((edge) => ({ ...edge }))
+    edges: workspace.edges.map((edge) => ({ ...edge })),
+    v2: workspace.v2 ? { ...workspace.v2 } : undefined
   };
 }
 
@@ -648,8 +667,22 @@ function editWorkspace(
           next = { ...next, cards: { ...next.cards, [cardId]: { ...next.cards[cardId], type: action.cardType } } };
         }
         if (action.note !== undefined) next = updateCardNote(next, cardId, action.note.slice(0, 20_000));
+        if (action.excludedReason !== undefined) {
+          const card = next.cards[cardId];
+          next = {
+            ...next,
+            cards: {
+              ...next.cards,
+              [cardId]: {
+                ...card,
+                excludedReason: action.excludedReason === null || action.excludedReason === "" ? undefined : action.excludedReason.slice(0, 2_000),
+                status: action.excludedReason === null || action.excludedReason === "" ? card.status : "excluded"
+              }
+            }
+          };
+        }
         if (action.status !== undefined) {
-          if (!["unread", "read", "adopted"].includes(action.status)) throw new Error("Unsupported card status");
+          if (!["unread", "read", "adopted", "excluded"].includes(action.status)) throw new Error("Unsupported card status");
           next = updateCardStatus(next, cardId, action.status);
         }
         break;
@@ -781,7 +814,7 @@ export function executeCollaborationTool(
       if (input.type !== undefined && !["web", "note", "html", "report", "agent"].includes(input.type)) {
         throw new Error("Unsupported card type");
       }
-      if (input.status !== undefined && !["unread", "read", "adopted"].includes(input.status)) {
+      if (input.status !== undefined && !["unread", "read", "adopted", "excluded"].includes(input.status)) {
         throw new Error("Unsupported card status");
       }
       const groupId = optionalGroupId(next, input.groupId);

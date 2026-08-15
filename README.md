@@ -18,6 +18,7 @@
     <img alt="Chrome MV3" src="https://img.shields.io/badge/Chrome-Manifest_V3-4285F4?logo=googlechrome&logoColor=white" />
     <img alt="Workspace 本地存储" src="https://img.shields.io/badge/Workspace-local_storage-2F855A" />
     <img alt="MCP 工具" src="https://img.shields.io/badge/MCP-17_tools-6750D8" />
+    <img alt="DSH 插件生态" src="https://img.shields.io/badge/DSH-%E4%B8%80%E5%88%87%E7%9A%86%E6%8F%92%E4%BB%B6-4D6BFE" />
     <img alt="CI" src="https://github.com/KaichenCurry/TabNexus/actions/workflows/ci.yml/badge.svg" />
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-20232A" />
   </p>
@@ -28,7 +29,7 @@
 <div align="center"><sub>把网页保存成带分组、备注、状态和关系的 Workspace。原标签放心关掉，需要时一键恢复。</sub></div>
 
 > [!IMPORTANT]
-> **当前版本为 v1.0.4。** 已提供可直接加载的 Chrome 安装包，Chrome Web Store 版本尚未发布。→ [两分钟上手](#start)
+> **当前版本为 v2.0.0（本地重构版）。** 产品已整体重构为「任务上下文文档」：任务头+进度条、自由章节、AI 一键整理、AI 总结、简单关系图、收件口与 Agent Handoff；DSH 插件生态 Agent（Preset + Skill + MCP 直连）已交付。Chrome Web Store 版本尚未发布。→ [两分钟上手](#start)
 
 <a id="why"></a>
 ## 😵 你不敢关的不是 Tab，而是那件还没做完的事
@@ -76,71 +77,46 @@ Workspace 不是一个网页仓库，而是一件任务的现场：它保留页�
 
 前两步构成完整的本地工作流：先让任务安全留下，再把思路理清；AI API 是可选增强，MCP Agent 是更进一步的协作方式。
 
-### 1️⃣ 标签与 Workspace：终于不用靠“开着不关”提醒自己
+### 1️⃣ 任务文档：把 Tabs 收成一份会生长的文档
 
-从当前 Chrome 窗口勾选同一任务的网页，完成**采集、分组、保存**。保存后可以关闭原标签：卡片仍在本地 Workspace 中，随时恢复一张、一个分组或整个工作区。
+首启只问一句「**这次你想搞清楚什么？**」。从收件口勾选当前窗口的页面 →「收进任务」——它们变成文档里的引用条目。任务头常驻：目标、下一步、**分段式进度条**（一段=一个章节，填充=阅读进度，⭐=已采用）。
 
-清空标签栏，不再等于放弃任务；它只是把任务从浏览器噪音中安静地保存下来。
+日常底座永远可用：保存当前页 ≤2 次点击、一键保存窗口、保存并关闭（固定标签永不批量关闭）、恢复、删除确认、最近关闭找回、URL 去重——**零 AI 依赖**。
 
-保存与关闭是两个明确动作：关闭原标签不会删除卡片，恢复时会避开已经打开的 URL，固定标签也不会被批量关闭。多 Workspace、备注、拖拽分组和 Markdown / JSON 导出仍然都在。
+### 2️⃣ 整理与推进：自由章节 + 四态 + 简单关系图
 
-<picture><img src="docs/assets/tabnexus-before.png" alt="整理前：当前窗口中待保存的多个标签" /></picture>
-
-### 2️⃣ 任务思路：不是把标签排整齐，而是把问题想清楚
-
-页面被保存，只是第一步。真正困难的是：**每张页面在这件事里意味着什么？**
-
-- 用卡片与分组区分背景、证据、方案、反例和结论，知道每个 Tab 属于哪个环节；
-- 用关系图看清支持、对比、依赖和下一步，发现哪些资料互相支撑、哪里还缺证据；
-- 用“待读 / 已读 / 已采用”记录进度，不再把“以后再看”当作任务状态。
-
-普通 Tab Manager 管理页面放在哪里；TabNexus 帮你理解页面在任务中扮演什么角色。再次打开 Workspace 时，你恢复的不只是一组网页，而是**上次思考到一半的现场**。
-
-| 卡片看板 | 流程 / 关系图 |
-|---|---|
-| <picture><img src="docs/assets/tabnexus-workspace.png" alt="TabNexus 卡片工作区与当前标签操作台" /></picture> | <picture><img src="docs/assets/tabnexus-relationship-map.png" alt="TabNexus 无限关系图与任务结构" /></picture> |
+- **自由章节**：按你的思路建章节、拖页入章、AI 建议结构（可编辑预览），不强制任何固定分类法；
+- **四态推进**：待读 / 已读 / 已采用 / 已排除（排除必填原因——"为什么不要"是一等公民），备注直接显示在条目正面；
+- **简单关系图**：章节泳道 + 页面节点 + 带标签箭头，点击节点打开原页；关系数据由你或 Agent 维护（propose_structure）；
+- **结论区**：固定文档尾部，写一句话结论 = 任务可交付；进度条涨满自动高亮「让 Agent 继续」。
 
 <a id="ai-api"></a>
-### 3️⃣ AI API：先配置自己的模型，再按意图整理
+### 3️⃣ AI 一键整理与 AI 总结
 
-按域名整理只能告诉你“页面来自哪里”，却不知道“你为什么打开它”。配置 AI 后，你可以直接说：
+**✦ AI 一键整理**（四模式，全部先预览后应用、可撤销）：
+- 按内容理解（AI 语义分组 + 逐条理由）
+- 按时间（今天 / 本周 / 更早，纯本地）
+- 按域名（纯本地，你主动选择，绝非默认）
+- 自定义提示词（如"按背景、证据、反例、结论"）
 
-> “按照背景、证据、反例和结论，整理这次行业研究。”
-
-AI 会根据你的 Query 判断页面在任务中的作用，提出分组建议，也可以单独建议关系结构；默认先展示预览，由你确认后再应用。
+**AI 总结**：一键把当前任务（仅标题/URL/备注/状态，**永不发送网页正文**）总结为结构化摘要，写入结论区，可继续编辑。
 
 > [!IMPORTANT]
-> **TabNexus 默认使用本地整理。要使用 AI 整理，只需在“设置 → 选择你的 AI 服务”中选择服务商、填写有效 API Key 并启用；TabNexus 会自动使用适配模型。未配置时系统保持本地模式，不会调用外部服务。**
->
-> 不配置 API 仍可完整使用采集、保存、恢复、手动及本地域名分组、卡片、关系图和进度管理。
-
-当前支持 DeepSeek、OpenAI、Claude、Kimi、通义千问和 MiniMax。建议点击“验证连接”，成功后模型会自动启用；默认流程仍是**选择标签 → 描述意图 → 预览 → 应用**。
-
-<picture><img src="docs/assets/tabnexus-ai-provider-setup.png" alt="在 TabNexus 中选择 AI 模型、填写 API Key 并验证连接" /></picture>
-
-<div align="center"><sub>默认显示“本地模式”；配置并启用模型后，才可使用 AI 意图整理。</sub></div>
-
-AI API 负责理解与整理 Workspace；MCP 负责把 Workspace 交给 Agent。两者互不依赖，也可以前后接力。
+> 未配置 AI 时系统保持本地模式（按时间/按域名照常可用），不会调用外部服务。支持 DeepSeek、OpenAI、Claude、Kimi、通义千问和 MiniMax。
 
 <a id="agent"></a>
-### 4️⃣ Agent 协作：停止充当“人肉 API”
+### 4️⃣ Agent 协作与 DSH 插件生态
 
-如果你只需要保存、梳理或用 AI 分类，到上一步已经可以完整使用 TabNexus。只有当任务还要继续调研、补资料、写报告或进入开发流程时，才需要让 Agent 接手。
+点「**让 Agent 继续**」：一键生成 **Context Packet**（目标、章节、页面、备注、状态、排除原因、下一步、结论——明示"不会提供：网页正文、API Key、其他任务"），复制进 DSH / Codex / Claude，Agent 从你停下的地方继续，并把结论、补页与结构建议写回任务（版本校验 + 幂等 + 破坏性确认 + 活动留痕）。
 
-过去，你要么把十几个链接逐条复制给 Agent，再从头解释背景；要么让 Computer Use / Playwright 重新逐页读取。TabNexus 让支持 MCP 的 Agent 通过一个本地接口，直接获得已经整理好的分组、备注、关系和进度。
+**DSH 插件生态 Agent 已交付**：安装 `tabnexus-research` 预设 + `tabnexus` 技能后，任何 DSH 会话即成为 Tab Agent（17 个 `mcp__tabnexus__*` 工具：读取任务档案、补充页面、更新状态、写回结论）。
 
-Agent 可以搜索 Workspace、添加网页或笔记、更新状态与分组、建议关系结构并写回报告。关键写入支持版本校验并记录活动，关闭或删除等破坏性操作必须由你确认。
-
-**你负责目标与判断，TabNexus 负责上下文，Agent 从你停下的地方继续。**
-
-| 连接常用 Agent | 查看 Agent 的读取与写回 |
-|---|---|
-| <picture><img src="docs/assets/tabnexus-agent-connect.png" alt="TabNexus 的 Agent 连接页面" /></picture> | <picture><img src="docs/assets/tabnexus-agent-activity.png" alt="TabNexus Agent 活动与写回记录" /></picture> |
+> **「一切皆插件 —— 那浏览器里那 50 个 Tab，也该是。」** 诚邀全球 Harness 开发者共建 DSH 插件生态。接入指南见 [agent/dsh/README.md](agent/dsh/README.md) 与 [agent/dsh/VERIFICATION.md](agent/dsh/VERIFICATION.md)。
 
 <a id="start"></a>
 ## 🚀 两分钟安装，并完成第一次整理
 
-1. **安装扩展：** 下载并解压 [TabNexus Chrome 安装包](https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.4/TabNexus-Chrome-v1.0.4.zip)，打开 <code>chrome://extensions</code>，开启**开发者模式**并选择**加载已解压的扩展程序**。
+1. **安装扩展：** 下载并解压 [TabNexus Chrome 安装包](https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/TabNexus-Chrome-v1.0.5.zip)，打开 <code>chrome://extensions</code>，开启**开发者模式**并选择**加载已解压的扩展程序**。
 2. **保存一个任务：** 打开 TabNexus，勾选属于同一任务的网页并点击**保存**。现在可以放心关闭原标签。
 3. **选择整理方式：** 系统默认在本地整理；需要 AI 时，先在设置中选择服务商、填写 API Key 并启用，再输入自己的整理意图。
 4. **继续推进：** 在看板或关系图中标记进度，需要时恢复卡片、分组或整个 Workspace。
@@ -169,14 +145,14 @@ pnpm build
 
 打开**设置 → 连接你常用的 Agent**。本地 MCP 提供 **17 个聚焦工具**，覆盖 Workspace、卡片、关系图、导出与标签操作。
 
-**不需要源码：**先完成上方两分钟扩展安装，再在设置中选择你使用的 Agent。TabNexus 会直接打开对应客户端的安装入口：Codex 进入原生插件安装页，TRAE Work CN 进入 MCP 导入窗口，Claude Desktop 下载可双击安装的扩展包。首次启动本地 MCP 时，开发类客户端需要已安装 Node.js 22.13+。
+**不需要源码：**先完成上方两分钟扩展安装，再在首次教程的第三步或**设置 → 连接你常用的 Agent**中选择客户端。Codex 会下载一个只需打开一次的 macOS 安装器，它自动添加 TabNexus Marketplace、安装插件并打开 Codex，不需要终端或输入 Query；TRAE Work CN 进入 MCP 导入窗口，Claude Desktop 下载可双击安装的扩展包。Cursor、VS Code 与 TRAE Work CN 首次启动本地 MCP 时需要已安装 Node.js 22.13+。
 
 <details>
 <summary><strong>已支持的客户端与技术文档</strong></summary>
 
 | 客户端 | 状态 | 接入方式 |
 |---|:---:|---|
-| Codex | ✅ | 打开原生 TabNexus 插件安装页 |
+| Codex | ✅ | 下载并打开一次 macOS 一键安装器 |
 | Claude Desktop | ✅ | 两分钟包内置 MCPB |
 | Cursor / VS Code / TRAE Work CN | ✅ | 打开客户端一键安装 / 导入 |
 | 扣子 Coze | 规划中 | 鉴权远程 MCP 网关 |
@@ -197,9 +173,9 @@ pnpm build
 
 ## 🛠️ 已实现与下一步
 
-**v1.0.4 已实现：**多 Workspace 的采集 / 保存 / 恢复闭环、按意图的多模型 AI 分类与可编辑预览、持久化关系画布、17 工具本地 MCP、中英双语界面、首次使用教程，以及无需源码的本机 Agent 安装入口。自动化基线为 191 项测试、17/17 MCP 工具、36/36 确定性能力检查。
+**v2.0.0 已实现（2026-08 全量重构）：**任务上下文文档（任务头+分段进度条 / 自由章节 / 四态引用块 / 结论区）、收件口与工具栏 Popup、⌘K 命令面板、日常底座（采集/恢复/删除/最近关闭/去重，零 AI 依赖）、AI 一键整理四模式与 AI 总结（预览→应用→撤销）、简单关系图（纯 SVG）、Context Packet v2 与 Agent Handoff、17 工具本地 MCP（v2 元数据与排除原因已流入 read_workspace / edit_workspace）、**DSH 插件生态 Agent**（`tabnexus-research` 预设 + `tabnexus` 技能 + MCP 直连配置，已安装到本机 DSH 并完成 7 项自动化验证）。
 
-**接下来：**Chrome Web Store 上架、面向云端 Agent 的鉴权远程 MCP、无障碍与大型 Workspace 性能。详见[实现状态](docs/IMPLEMENTATION_STATUS.md)和 [PRD](docs/product/PRD.md)。
+**接下来：**会话级验收（见 [agent/dsh/VERIFICATION.md](agent/dsh/VERIFICATION.md)）、Chrome Web Store 上架、面向云端 Agent 的鉴权远程 MCP、无障碍与大型任务性能。设计基线见 [BLUEPRINT](docs/product/BLUEPRINT.md)，执行清单见 [ACTION-ITEMS](docs/product/ACTION-ITEMS.md)。
 
 技术栈：React · TypeScript · Vite · Vitest · Playwright · Chrome Manifest V3 · Model Context Protocol。
 

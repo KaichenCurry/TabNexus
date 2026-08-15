@@ -25,6 +25,7 @@ export default defineConfig({
       input: {
         workspace: resolve(extensionRoot, "workspace.html"),
         options: resolve(extensionRoot, "options.html"),
+        popup: resolve(extensionRoot, "popup.html"),
         background: resolve(extensionRoot, "src/background.ts")
       },
       output: {

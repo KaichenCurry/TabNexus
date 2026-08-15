@@ -1,6 +1,6 @@
 {
   "name": "tabnexus",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A local-first Chrome workspace for browser tabs, intent-first AI organization, and Agent collaboration through MCP.",
   "private": true,
   "license": "MIT",
@@ -34,7 +34,8 @@
     "build:portable": "TABNEXUS_PORTABLE_BUILD=1 npm run build",
     "release:chrome": "npm run build:portable && node scripts/package-chrome-release.mjs",
     "release:mcp": "node scripts/package-mcp-runtime.mjs",
-    "release:assets": "npm run release:chrome && npm run release:mcp",
+    "release:codex": "node scripts/package-codex-installer.mjs",
+    "release:assets": "npm run release:chrome && npm run release:mcp && npm run release:codex",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run --config config/vite.config.ts",
     "test:watch": "vitest --config config/vite.config.ts",
