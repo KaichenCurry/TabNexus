@@ -25,9 +25,10 @@ export interface Config {
 
 export const Config: z<Config> = z.object({
   bridgePort: z.natural().default(43119),
-  mcpCommand: z.string().default("node"),
+  mcpCommand: z.string().default("npx"),
   mcpArgs: z.array(z.string()).default([
-    "/Users/chen/Desktop/TabNexus/agent/bridge/tabnexus-mcp.mjs"
+    "-y",
+    "https://github.com/KaichenCurry/TabNexus/releases/download/v2.0.0/tabnexus-mcp-runtime-2.0.0.tgz"
   ])
 });
 

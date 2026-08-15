@@ -11,6 +11,8 @@
     <a href="#ai-api">AI API</a> ·
     <a href="#agent">Agent 协作</a> ·
     <a href="#start">两分钟上手</a> ·
+    <a href="docs/INSTALL_CHROME.md">Chrome 安装</a> ·
+    <a href="docs/INSTALL_DSH.md">DSH 安装</a> ·
     <a href="docs/README.en.md">English</a>
   </p>
 
@@ -109,14 +111,14 @@ Workspace 不是一个网页仓库，而是一件任务的现场：它保留页�
 
 点「**让 Agent 继续**」：一键生成 **Context Packet**（目标、章节、页面、备注、状态、排除原因、下一步、结论——明示"不会提供：网页正文、API Key、其他任务"），复制进 DSH / Codex / Claude，Agent 从你停下的地方继续，并把结论、补页与结构建议写回任务（版本校验 + 幂等 + 破坏性确认 + 活动留痕）。
 
-**DSH 插件生态 Agent 已交付**：安装 `tabnexus-research` 预设 + `tabnexus` 技能后，任何 DSH 会话即成为 Tab Agent（17 个 `mcp__tabnexus__*` 工具：读取任务档案、补充页面、更新状态、写回结论）。
+**DSH 插件生态 Agent 已交付**：`dsh plugin add` 一条命令装好 `dsh-plugin-tabnexus`（17 个 `mcp__tabnexus__*` 工具 + 界面内工作区面板），任何 DSH 会话即成为 Tab Agent。完整安装教程见 [DSH 安装教程](docs/INSTALL_DSH.md)。
 
 > **「一切皆插件 —— 那浏览器里那 50 个 Tab，也该是。」** 诚邀全球 Harness 开发者共建 DSH 插件生态。接入指南见 [agent/dsh/README.md](agent/dsh/README.md) 与 [agent/dsh/VERIFICATION.md](agent/dsh/VERIFICATION.md)。
 
 <a id="start"></a>
 ## 🚀 两分钟安装，并完成第一次整理
 
-1. **安装扩展：** 下载并解压 [TabNexus Chrome 安装包](https://github.com/KaichenCurry/TabNexus/releases/download/v1.0.5/TabNexus-Chrome-v1.0.5.zip)，打开 <code>chrome://extensions</code>，开启**开发者模式**并选择**加载已解压的扩展程序**。
+1. **安装扩展：** 下载并解压 [TabNexus Chrome v2.0.0](https://github.com/KaichenCurry/TabNexus/releases/download/v2.0.0/TabNexus-Chrome-v2.0.0.zip)，打开 <code>chrome://extensions</code>，开启**开发者模式**并选择**加载已解压的扩展程序**。完整图文教程见 [Chrome 安装教程](docs/INSTALL_CHROME.md)。
 2. **保存一个任务：** 打开 TabNexus，勾选属于同一任务的网页并点击**保存**。现在可以放心关闭原标签。
 3. **选择整理方式：** 系统默认在本地整理；需要 AI 时，先在设置中选择服务商、填写 API Key 并启用，再输入自己的整理意图。
 4. **继续推进：** 在看板或关系图中标记进度，需要时恢复卡片、分组或整个 Workspace。
