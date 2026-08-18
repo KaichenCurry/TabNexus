@@ -395,12 +395,50 @@ function agentActivityRevision(items: ReturnType<typeof agentActivitySnapshot>):
   return hashContext("actr", items);
 }
 
+function isDshShellUrl(raw: string | undefined): boolean {
+  if (!raw) return false;
+  try {
+    const url = new URL(raw);
+    return (url.hostname === "127.0.0.1" || url.hostname === "localhost") && url.port === "3080";
+  } catch {
+    return false;
+  }
+}
+
+function supportedTabCount(tabs: chrome.tabs.Tab[]): number {
+  return tabs.filter((tab) => isSupportedUrl(tab.url ?? tab.pendingUrl ?? "") && !isDshShellUrl(tab.url ?? tab.pendingUrl)).length;
+}
+
+/**
+ * DSH desktop is commonly installed as a Chrome App/PWA window. Once the user
+ * clicks it, `tabs.query({ lastFocusedWindow: true })` can otherwise collapse
+ * the workbench to the single DSH tab. Prefer the last normal browser window,
+ * and fall back to the normal window with the most real webpage tabs.
+ */
+async function queryManagedBrowserTabs(): Promise<chrome.tabs.Tab[]> {
+  try {
+    const lastNormal = await chrome.windows.getLastFocused({ populate: true, windowTypes: ["normal"] });
+    const lastTabs = lastNormal.tabs ?? [];
+    if (supportedTabCount(lastTabs) > 0) return lastTabs;
+
+    const normalWindows = await chrome.windows.getAll({ populate: true, windowTypes: ["normal"] });
+    const best = normalWindows
+      .map((window) => window.tabs ?? [])
+      .filter((tabs) => supportedTabCount(tabs) > 0)
+      .sort((left, right) => supportedTabCount(right) - supportedTabCount(left))[0];
+    if (best) return best;
+  } catch {
+    // Older Chromium builds may reject windowTypes; retain the legacy fallback.
+  }
+  return chrome.tabs.query({ lastFocusedWindow: true });
+}
+
 async function readBrowserTabContext(workspace: Workspace) {
   try {
     const savedCardsByUrl = new Map(Object.values(workspace.cards).flatMap((card) =>
       card.url ? [[normalizeUrl(card.url), card.id] as const] : []
     ));
-    const tabs = await chrome.tabs.query({ lastFocusedWindow: true });
+    const tabs = await queryManagedBrowserTabs();
     const browserTabs = tabs.flatMap((tab) => {
       const url = tab.url ?? tab.pendingUrl ?? "";
       if (tab.id === undefined || tab.windowId === undefined || !isSupportedUrl(url)) return [];
@@ -643,7 +681,7 @@ async function executeBrowserSync(
     }
     if (request.input.groupId && !workspace.groups[request.input.groupId]) throw new Error("Unknown group id");
     const requestedIds = new Set(request.input.tabIds);
-    const current = await chrome.tabs.query({ lastFocusedWindow: true });
+    const current = await queryManagedBrowserTabs();
     const selected = current.flatMap((tab) => requestedIds.has(tab.id ?? -1) ? chromeTabToOpenTab(tab) ?? [] : []);
     failed = requestedIds.size - selected.length;
     const collected = collectTabs(workspace, selected, request.input.groupId ?? null);
@@ -670,7 +708,7 @@ async function executeBrowserSync(
       if (!card) throw new Error(`Unknown card id: ${cardId}`);
       return card;
     });
-    const openTabs = await chrome.tabs.query({ lastFocusedWindow: true });
+    const openTabs = await queryManagedBrowserTabs();
     const openUrls = new Set(openTabs.flatMap((tab) => {
       const url = tab.url ?? tab.pendingUrl;
       return url && isSupportedUrl(url) ? [normalizeUrl(url)] : [];
@@ -750,7 +788,7 @@ async function prepareBrowserClose(
   if (request.input.groupId && !workspace.groups[request.input.groupId]) throw new Error("Unknown group id");
   const requestedIds = [...new Set(request.input.tabIds)];
   const requested = new Set(requestedIds);
-  const current = await chrome.tabs.query({ lastFocusedWindow: true });
+  const current = await queryManagedBrowserTabs();
   const foundIds = new Set(current.flatMap((tab) => tab.id !== undefined && requested.has(tab.id) ? [tab.id] : []));
   const missingTabIds = requestedIds.filter((id) => !foundIds.has(id));
   const skippedPinnedTabIds = current.flatMap((tab) => tab.id !== undefined && requested.has(tab.id) && tab.pinned ? [tab.id] : []);
