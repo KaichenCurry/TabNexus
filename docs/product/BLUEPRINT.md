@@ -1,6 +1,6 @@
 # TabNexus v2 蓝图（唯一执行基线）
 
-> 版本：BLUEPRINT v2.0 · 2026-08-15 · **本文是 TabNexus 唯一的产品、设计与架构基线**。
+> 版本：BLUEPRINT v2.1 · 2026-08-19 · **本文是 TabNexus 唯一的产品、设计与架构基线**。
 > 主设计负责人：主开发 AI（本文件即其裁决）。
 > 其他文档（REBUILD-PLAN / MASTER-PLAN / REDESIGN / PARADIGM-REVIEW / PRD）均为参考材料：可取观点，不可改基线；冲突处以本文为准。
 
@@ -15,6 +15,7 @@
 | D2 | **分组不固定**：完全由用户 + AI 提示词意图管理；支持一键总结、按内容/时间/域名/自定义提示词划分 | 用户 | ✅ 生效 |
 | D3 | **结论与进度可视化**：分段式任务进度条 + 结论区 | 用户 | ✅ 生效 |
 | D4 | 双形态：Chrome 扩展（Web Store 后话）+ DSH 插件生态 | 用户 | ✅ 生效 |
+| D5 | **DSH v0.3 是纯 UI、本地优先的小插件**：只做任务管理、分类、网页状态和简单流程；不注册 Agent 工具，不提供 MCP / Host API / SSE | 用户 | ✅ 生效 |
 
 ---
 
@@ -42,6 +43,8 @@
 **vs Browser Use / Computer Use**：他们读 live tabs 的快照（每次重扫、贵、慢、隐私暴露）；TabNexus 存跨会话的、带人类判断的任务档案——**上下游关系，非竞品**。档案给现场扫描当地图，把"盲扫 50 页"变成"精读 2 页"。
 
 **目标用户**：以任务为单位开 10–50 个页面、任务跨天、最终要交给 AI/Agent 的知识工作者。
+
+**DSH v0.3 边界**：DSH 本身已经是 Agent，TabNexus 不重复建设 Agent 接入层。DSH 版只在官方 `shell.overlay` Slot 中提供任务、分类、网页资料与三段式流程界面，数据保存在 Web Client 的 `localStorage`；只接受 `http://` / `https://`。Chrome 版的 MCP/Agent 能力与 DSH 版解耦。
 
 ---
 
@@ -302,20 +305,22 @@ extension/src/v2/
 
 ---
 
-## 11. DSH 双形态战略（事实已核验）
+## 11. DSH 双形态战略（v0.3 执行基线）
 
-- **核验事实**：DSH = Cordis 插件架构（"一切皆插件"是字面事实）；`dsh-mcp-client` 官方描述 *"connects to MCP servers and registers their tools on ctx.tools"*（本机 `@deepseek-ai/dsh@0.1.0-rc.6` 源码确认）；支持 stdio / Streamable HTTP，工具注册为 `mcp__<serverName>__<tool>`；带重连监督与凭据脱敏。生态动态：[iThome](https://www.ithome.com/0/989/446.htm) · [InfoQ](https://www.infoq.cn/article/de9AljWc4ej2WKAyW8dD) · [Oh-My-DSH](https://github.com/like-study1/Oh-My-DSH)。
-- **L1（1–2 天）**：DSH 配置接入 `tabnexus-mcp`（schema 已按本机源码校正：`serverName`/`command`/`args`/`env`/`cwd`/`toolCallTimeoutMs`/`failOnStartupError` 均必填）。
-- **L2（1 周）**：`tabnexus-research` Preset + Skill——"先读任务上下文，尊重已排除 Page，产出写回任务文档，结构修改先预览，副作用必须确认"。
-- **L3（✅ 已交付 2026-08-15）**：真·DSH bundle 插件 `dsh-plugin-tabnexus`（host 面挂载 mcp-client 注册 17 工具 + 状态路由；client 面浏览器状态徽章；`dsh plugin add` 安装；headless 会话全链路实证通过）。
-- **口号**：**「一切皆插件 —— 那浏览器里那 50 个 Tab，也该是。」**
-- **双形态关系**：Chrome 扩展 = 人的入口；DSH 插件 = Agent 的入口；共享同一份本地数据，互为价值放大器。
+- **独立仓库**：DSH 插件在 [`KaichenCurry/TabNexus-DSH`](https://github.com/KaichenCurry/TabNexus-DSH) 独立开发与发布，不修改 Chrome 扩展运行代码。
+- **只做简单功能**：任务创建/切换/设置，分类整理，网页标题/URL/备注，以及“待处理 → 进行中 → 已完成”的轻量流程视图。
+- **纯 Client**：Host 为空壳；不注入 `tools` 或 `webServer`，不注册 `mcp__tabnexus__*`，不提供 `/plugins/tabnexus/*` 路由、SSE、Skill 或 Agent preset。
+- **本地优先**：状态保存在 `tabnexus:dsh:workspace:v3` 浏览器本地存储；不需要账号、数据库、模型或 API Key。
+- **原生入口**：使用官方 `shell.overlay` Slot；右上角胶囊打开玻璃 Dock，支持展开工作区和窄屏抽屉。
+- **网页限定**：只接受 `http(s)`；规范化 URL、去追踪参数、同任务去重。不读取或关闭真实 Chrome 标签。
+- **双形态关系**：Chrome 版继续承担浏览器采集与 Agent 桥接；DSH 版是 Agent 界面内的独立轻量任务管理器，首版不做数据同步。
+- **口号**：**「一切皆插件 —— DSH 也可以有自己的 Tab 管理器。」**
 
 ---
 
 ## 12. 风险与红线
 
-**风险**：① 画布吞噬主线（控制：画布非默认视图、独立阶段交付、AI 改动必预览）；② 自由章节失控（控制：可选模板+AI 建议，章节恒由用户编辑，支持快速合并/重命名）；③ Excalidraw 受控 API 坑（控制：R3 POC 第一天验证 issue #7585）；④ DSH 接口变动（控制：先 MCP 标准+Skill，最后才 Cordis UI 插件）；⑤ Schema v2 破坏旧数据（控制：纯函数迁移+备份+双读验证+回滚）。
+**风险**：① 画布吞噬主线（控制：画布非默认视图、独立阶段交付、AI 改动必预览）；② 自由章节失控（控制：可选模板+AI 建议，章节恒由用户编辑，支持快速合并/重命名）；③ Excalidraw 受控 API 坑（控制：R3 POC 第一天验证 issue #7585）；④ DSH 预览版 Slot 变动（控制：rc.6 基线、隔离 profile、真实 Web/桌面与响应式验收）；⑤ Schema v2 破坏旧数据（控制：纯函数迁移+备份+双读验证+回滚）。
 
 **红线（任何阶段不得破坏）**：① 本地优先与隐私边界（不发正文/备注，Key 不暴露给 Agent）；② 破坏性操作确认 + revision/幂等收据；③ MCP 工具名与契约（新增只做加法）；④ 中英双语 + `pnpm check` 全量回归（189 测试与 E2E 同步更新文案断言）。
 
