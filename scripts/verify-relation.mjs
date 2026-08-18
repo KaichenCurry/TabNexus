@@ -29,11 +29,12 @@ await setup.evaluate(async () => {
 const page = await context.newPage();
 await page.goto(`chrome-extension://${id}/workspace.html`);
 await page.waitForTimeout(1000);
-await page.getByRole("button", { name: "画布" }).click();
+await page.getByRole("button", { name: "关系" }).click();
 await page.waitForTimeout(600);
 const metrics = await page.evaluate(() => ({
   nodeCount: document.querySelectorAll(".tn-relation-node").length,
-  edgeCount: document.querySelectorAll(".tn-relation-body line").length,
+  edgeCount: document.querySelectorAll(".tn-relation-edge").length,
+  laneCount: document.querySelectorAll(".tn-relation-lane").length,
   labels: [...document.querySelectorAll(".tn-relation-label")].map((el) => el.textContent),
   titles: [...document.querySelectorAll(".tn-relation-title")].map((el) => el.textContent),
   hint: document.querySelector(".tn-canvas-hint")?.textContent

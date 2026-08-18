@@ -102,7 +102,7 @@ test("collects tabs through the v2 inbox and restores a closed page", async () =
   await workspace.locator(".tn-inbox-actions .tn-primary").click();
 
   await expect(workspace.locator(".tn-page")).toHaveCount(3);
-  await expect(workspace.getByText("0/3 已读")).toBeVisible();
+  await expect(workspace.getByText(/0\/3 已读/)).toBeVisible();
 
   // 关闭一个原标签后，从引用块 ↗ 恢复
   await sourcePages[0].close();
@@ -124,6 +124,7 @@ test("save-and-close closes originals only after saving", async () => {
   await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(0).click();
   await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(1).click();
   await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(2).click();
+  workspace.once("dialog", (dialog) => void dialog.accept());
   await workspace.getByRole("button", { name: "保存并关闭" }).click();
 
   await expect.poll(async () => {
@@ -131,6 +132,45 @@ test("save-and-close closes originals only after saving", async () => {
     return Object.keys(stored.workspaces["ws-1"].cards).length;
   }).toBe(3);
   await expect.poll(() => Promise.resolve(sourcePages.every((page) => page.isClosed()))).toBe(true);
+});
+
+test("collects pages directly into the chosen context section", async () => {
+  for (const slug of ["section-source-a", "section-source-b"]) {
+    const source = await context.newPage();
+    await source.goto(`https://tabnexus.test/${slug}`);
+  }
+  const id = await extensionId();
+  const workspace = await context.newPage();
+  await workspace.goto(`chrome-extension://${id}/workspace.html`);
+  await workspace.evaluate(async () => {
+    const state = (await chrome.storage.local.get("tabnexus.appState.v1"))["tabnexus.appState.v1"] as any;
+    state.workspaces["ws-1"].groupOrder = ["research"];
+    state.workspaces["ws-1"].groups = {
+      research: { id: "research", name: "研究资料", color: "#3379D6", cardIds: [] }
+    };
+    await chrome.storage.local.set({ "tabnexus.appState.v1": state });
+  });
+  await workspace.reload();
+
+  await workspace.getByRole("button", { name: "添加资料到「研究资料」" }).click();
+  await expect(workspace.locator(".tn-inbox-header strong")).toHaveText("收进「研究资料」");
+  await expect(workspace.locator(".tn-inbox-item")).toHaveCount(2);
+  await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(0).click();
+  await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(1).click();
+  await expect(workspace.locator(".tn-inbox-actions .tn-primary")).toContainText("收进「研究资料」 2");
+  await workspace.locator(".tn-inbox-actions .tn-primary").click();
+
+  await expect(workspace.locator("#section-research .tn-page")).toHaveCount(2);
+  const assignment = await workspace.evaluate(async () => {
+    const state = (await chrome.storage.local.get("tabnexus.appState.v1"))["tabnexus.appState.v1"] as any;
+    const task = state.workspaces["ws-1"];
+    return {
+      sectionIds: task.groups.research.cardIds,
+      cardSections: Object.values(task.cards).map((card: any) => card.groupId)
+    };
+  });
+  expect(assignment.sectionIds).toHaveLength(2);
+  expect(assignment.cardSections).toEqual(["research", "research"]);
 });
 
 test("AI summarize writes the conclusion back through SUMMARIZE_TASK", async () => {
@@ -225,14 +265,14 @@ test("AI organize by content moves only unassigned pages into real sections", as
   await workspace.locator(".tn-inbox-actions .tn-primary").click();
   await expect(workspace.locator(".tn-page")).toHaveCount(3);
 
-  await workspace.getByRole("button", { name: /AI 一键整理/ }).click();
+  await workspace.getByRole("button", { name: "智能整理" }).click();
   await workspace.getByText("按内容理解", { exact: true }).click();
   await workspace.getByRole("button", { name: "生成整理建议" }).click();
   await expect(workspace.locator(".tn-proposal-group")).toHaveCount(1);
   expect(capturedCards.map((card) => card.title).sort()).toEqual(["ai-0", "ai-1", "ai-2"]);
   await workspace.getByRole("button", { name: "应用整理" }).click();
 
-  await expect(workspace.getByRole("heading", { name: /语义分组/ })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "语义分组", exact: true })).toBeVisible();
   await expect(workspace.locator(".tn-section .tn-page")).toHaveCount(3);
 });
 
@@ -264,7 +304,7 @@ test("M3 Agent write-back appears live in the v2 document", async () => {
   if (!organized.ok) throw new Error(organized.error);
 
   await expect(workspace.getByText("Agent market report")).toBeVisible();
-  await expect(workspace.locator(".tn-section-heading").getByRole("button", { name: "Agent organized", exact: true })).toBeVisible();
+  await expect(workspace.locator(".tn-section-heading").getByText("Agent organized", { exact: true })).toBeVisible();
 });
 
 test("uses the correct Agent path for source and portable builds", async () => {

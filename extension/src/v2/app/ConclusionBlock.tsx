@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { activeAiConfig } from "../../core/aiProviders";
 import { message } from "../../i18n";
 import type { Locale, Settings, SummarizeRequest } from "../../core/types";
 import type { Task } from "../core/taskModel";
+import { Icon } from "./Icon";
 
 type Props = {
   task: Task;
@@ -15,6 +16,8 @@ export function ConclusionBlock({ task, locale, settings, onApplySummary }: Prop
   const [draft, setDraft] = useState(task.conclusion);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => { setDraft(task.conclusion); }, [task.id, task.conclusion]);
 
   const ai = useMemo(() => {
     if (!settings.aiEnabled) return null;
@@ -60,25 +63,29 @@ export function ConclusionBlock({ task, locale, settings, onApplySummary }: Prop
 
   return (
     <section className="tn-conclusion" aria-label={message(locale, "v2Conclusion")}>
-      <h3 className="tn-section-heading">{message(locale, "v2Conclusion")}</h3>
+      <header className="tn-conclusion-head">
+        <span>
+          <small>{locale === "zh" ? "输出" : "OUTPUT"}</small>
+          <strong>{message(locale, "v2Conclusion")}</strong>
+        </span>
+        <button
+          type="button"
+          className="tn-ai-text-button"
+          disabled={busy || !ai}
+          title={ai ? undefined : message(locale, "v2OrganizeLocalOnly")}
+          onClick={() => void summarize()}
+        >
+          <Icon name="sparkles" />
+          {busy ? message(locale, "v2OrganizeGenerating") : message(locale, "v2AiSummarize")}
+        </button>
+      </header>
       <textarea
         value={draft}
         placeholder="暂未成稿。写一句话结论，或让 AI 帮你总结。"
         onChange={(event) => setDraft(event.target.value)}
         onBlur={() => draft !== task.conclusion && onApplySummary({ summary: task.summary ?? "", conclusion: draft, nextStep: task.nextStep })}
       />
-      <div className="tn-conclusion-actions">
-        <button
-          type="button"
-          className="tn-accent"
-          disabled={busy || !ai}
-          title={ai ? undefined : message(locale, "v2OrganizeLocalOnly")}
-          onClick={() => void summarize()}
-        >
-          {busy ? message(locale, "v2OrganizeGenerating") : message(locale, "v2AiSummarize")}
-        </button>
-        {error && <span className="tn-modal-error">{error}</span>}
-      </div>
+      {error && <p className="tn-conclusion-error">{error}</p>}
     </section>
   );
 }

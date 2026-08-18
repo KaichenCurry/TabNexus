@@ -4,13 +4,13 @@ import type { Locale } from "../../core/types";
 import { layoutRelations, nodeCenter } from "../core/relation";
 import type { Task } from "../core/taskModel";
 
-type Props = { task: Task; locale: Locale; onClose: () => void };
+type Props = { task: Task; locale: Locale };
 
 const STATUS_GLYPH: Record<string, string> = {
-  unread: "○",
-  read: "◐",
-  adopted: "⭐",
-  excluded: "✕"
+  unread: "待读",
+  read: "已读",
+  adopted: "采用",
+  excluded: "排除"
 };
 
 const STATUS_STROKE: Record<string, string> = {
@@ -20,7 +20,7 @@ const STATUS_STROKE: Record<string, string> = {
   excluded: "var(--tn-gray-400)"
 };
 
-export function RelationView({ task, locale, onClose }: Props) {
+export function RelationView({ task, locale }: Props) {
   const layout = useMemo(() => layoutRelations(task), [task]);
 
   const openPage = (url?: string) => {
@@ -32,8 +32,11 @@ export function RelationView({ task, locale, onClose }: Props) {
   return (
     <div className="tn-relation" aria-label={message(locale, "v2Canvas")}>
       <div className="tn-canvas-bar">
-        <button type="button" className="tn-secondary" onClick={onClose}>← {message(locale, "v2Document")}</button>
-        <span className="tn-canvas-hint">{layout.nodes.length} 个节点 · {layout.edges.length} 条关系 · 点击节点打开原页</span>
+        <span>
+          <strong>{locale === "zh" ? "上下文关系" : "Context relationships"}</strong>
+          <small>{locale === "zh" ? "章节是范围，连线表达证据之间的关系" : "Sections provide scope; links explain how evidence relates"}</small>
+        </span>
+        <span className="tn-canvas-hint">{layout.nodes.length} {locale === "zh" ? "个页面" : "pages"} · {layout.edges.length} {locale === "zh" ? "条关系" : "links"}</span>
       </div>
       {layout.nodes.length === 0 ? (
         <p className="tn-canvas-loading">先收进一些页面，关系图会出现在这里。</p>
@@ -51,6 +54,14 @@ export function RelationView({ task, locale, onClose }: Props) {
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--tn-gray-400)" />
               </marker>
             </defs>
+            {layout.lanes.map((lane) => (
+              <g key={lane.id} className="tn-relation-lane">
+                <rect x={lane.x} y={lane.y} width={lane.width} height={lane.height} rx={14} />
+                <rect className="tn-relation-lane-color" x={lane.x} y={lane.y} width={4} height={lane.height} rx={2} fill={lane.color ?? "var(--tn-gray-300)"} />
+                <text x={lane.x + 20} y={lane.y + 28} className="tn-relation-lane-title">{lane.name}</text>
+                <text x={lane.x + 20} y={lane.y + 46} className="tn-relation-lane-count">{lane.count} {locale === "zh" ? "个页面" : "pages"}</text>
+              </g>
+            ))}
             {layout.edges.map((edge, index) => {
               const from = layout.nodes.find((node) => node.pageId === edge.fromPageId);
               const to = layout.nodes.find((node) => node.pageId === edge.toPageId);
@@ -61,7 +72,7 @@ export function RelationView({ task, locale, onClose }: Props) {
               const midY = (a.y + b.y) / 2;
               return (
                 <g key={`${edge.fromPageId}-${edge.toPageId}-${index}`}>
-                  <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="var(--tn-gray-400)" strokeWidth={1.5} markerEnd="url(#tn-arrow)" />
+                  <path d={`M ${a.x} ${a.y} C ${midX} ${a.y}, ${midX} ${b.y}, ${b.x} ${b.y}`} className="tn-relation-edge" markerEnd="url(#tn-arrow)" />
                   {edge.label && (
                     <text x={midX} y={midY - 6} textAnchor="middle" className="tn-relation-label">{edge.label}</text>
                   )}
@@ -76,12 +87,12 @@ export function RelationView({ task, locale, onClose }: Props) {
                   width={node.width}
                   height={node.height}
                   rx={10}
-                  fill="var(--tn-gray-50)"
+                  fill="var(--tn-surface)"
                   stroke={STATUS_STROKE[node.status] ?? "var(--tn-gray-400)"}
                   strokeWidth={node.status === "adopted" ? 2 : 1}
                 />
-                <text x={node.x + 12} y={node.y + 22} className="tn-relation-glyph">{STATUS_GLYPH[node.status] ?? "○"}</text>
-                <text x={node.x + 12} y={node.y + 46} className="tn-relation-title">{node.title.length > 22 ? `${node.title.slice(0, 22)}…` : node.title}</text>
+                <text x={node.x + 12} y={node.y + 20} className={`tn-relation-glyph status-${node.status}`}>{STATUS_GLYPH[node.status] ?? "待读"}</text>
+                <text x={node.x + 12} y={node.y + 45} className="tn-relation-title">{node.title.length > 24 ? `${node.title.slice(0, 24)}…` : node.title}</text>
               </g>
             ))}
           </svg>

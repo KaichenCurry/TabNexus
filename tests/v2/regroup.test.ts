@@ -38,6 +38,14 @@ describe("v2 regroup", () => {
     expect(groups["更早"]).toEqual(["old", "undated"]);
   });
 
+  it("keeps assignment ids aligned when only a later time bucket is present", () => {
+    const task = makeTask();
+    const proposal = createTimeProposal(task, ["old", "undated"], NOW);
+    expect(proposal.groups).toHaveLength(1);
+    expect(proposal.groups[0].name).toBe("更早");
+    expect(new Set(proposal.assignments.map((assignment) => assignment.groupId))).toEqual(new Set([proposal.groups[0].id]));
+  });
+
   it("groups by domain locally and reuses nothing when no sections exist", () => {
     const task = makeTask();
     const proposal = createDomainProposalV2(task, "zh", ["today", "dup"]);

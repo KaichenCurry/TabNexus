@@ -3,28 +3,32 @@ import type { Locale, RecentClosedTab } from "../../core/types";
 import { message } from "../../i18n";
 import { buildInboxSnapshot, closeableTabIds, selectionToOpenTabs, type InboxTabItem } from "../core/inbox";
 import type { Task } from "../core/taskModel";
+import { Icon } from "./Icon";
 
 type Props = {
   task: Task;
   locale: Locale;
   recentlyClosed: RecentClosedTab[];
+  targetSectionName?: string;
   onClose: () => void;
-  onCollect: (tabs: ReturnType<typeof selectionToOpenTabs>, closeAfter: boolean) => Promise<boolean>;
+  onCollect: (tabs: ReturnType<typeof selectionToOpenTabs>, closeAfter: boolean) => Promise<"saved" | "cancelled" | "failed">;
   onRestoreRecent: (item: RecentClosedTab) => void;
   onDismissRecent: (id: string) => void;
 };
 
 type RawTab = { id?: number; windowId?: number; title?: string; url?: string; favIconUrl?: string; pinned?: boolean };
 
-export function InboxDrawer({ task, locale, recentlyClosed, onClose, onCollect, onRestoreRecent, onDismissRecent }: Props) {
+export function InboxDrawer({ task, locale, recentlyClosed, targetSectionName, onClose, onCollect, onRestoreRecent, onDismissRecent }: Props) {
   const [items, setItems] = useState<InboxTabItem[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (typeof chrome === "undefined" || !chrome.tabs?.query) return;
     try {
+      setError(null);
       const tabs = await chrome.tabs.query({ lastFocusedWindow: true });
       const raw: RawTab[] = tabs;
       const snapshot = buildInboxSnapshot(task, raw
@@ -40,8 +44,9 @@ export function InboxDrawer({ task, locale, recentlyClosed, onClose, onCollect, 
       setItems(snapshot.items);
     } catch {
       setItems([]);
+      setError(locale === "zh" ? "无法读取当前窗口，请重新打开收件口" : "Could not read the current window. Reopen the inbox.");
     }
-  }, [task.id, task.pages]);
+  }, [locale, task.id, task.pages]);
 
   useEffect(() => { void refresh(); }, [refresh]);
 
@@ -57,13 +62,20 @@ export function InboxDrawer({ task, locale, recentlyClosed, onClose, onCollect, 
   const saved = items.filter((item) => item.savedPageId);
   const selectedUnsaved = unsaved.filter((item) => selected.has(item.tabId));
   const selectedCount = selectedUnsaved.length;
+  const allSelected = unsaved.length > 0 && selectedCount === unsaved.length;
+
+  useEffect(() => {
+    const available = new Set(unsaved.map((item) => item.tabId));
+    setSelected((current) => new Set([...current].filter((id) => available.has(id))));
+  }, [items]);
 
   const runCollect = async (closeAfter: boolean) => {
     if (busy || selectedCount === 0) return;
     setBusy(true);
     try {
-      const ok = await onCollect(selectionToOpenTabs(items, [...selected]), closeAfter);
-      if (ok) setSelected(new Set());
+      const result = await onCollect(selectionToOpenTabs(items, [...selected]), closeAfter);
+      if (result === "saved") setSelected(new Set());
+      if (result === "failed") setError(locale === "zh" ? "保存失败，浏览器页面没有被关闭" : "Save failed. Browser pages were left open.");
     } finally {
       setBusy(false);
       void refresh();
@@ -73,10 +85,28 @@ export function InboxDrawer({ task, locale, recentlyClosed, onClose, onCollect, 
   return (
     <aside className="tn-inbox" aria-label={message(locale, "v2Inbox")}>
       <header className="tn-inbox-header">
-        <strong>{message(locale, "v2Inbox")}</strong>
-        <em>{unsaved.length}</em>
-        <button type="button" onClick={onClose} aria-label="close">×</button>
+        <span>
+          <small>{message(locale, "v2Inbox")}</small>
+          <strong>{targetSectionName
+            ? (locale === "zh" ? `收进「${targetSectionName}」` : `Add to “${targetSectionName}”`)
+            : (locale === "zh" ? "当前窗口" : "Current window")}</strong>
+        </span>
+        <em>{unsaved.length} {locale === "zh" ? "个未保存" : "unsaved"}</em>
+        <button type="button" onClick={onClose} aria-label={message(locale, "closeModal")}><Icon name="close" /></button>
       </header>
+
+      <div className="tn-inbox-tools">
+        <label>
+          <input
+            type="checkbox"
+            checked={allSelected}
+            disabled={unsaved.length === 0}
+            onChange={() => setSelected(allSelected ? new Set() : new Set(unsaved.map((item) => item.tabId)))}
+          />
+          {locale === "zh" ? "全选未保存页面" : "Select all unsaved pages"}
+        </label>
+        <button type="button" onClick={() => void refresh()}>{locale === "zh" ? "刷新" : "Refresh"}</button>
+      </div>
 
       <div className="tn-inbox-list">
         {unsaved.map((item) => (
@@ -86,12 +116,16 @@ export function InboxDrawer({ task, locale, recentlyClosed, onClose, onCollect, 
               checked={selected.has(item.tabId)}
               onChange={() => toggle(item.tabId)}
             />
-            <span className="tn-inbox-title">{item.title}</span>
-            <small>{domainOf(item.url)}</small>
-            {item.pinned && <i className="tn-inbox-pinned">固定</i>}
+            {item.favicon ? <img src={item.favicon} alt="" /> : <span className="tn-inbox-fallback">{item.title.slice(0, 1).toUpperCase()}</span>}
+            <span className="tn-inbox-copy">
+              <span className="tn-inbox-title">{item.title}</span>
+              <small>{domainOf(item.url)}</small>
+            </span>
+            {item.pinned && <i className="tn-inbox-pinned">{locale === "zh" ? "固定" : "Pinned"}</i>}
           </label>
         ))}
         {unsaved.length === 0 && <p className="tn-inbox-empty">当前窗口没有未保存的页面</p>}
+        {error && <p className="tn-inbox-error">{error}</p>}
       </div>
 
       <footer className="tn-inbox-actions">
@@ -101,7 +135,11 @@ export function InboxDrawer({ task, locale, recentlyClosed, onClose, onCollect, 
           disabled={selectedCount === 0 || busy}
           onClick={() => void runCollect(false)}
         >
-          {message(locale, "v2CollectIntoTask", { count: selectedCount })}
+          {busy
+            ? (locale === "zh" ? "正在保存…" : "Saving…")
+            : targetSectionName
+              ? (locale === "zh" ? `收进「${targetSectionName}」 ${selectedCount}` : `Add to “${targetSectionName}” ${selectedCount}`)
+              : message(locale, "v2CollectIntoTask", { count: selectedCount })}
         </button>
         {selectedCount > 0 && (
           <button
@@ -118,7 +156,8 @@ export function InboxDrawer({ task, locale, recentlyClosed, onClose, onCollect, 
       {saved.length > 0 && (
         <div className="tn-inbox-saved">
           <button type="button" onClick={() => setShowSaved((value) => !value)}>
-            {message(locale, "v2SavedCollapsed", { count: saved.length })} ▸
+            <Icon name="chevron" className={showSaved ? "expanded" : ""} />
+            {message(locale, "v2SavedCollapsed", { count: saved.length })}
           </button>
           {showSaved && saved.map((item) => (
             <div key={item.tabId} className="tn-inbox-saved-item">
@@ -135,8 +174,8 @@ export function InboxDrawer({ task, locale, recentlyClosed, onClose, onCollect, 
           {recentlyClosed.map((item) => (
             <div key={item.id} className="tn-inbox-recent-item">
               <span>{item.title}</span>
-              <button type="button" onClick={() => onRestoreRecent(item)}>↗</button>
-              <button type="button" onClick={() => onDismissRecent(item.id)}>×</button>
+              <button type="button" onClick={() => onRestoreRecent(item)} aria-label={message(locale, "v2Restore")}><Icon name="external" /></button>
+              <button type="button" onClick={() => onDismissRecent(item.id)} aria-label={message(locale, "delete")}><Icon name="close" /></button>
             </div>
           ))}
         </div>

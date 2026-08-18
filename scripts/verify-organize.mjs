@@ -42,7 +42,7 @@ await page.goto(`chrome-extension://${id}/workspace.html`);
 await page.waitForTimeout(1200);
 
 // 1) 打开整理模态，选「按时间」
-await page.getByRole("button", { name: /AI 一键整理/ }).click();
+await page.getByRole("button", { name: "智能整理" }).click();
 await page.waitForTimeout(400);
 await page.getByText("按时间", { exact: true }).click();
 await page.getByRole("button", { name: "生成整理建议" }).click();
@@ -71,7 +71,7 @@ const afterUndo = await page.evaluate(async () => {
 console.log("after undo groupCount:", afterUndo.groupCount);
 
 // 4) 按域名模式
-await page.getByRole("button", { name: /AI 一键整理/ }).click();
+await page.getByRole("button", { name: "智能整理" }).click();
 await page.waitForTimeout(300);
 await page.getByText("按域名", { exact: true }).click();
 await page.getByRole("button", { name: "生成整理建议" }).click();

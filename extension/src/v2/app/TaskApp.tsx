@@ -1,18 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   loadAppState,
   loadRecentlyClosed,
   loadSettings,
   saveAppState,
   saveRecentlyClosed,
-  saveSettings,
   subscribeToAppState,
   subscribeToSettings
 } from "../../core/storage";
 import type { AppState, Locale, OpenTab, RecentClosedTab, Settings } from "../../core/types";
-import { message } from "../../i18n";
-import { collectTabs, updateWorkspace } from "../../core/workspace";
 import { applyGroupingProposal } from "../../core/grouping";
+import { normalizeUrl } from "../../core/url";
+import { collectTabs, updateWorkspace } from "../../core/workspace";
 import {
   activeTask,
   createSection,
@@ -29,16 +28,18 @@ import {
   updateTaskMeta
 } from "../core/taskOps";
 import type { PageStatus, Task } from "../core/taskModel";
-import { TaskHeader } from "./TaskHeader";
-import { SectionList } from "./SectionList";
-import { ConclusionBlock } from "./ConclusionBlock";
-import { FirstRun } from "./FirstRun";
-import { InboxDrawer } from "./InboxDrawer";
+import { AppSidebar } from "./AppSidebar";
 import { CommandPalette } from "./CommandPalette";
-import { OrganizeModal } from "./OrganizeModal";
+import { ConclusionBlock } from "./ConclusionBlock";
 import { ExportModal } from "./ExportModal";
+import { FirstRun } from "./FirstRun";
 import { HandoffModal } from "./HandoffModal";
+import { InboxDrawer } from "./InboxDrawer";
+import { OrganizeModal } from "./OrganizeModal";
 import { RelationView } from "./RelationView";
+import { SectionList } from "./SectionList";
+import { TaskHeader } from "./TaskHeader";
+import { TaskToolbar } from "./TaskToolbar";
 import "../app.css";
 
 const DEFAULT_TASK_NAMES = new Set(["我的工作区", "My workspace", "未命名工作区", "Untitled workspace"]);
@@ -46,30 +47,28 @@ const DEFAULT_TASK_NAMES = new Set(["我的工作区", "My workspace", "未命�
 export function TaskApp() {
   const [state, setState] = useState<AppState | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
-  const [pendingSave, setPendingSave] = useState<AppState | null>(null);
   const [recentlyClosed, setRecentlyClosed] = useState<RecentClosedTab[]>([]);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [inboxOpen, setInboxOpen] = useState(() => new URLSearchParams(window.location.search).has("inbox"));
+  const [collectTargetSectionId, setCollectTargetSectionId] = useState<string | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [organizeOpen, setOrganizeOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [handoffOpen, setHandoffOpen] = useState(false);
-  const [view, setView] = useState<"doc" | "canvas">("doc");
+  const [view, setView] = useState<"doc" | "relation">("doc");
   const [undoTask, setUndoTask] = useState<Task | null>(null);
+  const saveQueue = useRef<Promise<void>>(Promise.resolve());
 
   useEffect(() => {
     let disposed = false;
-    void Promise.all([loadAppState(), loadSettings(), loadRecentlyClosed()]).then(([loadedState, loadedSettings, loadedRecent]) => {
+    void Promise.all([loadAppState(), loadSettings(), loadRecentlyClosed()]).then(([nextState, nextSettings, nextRecent]) => {
       if (disposed) return;
-      setState(loadedState);
-      setSettings(loadedSettings);
-      setRecentlyClosed(loadedRecent);
+      setState(nextState);
+      setSettings(nextSettings);
+      setRecentlyClosed(nextRecent);
     });
-    const offState = subscribeToAppState(() => {
-      void loadAppState().then((next) => setState((current) => (current ? next : current)));
-    });
-    const offSettings = subscribeToSettings(() => {
-      void loadSettings().then((next) => setSettings((current) => (current ? next : current)));
-    });
+    const offState = subscribeToAppState(() => void loadAppState().then(setState));
+    const offSettings = subscribeToSettings(() => void loadSettings().then(setSettings));
     return () => { disposed = true; offState(); offSettings(); };
   }, []);
 
@@ -84,14 +83,16 @@ export function TaskApp() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  useEffect(() => {
-    if (!pendingSave) return;
-    void saveAppState(pendingSave).then(() => setPendingSave(null));
-  }, [pendingSave]);
-
-  const persist = useCallback((next: AppState) => {
+  /** 串行写入，避免快速编辑时较早的 save 完成回调覆盖最后一次修改。 */
+  const persist = useCallback((next: AppState): Promise<boolean> => {
     setState(next);
-    setPendingSave(next);
+    setSaveError(null);
+    const operation = saveQueue.current.then(() => saveAppState(next));
+    saveQueue.current = operation.catch(() => undefined);
+    return operation.then(() => true).catch(() => {
+      setSaveError("本地保存失败，请保留此页面并重试");
+      return false;
+    });
   }, []);
 
   const locale: Locale = settings?.locale ?? "zh";
@@ -101,209 +102,146 @@ export function TaskApp() {
   if (!state || !settings || !task) return null;
 
   const isFirstRun = Object.keys(task.pages).length === 0 && !task.goal && DEFAULT_TASK_NAMES.has(task.name);
+  const pageCount = Object.keys(task.pages).length;
+  const collectTargetSection = collectTargetSectionId ? task.sections.find((section) => section.id === collectTargetSectionId) : undefined;
+  const switchTask = (taskId: string) => { setUndoTask(null); setCollectTargetSectionId(null); void persist({ ...state, activeWorkspaceId: taskId }); };
+  const handleRenameTask = (name: string) => void persist(renameTask(state, task.id, name));
+  const handleMeta = (patch: Parameters<typeof updateTaskMeta>[2]) => void persist(updateTaskMeta(state, task.id, patch));
+  const handleCreateSection = (name?: string) => void persist(createSection(state, task.id, locale, name));
+  const handleMovePages = (pageIds: string[], sectionId: string | null) => void persist(movePagesToSection(state, task.id, pageIds, sectionId));
+  const handlePageStatus = (pageId: string, status: PageStatus, reason?: string) => void persist(setPageStatus(state, task.id, pageId, status, reason));
+  const handlePageNote = (pageId: string, note: string) => void persist(setPageNote(state, task.id, pageId, note));
 
-  const switchTask = (taskId: string) => persist({ ...state, activeWorkspaceId: taskId });
-  const handleRenameTask = (name: string) => persist(renameTask(state, task.id, name));
-  const handleMeta = (patch: Parameters<typeof updateTaskMeta>[2]) => persist(updateTaskMeta(state, task.id, patch));
-  const handleCreateSection = (name?: string) => persist(createSection(state, task.id, locale, name));
-  const handleRenameSection = (sectionId: string, name: string) => persist(renameSection(state, task.id, sectionId, name));
-  const handleDeleteSection = (sectionId: string) => persist(deleteSection(state, task.id, sectionId));
-  const handleMovePages = (pageIds: string[], sectionId: string | null) => persist(movePagesToSection(state, task.id, pageIds, sectionId));
-  const handlePageStatus = (pageId: string, status: PageStatus, excludedReason?: string) => persist(setPageStatus(state, task.id, pageId, status, excludedReason));
-  const handlePageNote = (pageId: string, note: string) => persist(setPageNote(state, task.id, pageId, note));
-  const handleLocale = (next: Locale) => {
-    const updated = { ...settings, locale: next };
-    setSettings(updated);
-    void saveSettings(updated);
+  const openSettings = () => {
+    const url = typeof chrome !== "undefined" && chrome.runtime?.getURL ? chrome.runtime.getURL("options.html") : "options.html";
+    window.open(url, "_blank", "noopener");
+  };
+  const openPage = (url?: string) => {
+    if (!url) return;
+    if (typeof chrome !== "undefined" && chrome.tabs?.create) void chrome.tabs.create({ url });
+    else window.open(url, "_blank", "noopener");
+  };
+  const openSection = async (urls: string[]) => {
+    const uniqueUrls = [...new Map(urls.map((url) => [normalizeUrl(url), url])).values()];
+    if (uniqueUrls.length === 0) return;
+    if (typeof chrome !== "undefined" && chrome.tabs?.create) {
+      const currentTabs = chrome.tabs.query ? await chrome.tabs.query({}) : [];
+      const openUrls = new Set(currentTabs.flatMap((tab) => tab.url ? [normalizeUrl(tab.url)] : []));
+      for (const url of uniqueUrls) {
+        if (!openUrls.has(normalizeUrl(url))) await chrome.tabs.create({ url, active: false });
+      }
+      return;
+    }
+    uniqueUrls.forEach((url) => window.open(url, "_blank", "noopener"));
   };
 
-  // ── 日常底座动作 ──
-  // 注意：这里必须是普通函数（早退 return 之后不允许再出现 hook 调用）
-  const handleCollect = async (openTabs: OpenTab[], closeAfter: boolean): Promise<boolean> => {
+  const handleCollect = async (openTabs: OpenTab[], closeAfter: boolean): Promise<"saved" | "cancelled" | "failed"> => {
     const workspace = state.workspaces[task.id];
-    const collected = collectTabs(workspace, openTabs, null);
-    persist(updateWorkspace(state, collected.workspace));
-    if (closeAfter && typeof chrome !== "undefined" && chrome.tabs?.remove) {
-      const closeable = openTabs.filter((tab) => !tab.pinned).map((tab) => tab.id);
-      if (closeable.length) await chrome.tabs.remove(closeable);
+    if (!workspace) return "failed";
+    const closeable = openTabs.filter((tab) => !tab.pinned).map((tab) => tab.id);
+    if (closeAfter && closeable.length > 0) {
+      const confirmed = window.confirm(locale === "zh"
+        ? `将先保存 ${openTabs.length} 个页面，再关闭其中 ${closeable.length} 个普通标签。固定标签不会关闭。`
+        : `Save ${openTabs.length} pages, then close ${closeable.length} regular tabs. Pinned tabs stay open.`);
+      if (!confirmed) return "cancelled";
     }
-    return true;
+    const targetSectionId = collectTargetSectionId && task.sections.some((section) => section.id === collectTargetSectionId)
+      ? collectTargetSectionId
+      : null;
+    const collected = collectTabs(workspace, openTabs, targetSectionId);
+    const saved = await persist(updateWorkspace(state, collected.workspace));
+    if (!saved) return "failed";
+    if (closeAfter && closeable.length > 0 && typeof chrome !== "undefined" && chrome.tabs?.remove) {
+      await chrome.tabs.remove(closeable);
+    }
+    return "saved";
   };
 
   const handleRestoreRecent = (item: RecentClosedTab) => {
-    if (typeof chrome !== "undefined" && chrome.tabs?.create) void chrome.tabs.create({ url: item.url });
+    openPage(item.url);
     const next = recentlyClosed.filter((candidate) => candidate.id !== item.id);
     setRecentlyClosed(next);
     void saveRecentlyClosed(next);
   };
   const handleDismissRecent = (id: string) => {
+    if (!window.confirm(locale === "zh" ? "从最近关闭记录中移除这一项？" : "Remove this item from recently closed?")) return;
     const next = recentlyClosed.filter((candidate) => candidate.id !== id);
     setRecentlyClosed(next);
     void saveRecentlyClosed(next);
   };
-
-  const handleRestorePage = (url?: string) => {
-    if (!url) return;
-    if (typeof chrome !== "undefined" && chrome.tabs?.create) void chrome.tabs.create({ url });
-    else window.open(url, "_blank", "noopener");
+  const handleDeleteSection = (sectionId: string) => {
+    const section = task.sections.find((candidate) => candidate.id === sectionId);
+    if (!section || !window.confirm(locale === "zh" ? `删除章节「${section.name}」？页面会保留为未归类。` : `Delete “${section.name}”? Its pages will remain unassigned.`)) return;
+    void persist(deleteSection(state, task.id, sectionId));
   };
-  const handleCreateTask = () => {
-    const name = window.prompt(message(locale, "v2FirstQuestion"));
-    if (name === null) return;
-    persist(createTask(state, locale, name));
-  };
-
   const handleDeletePage = (pageId: string, title: string) => {
-    if (!window.confirm(`删除「${title}」？此操作不可撤销。`)) return;
-    persist(deletePage(state, task.id, pageId));
+    if (!window.confirm(locale === "zh" ? `从任务中移除「${title}」？浏览器标签不会关闭。` : `Remove “${title}” from this task? Its browser tab will stay open.`)) return;
+    void persist(deletePage(state, task.id, pageId));
   };
-
-  // ── AI 一键整理（任务链"整"）──
   const handleApplyOrganize = (proposal: Parameters<typeof applyGroupingProposal>[1]) => {
     setUndoTask(task);
-    const nextWorkspace = applyGroupingProposal(taskToWorkspaceView(task), proposal);
-    persist(updateWorkspace(state, nextWorkspace));
+    void persist(updateWorkspace(state, applyGroupingProposal(taskToWorkspaceView(task), proposal)));
     setOrganizeOpen(false);
   };
   const handleUndoOrganize = () => {
     if (!undoTask) return;
-    persist(updateWorkspace(state, taskToWorkspaceView(undoTask)));
+    void persist(updateWorkspace(state, taskToWorkspaceView(undoTask)));
     setUndoTask(null);
-  };
-
-  // ── AI 总结（任务链"结"）──
-  const handleApplySummary = (patch: { summary: string; conclusion: string; nextStep: string }) => {
-    persist(updateTaskMeta(state, task.id, patch));
   };
 
   return (
     <div className="tn-shell">
-      <aside className="tn-sidebar">
-        <div className="tn-brand">TabNexus</div>
-        <nav className="tn-task-list">
-          {tasks.map((candidate) => (
-            <button
-              key={candidate.id}
-              type="button"
-              className={`tn-task-item ${candidate.id === task.id ? "active" : ""}`}
-              onClick={() => switchTask(candidate.id)}
-            >
-              <span className="tn-task-name">{candidate.name}</span>
-              <small>{Object.keys(candidate.pages).length}</small>
-            </button>
-          ))}
-        </nav>
-        <button type="button" className="tn-sidebar-add" onClick={handleCreateTask}>
-          ＋ {message(locale, "v2NewTask")}
-        </button>
-        <div className="tn-sidebar-footer">
-          <button type="button" className="tn-locale" onClick={() => handleLocale(locale === "zh" ? "en" : "zh")}>
-            {locale === "zh" ? "中文" : "EN"}
-          </button>
-          <button type="button" className="tn-settings" onClick={() => window.open(chrome?.runtime?.getURL?.("options.html"), "_blank")}>
-            ⚙ {message(locale, "settings")}
-          </button>
-        </div>
-      </aside>
-
+      <AppSidebar tasks={tasks} activeTaskId={task.id} locale={locale} onSwitchTask={switchTask} onCreateTask={() => void persist(createTask(state, locale))} onOpenSearch={() => setPaletteOpen(true)} />
       <main className="tn-main">
-        <div className="tn-viewbar">
-          <div className="tn-view-tabs" role="group" aria-label="view">
-            <button type="button" className={view === "doc" ? "active" : ""} onClick={() => setView("doc")}>{message(locale, "v2Document")}</button>
-            <button type="button" className={view === "canvas" ? "active" : ""} onClick={() => setView("canvas")}>{message(locale, "v2Canvas")}</button>
-            <button type="button" onClick={() => setInboxOpen((value) => !value)} aria-pressed={inboxOpen}>
-              {message(locale, "v2Inbox")} {recentlyClosed.length > 0 ? "●" : ""}
-            </button>
-          </div>
-          <div className="tn-viewbar-right">
-            {undoTask && (
-              <button type="button" className="tn-secondary" onClick={handleUndoOrganize}>↶ {message(locale, "v2Undo")}</button>
-            )}
-            <button type="button" className="tn-secondary" onClick={() => setOrganizeOpen(true)}>✦ {message(locale, "v2AiOneClickOrganize")}</button>
-            <button type="button" className="tn-secondary" onClick={() => setExportOpen(true)}>⇧ {message(locale, "export")}</button>
-            <button type="button" className="tn-kbutton" onClick={() => setPaletteOpen(true)} title="⌘K">⌘K</button>
-            <button
-              type="button"
-              className="tn-primary"
-              disabled={Object.keys(task.pages).length === 0}
-              title={Object.keys(task.pages).length === 0 ? "先收进一些页面" : undefined}
-              onClick={() => setHandoffOpen(true)}
-            >{message(locale, "v2LetAgentContinue")}</button>
-          </div>
-        </div>
-
-        {view === "canvas" ? (
-          <RelationView
-            task={task}
-            locale={locale}
-            onClose={() => setView("doc")}
-          />
-        ) : (
-        <>
-        <TaskHeader
-          task={task}
-          locale={locale}
-          onRename={handleRenameTask}
-          onMeta={handleMeta}
+        <TaskToolbar
+          locale={locale} taskName={task.name} pageCount={pageCount} view={view}
+          canHandoff={pageCount > 0} canOrganize={pageCount > 0} canUndo={Boolean(undoTask)}
+          onView={setView} onCollect={() => { setCollectTargetSectionId(null); setInboxOpen(true); }} onOrganize={() => setOrganizeOpen(true)}
+          onHandoff={() => setHandoffOpen(true)} onUndo={handleUndoOrganize} onExport={() => setExportOpen(true)}
+          onOpenSearch={() => setPaletteOpen(true)} onOpenSettings={openSettings}
         />
-
-        {isFirstRun ? (
-          <FirstRun locale={locale} onCreate={(name) => persist(renameTask(state, task.id, name))} />
-        ) : (
-          <>
-            <SectionList
-              task={task}
-              locale={locale}
-              onCreateSection={handleCreateSection}
-              onRenameSection={handleRenameSection}
-              onDeleteSection={handleDeleteSection}
-              onMovePages={handleMovePages}
-              onPageStatus={handlePageStatus}
-              onPageNote={handlePageNote}
-              onRestorePage={handleRestorePage}
-              onDeletePage={handleDeletePage}
-            />
-            <ConclusionBlock task={task} locale={locale} settings={settings} onApplySummary={handleApplySummary} />
-          </>
-        )}
-        </>
-        )}
+        {saveError && <div className="tn-save-error" role="alert">{saveError}</div>}
+        <div className="tn-content">
+          {view === "relation" ? <RelationView task={task} locale={locale} /> : (
+            <>
+              {isFirstRun ? (
+                <FirstRun locale={locale} onCreate={(name) => { void persist(renameTask(state, task.id, name)); setCollectTargetSectionId(null); setInboxOpen(true); }} />
+              ) : (
+                <>
+                  <TaskHeader task={task} locale={locale} onRename={handleRenameTask} onMeta={handleMeta} />
+                  <SectionList
+                    task={task} locale={locale} onCreateSection={handleCreateSection}
+                    onRenameSection={(sectionId, name) => void persist(renameSection(state, task.id, sectionId, name))}
+                    onDeleteSection={handleDeleteSection} onMovePages={handleMovePages}
+                    onPageStatus={handlePageStatus} onPageNote={handlePageNote} onRestorePage={openPage}
+                    onRestoreSection={(urls) => void openSection(urls)}
+                    onCollectToSection={(sectionId) => { setCollectTargetSectionId(sectionId); setInboxOpen(true); }}
+                    onDeletePage={handleDeletePage}
+                  />
+                  <ConclusionBlock task={task} locale={locale} settings={settings} onApplySummary={(patch) => void persist(updateTaskMeta(state, task.id, patch))} />
+                </>
+              )}
+            </>
+          )}
+        </div>
       </main>
 
-      {organizeOpen && (
-        <OrganizeModal
-          task={task}
-          locale={locale}
-          settings={settings}
-          onApply={handleApplyOrganize}
-          onClose={() => setOrganizeOpen(false)}
-        />
-      )}
-
+      {organizeOpen && <OrganizeModal task={task} locale={locale} settings={settings} onApply={handleApplyOrganize} onClose={() => setOrganizeOpen(false)} />}
       {exportOpen && <ExportModal task={task} locale={locale} onClose={() => setExportOpen(false)} />}
-
       {handoffOpen && <HandoffModal task={task} locale={locale} onClose={() => setHandoffOpen(false)} />}
-
       {inboxOpen && (
         <InboxDrawer
-          task={task}
-          locale={locale}
-          recentlyClosed={recentlyClosed}
-          onClose={() => setInboxOpen(false)}
-          onCollect={handleCollect}
-          onRestoreRecent={handleRestoreRecent}
-          onDismissRecent={handleDismissRecent}
+          task={task} locale={locale} recentlyClosed={recentlyClosed} targetSectionName={collectTargetSection?.name}
+          onClose={() => { setInboxOpen(false); setCollectTargetSectionId(null); }} onCollect={handleCollect}
+          onRestoreRecent={handleRestoreRecent} onDismissRecent={handleDismissRecent}
         />
       )}
-
       {paletteOpen && (
         <CommandPalette
-          tasks={tasks}
-          activeTaskId={task.id}
-          locale={locale}
-          onSwitchTask={switchTask}
-          onCreateSection={() => handleCreateSection()}
-          onClose={() => setPaletteOpen(false)}
+          tasks={tasks} activeTaskId={task.id} locale={locale} onSwitchTask={switchTask}
+          onOpenPage={(taskId, url) => { if (taskId !== task.id) switchTask(taskId); openPage(url); }}
+          onOpenInbox={() => { setCollectTargetSectionId(null); setInboxOpen(true); }} onOrganize={() => pageCount > 0 && setOrganizeOpen(true)}
+          onCreateSection={() => handleCreateSection()} onClose={() => setPaletteOpen(false)}
         />
       )}
     </div>

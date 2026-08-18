@@ -315,7 +315,7 @@ export function OptionsApp() {
                   onClick={() => void selectProvider(providerId)}
                 >
                   <span className="provider-mark">{provider.mark}</span>
-                  <span><strong>{provider.name}</strong><small>{configured ? text("已保存密钥", "Key saved") : text("填写 API key", "Add API key")}</small></span>
+                  <span><strong>{provider.name}</strong><small>{configured ? text("密钥已保存", "Key saved") : text("配置密钥", "Add key")}</small></span>
                   <i aria-hidden="true">{selected ? "✓" : ""}</i>
                 </button>
               );

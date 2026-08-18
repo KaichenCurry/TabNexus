@@ -57,10 +57,13 @@ describe("v2 TaskApp", () => {
     expect(screen.getAllByText("市场").length).toBeGreaterThan(0);
     expect(screen.getByText("页-a")).toBeInTheDocument();
     expect(screen.getByText("页-b")).toBeInTheDocument();
-    expect(screen.getByText("2/2 已读")).toBeInTheDocument();
-    expect(screen.getByText("⭐ 1 已采用")).toBeInTheDocument();
+    expect(screen.getByText(/2\/2 已读/)).toBeInTheDocument();
+    expect(screen.getByText(/已采用 1/)).toBeInTheDocument();
     expect(screen.getByDisplayValue("值得研究")).toBeInTheDocument();
     expect(screen.getByDisplayValue("已过期")).toBeInTheDocument();
+    expect(screen.getByText("已保存 3 个页面")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "添加资料到「市场」" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "打开章节「市场」全部页面" })).toBeInTheDocument();
   });
 
   it("organizes by domain with preview and applies to sections", async () => {
@@ -69,7 +72,7 @@ describe("v2 TaskApp", () => {
       b: makeCard("b", { url: "https://y.example.org", groupId: null })
     }, { goal: "", nextStep: "", conclusion: "" });
     render(<TaskApp />);
-    fireEvent.click(await screen.findByRole("button", { name: /AI 一键整理/ }));
+    fireEvent.click(await screen.findByRole("button", { name: "智能整理" }));
     fireEvent.click(await screen.findByText("按域名", { exact: true }));
     fireEvent.click(screen.getByRole("button", { name: "生成整理建议" }));
     expect(await screen.findByText("example.com", { exact: true })).toBeInTheDocument();
@@ -85,7 +88,8 @@ describe("v2 TaskApp", () => {
   it("opens the export modal with markdown content", async () => {
     seedState("评估 Perplexity", { a: makeCard("a", { status: "read" }) });
     render(<TaskApp />);
-    fireEvent.click(await screen.findByRole("button", { name: /导出/ }));
+    fireEvent.click(await screen.findByRole("button", { name: "更多操作" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: /导出/ }));
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "复制" })).toBeInTheDocument();
   });

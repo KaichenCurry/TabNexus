@@ -4,6 +4,7 @@ import { message } from "../../i18n";
 import type { Locale } from "../../core/types";
 import { taskToWorkspaceView } from "../core/taskOps";
 import type { Task } from "../core/taskModel";
+import { Icon } from "./Icon";
 
 type Props = { task: Task; locale: Locale; onClose: () => void };
 
@@ -42,8 +43,8 @@ export function ExportModal({ task, locale, onClose }: Props) {
     <div className="tn-modal-backdrop" onClick={onClose}>
       <div className="tn-modal" role="dialog" aria-label={message(locale, "export")} onClick={(event) => event.stopPropagation()}>
         <header className="tn-modal-head">
-          <strong>⇧ {message(locale, "export")}</strong>
-          <button type="button" onClick={onClose}>×</button>
+          <span><Icon name="export" /><strong>{message(locale, "export")}</strong></span>
+          <button type="button" onClick={onClose} aria-label={message(locale, "closeModal")}><Icon name="close" /></button>
         </header>
         <div className="tn-modal-body">
           <div className="tn-mode-list" role="group">
