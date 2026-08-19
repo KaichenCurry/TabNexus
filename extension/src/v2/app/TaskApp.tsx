@@ -5,6 +5,7 @@ import {
   loadSettings,
   saveAppState,
   saveRecentlyClosed,
+  saveSettings,
   subscribeToAppState,
   subscribeToSettings
 } from "../../core/storage";
@@ -34,6 +35,7 @@ import { ConclusionBlock } from "./ConclusionBlock";
 import { ExportModal } from "./ExportModal";
 import { FirstRun } from "./FirstRun";
 import { HandoffModal } from "./HandoffModal";
+import { Icon } from "./Icon";
 import { InboxDrawer } from "./InboxDrawer";
 import { OrganizeModal } from "./OrganizeModal";
 import { RelationView } from "./RelationView";
@@ -49,7 +51,8 @@ export function TaskApp() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [recentlyClosed, setRecentlyClosed] = useState<RecentClosedTab[]>([]);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [inboxOpen, setInboxOpen] = useState(() => new URLSearchParams(window.location.search).has("inbox"));
+  const forceInboxOpen = useMemo(() => new URLSearchParams(window.location.search).has("inbox"), []);
+  const [inboxOpen, setInboxOpen] = useState(forceInboxOpen);
   const [collectTargetSectionId, setCollectTargetSectionId] = useState<string | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [organizeOpen, setOrganizeOpen] = useState(false);
@@ -58,6 +61,18 @@ export function TaskApp() {
   const [view, setView] = useState<"doc" | "relation">("doc");
   const [undoTask, setUndoTask] = useState<Task | null>(null);
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("dsh") !== "connect" || typeof chrome === "undefined" || !chrome.runtime?.reload) return;
+
+    // The DSH installer may replace an unpacked build while Chrome still runs
+    // its previous service worker. Remove the marker before restarting so this
+    // recovery path is always one-shot and can never enter a reload loop.
+    window.history.replaceState(null, "", chrome.runtime.getURL("workspace.html"));
+    const timer = window.setTimeout(() => chrome.runtime.reload(), 80);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     let disposed = false;
@@ -71,6 +86,11 @@ export function TaskApp() {
     const offSettings = subscribeToSettings(() => void loadSettings().then(setSettings));
     return () => { disposed = true; offState(); offSettings(); };
   }, []);
+
+  useEffect(() => {
+    if (!settings) return;
+    setInboxOpen(forceInboxOpen || !settings.rightRailCollapsed);
+  }, [forceInboxOpen, settings?.rightRailCollapsed]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -111,6 +131,12 @@ export function TaskApp() {
   const handleMovePages = (pageIds: string[], sectionId: string | null) => void persist(movePagesToSection(state, task.id, pageIds, sectionId));
   const handlePageStatus = (pageId: string, status: PageStatus, reason?: string) => void persist(setPageStatus(state, task.id, pageId, status, reason));
   const handlePageNote = (pageId: string, note: string) => void persist(setPageNote(state, task.id, pageId, note));
+  const setRailOpen = (open: boolean) => {
+    setInboxOpen(open);
+    const nextSettings = { ...settings, rightRailCollapsed: !open };
+    setSettings(nextSettings);
+    void saveSettings(nextSettings);
+  };
 
   const openSettings = () => {
     const url = typeof chrome !== "undefined" && chrome.runtime?.getURL ? chrome.runtime.getURL("options.html") : "options.html";
@@ -196,16 +222,17 @@ export function TaskApp() {
         <TaskToolbar
           locale={locale} taskName={task.name} pageCount={pageCount} view={view}
           canHandoff={pageCount > 0} canOrganize={pageCount > 0} canUndo={Boolean(undoTask)}
-          onView={setView} onCollect={() => { setCollectTargetSectionId(null); setInboxOpen(true); }} onOrganize={() => setOrganizeOpen(true)}
+          railOpen={inboxOpen}
+          onView={setView} onCollect={() => { setCollectTargetSectionId(null); setRailOpen(true); }} onOrganize={() => setOrganizeOpen(true)}
           onHandoff={() => setHandoffOpen(true)} onUndo={handleUndoOrganize} onExport={() => setExportOpen(true)}
-          onOpenSearch={() => setPaletteOpen(true)} onOpenSettings={openSettings}
+          onOpenSearch={() => setPaletteOpen(true)} onOpenSettings={openSettings} onToggleRail={() => setRailOpen(!inboxOpen)}
         />
         {saveError && <div className="tn-save-error" role="alert">{saveError}</div>}
         <div className="tn-content">
           {view === "relation" ? <RelationView task={task} locale={locale} /> : (
             <>
               {isFirstRun ? (
-                <FirstRun locale={locale} onCreate={(name) => { void persist(renameTask(state, task.id, name)); setCollectTargetSectionId(null); setInboxOpen(true); }} />
+                <FirstRun locale={locale} onCreate={(name) => { void persist(renameTask(state, task.id, name)); setCollectTargetSectionId(null); setRailOpen(true); }} />
               ) : (
                 <>
                   <TaskHeader task={task} locale={locale} onRename={handleRenameTask} onMeta={handleMeta} />
@@ -215,7 +242,7 @@ export function TaskApp() {
                     onDeleteSection={handleDeleteSection} onMovePages={handleMovePages}
                     onPageStatus={handlePageStatus} onPageNote={handlePageNote} onRestorePage={openPage}
                     onRestoreSection={(urls) => void openSection(urls)}
-                    onCollectToSection={(sectionId) => { setCollectTargetSectionId(sectionId); setInboxOpen(true); }}
+                    onCollectToSection={(sectionId) => { setCollectTargetSectionId(sectionId); setRailOpen(true); }}
                     onDeletePage={handleDeletePage}
                   />
                   <ConclusionBlock task={task} locale={locale} settings={settings} onApplySummary={(patch) => void persist(updateTaskMeta(state, task.id, patch))} />
@@ -226,21 +253,30 @@ export function TaskApp() {
         </div>
       </main>
 
-      {organizeOpen && <OrganizeModal task={task} locale={locale} settings={settings} onApply={handleApplyOrganize} onClose={() => setOrganizeOpen(false)} />}
-      {exportOpen && <ExportModal task={task} locale={locale} onClose={() => setExportOpen(false)} />}
-      {handoffOpen && <HandoffModal task={task} locale={locale} onClose={() => setHandoffOpen(false)} />}
+      {!inboxOpen && (
+        <aside className="tn-inbox-collapsed">
+          <button type="button" onClick={() => setRailOpen(true)} aria-label={locale === "zh" ? "展开标签操作台" : "Expand tab workbench"} title={locale === "zh" ? "展开标签操作台" : "Expand tab workbench"}>
+            <Icon name="collect" />
+            <span>{locale === "zh" ? "标签" : "Tabs"}</span>
+          </button>
+        </aside>
+      )}
       {inboxOpen && (
         <InboxDrawer
           task={task} locale={locale} recentlyClosed={recentlyClosed} targetSectionName={collectTargetSection?.name}
-          onClose={() => { setInboxOpen(false); setCollectTargetSectionId(null); }} onCollect={handleCollect}
+          onClose={() => { setCollectTargetSectionId(null); setRailOpen(false); }} onCollect={handleCollect}
           onRestoreRecent={handleRestoreRecent} onDismissRecent={handleDismissRecent}
         />
       )}
+
+      {organizeOpen && <OrganizeModal task={task} locale={locale} settings={settings} onApply={handleApplyOrganize} onClose={() => setOrganizeOpen(false)} />}
+      {exportOpen && <ExportModal task={task} locale={locale} onClose={() => setExportOpen(false)} />}
+      {handoffOpen && <HandoffModal task={task} locale={locale} onClose={() => setHandoffOpen(false)} />}
       {paletteOpen && (
         <CommandPalette
           tasks={tasks} activeTaskId={task.id} locale={locale} onSwitchTask={switchTask}
           onOpenPage={(taskId, url) => { if (taskId !== task.id) switchTask(taskId); openPage(url); }}
-          onOpenInbox={() => { setCollectTargetSectionId(null); setInboxOpen(true); }} onOrganize={() => pageCount > 0 && setOrganizeOpen(true)}
+          onOpenInbox={() => { setCollectTargetSectionId(null); setRailOpen(true); }} onOrganize={() => pageCount > 0 && setOrganizeOpen(true)}
           onCreateSection={() => handleCreateSection()} onClose={() => setPaletteOpen(false)}
         />
       )}

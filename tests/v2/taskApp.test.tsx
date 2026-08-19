@@ -66,6 +66,17 @@ describe("v2 TaskApp", () => {
     expect(screen.getByRole("button", { name: "打开章节「市场」全部页面" })).toBeInTheDocument();
   });
 
+  it("keeps the tab workbench as a compact third column and exposes a recoverable toggle", async () => {
+    seedState("评估 Perplexity", { a: makeCard("a") });
+    render(<TaskApp />);
+    expect(await screen.findByText("标签操作台")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "收起标签操作台" }));
+    await waitFor(() => expect(screen.queryByText("标签操作台")).not.toBeInTheDocument());
+    expect(screen.getAllByRole("button", { name: "展开标签操作台" }).length).toBeGreaterThan(0);
+    fireEvent.click(screen.getAllByRole("button", { name: "展开标签操作台" })[0]);
+    expect(await screen.findByText("标签操作台")).toBeInTheDocument();
+  });
+
   it("organizes by domain with preview and applies to sections", async () => {
     seedState("评估 Perplexity", {
       a: makeCard("a", { url: "https://x.example.com", groupId: null }),

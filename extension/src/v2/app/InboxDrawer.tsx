@@ -22,7 +22,6 @@ export function InboxDrawer({ task, locale, recentlyClosed, targetSectionName, o
   const [items, setItems] = useState<InboxTabItem[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
-  const [showSaved, setShowSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
@@ -59,7 +58,6 @@ export function InboxDrawer({ task, locale, recentlyClosed, targetSectionName, o
   };
 
   const unsaved = items.filter((item) => !item.savedPageId);
-  const saved = items.filter((item) => item.savedPageId);
   const selectedUnsaved = unsaved.filter((item) => selected.has(item.tabId));
   const selectedCount = selectedUnsaved.length;
   const allSelected = unsaved.length > 0 && selectedCount === unsaved.length;
@@ -86,12 +84,12 @@ export function InboxDrawer({ task, locale, recentlyClosed, targetSectionName, o
     <aside className="tn-inbox" aria-label={message(locale, "v2Inbox")}>
       <header className="tn-inbox-header">
         <span>
-          <small>{message(locale, "v2Inbox")}</small>
+          <small>{targetSectionName ? message(locale, "v2Inbox") : (locale === "zh" ? "当前窗口" : "Current window")}</small>
           <strong>{targetSectionName
             ? (locale === "zh" ? `收进「${targetSectionName}」` : `Add to “${targetSectionName}”`)
-            : (locale === "zh" ? "当前窗口" : "Current window")}</strong>
+            : (locale === "zh" ? "标签操作台" : "Tab workbench")}</strong>
         </span>
-        <em>{unsaved.length} {locale === "zh" ? "个未保存" : "unsaved"}</em>
+        <em>{items.length} {locale === "zh" ? "个打开" : "open"}</em>
         <button type="button" onClick={onClose} aria-label={message(locale, "closeModal")}><Icon name="close" /></button>
       </header>
 
@@ -109,22 +107,23 @@ export function InboxDrawer({ task, locale, recentlyClosed, targetSectionName, o
       </div>
 
       <div className="tn-inbox-list">
-        {unsaved.map((item) => (
-          <label key={item.tabId} className="tn-inbox-item">
+        {items.map((item) => (
+          <label key={item.tabId} className={`tn-inbox-item ${item.savedPageId ? "saved" : ""}`}>
             <input
               type="checkbox"
-              checked={selected.has(item.tabId)}
+              checked={Boolean(item.savedPageId) || selected.has(item.tabId)}
+              disabled={Boolean(item.savedPageId)}
               onChange={() => toggle(item.tabId)}
             />
             {item.favicon ? <img src={item.favicon} alt="" /> : <span className="tn-inbox-fallback">{item.title.slice(0, 1).toUpperCase()}</span>}
             <span className="tn-inbox-copy">
               <span className="tn-inbox-title">{item.title}</span>
-              <small>{domainOf(item.url)}</small>
+              <small>{domainOf(item.url)}{item.savedPageId ? ` · ${locale === "zh" ? "已保存" : "saved"}` : ""}</small>
             </span>
             {item.pinned && <i className="tn-inbox-pinned">{locale === "zh" ? "固定" : "Pinned"}</i>}
           </label>
         ))}
-        {unsaved.length === 0 && <p className="tn-inbox-empty">当前窗口没有未保存的页面</p>}
+        {items.length === 0 && <p className="tn-inbox-empty">当前窗口没有可管理的网页标签</p>}
         {error && <p className="tn-inbox-error">{error}</p>}
       </div>
 
@@ -152,21 +151,6 @@ export function InboxDrawer({ task, locale, recentlyClosed, targetSectionName, o
           </button>
         )}
       </footer>
-
-      {saved.length > 0 && (
-        <div className="tn-inbox-saved">
-          <button type="button" onClick={() => setShowSaved((value) => !value)}>
-            <Icon name="chevron" className={showSaved ? "expanded" : ""} />
-            {message(locale, "v2SavedCollapsed", { count: saved.length })}
-          </button>
-          {showSaved && saved.map((item) => (
-            <div key={item.tabId} className="tn-inbox-saved-item">
-              <span>{item.title}</span>
-              <small>已保存</small>
-            </div>
-          ))}
-        </div>
-      )}
 
       {recentlyClosed.length > 0 && (
         <div className="tn-inbox-recent">

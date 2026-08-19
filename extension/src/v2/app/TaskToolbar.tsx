@@ -11,6 +11,7 @@ type Props = {
   canHandoff: boolean;
   canOrganize: boolean;
   canUndo: boolean;
+  railOpen: boolean;
   onView: (view: "doc" | "relation") => void;
   onCollect: () => void;
   onOrganize: () => void;
@@ -19,6 +20,7 @@ type Props = {
   onExport: () => void;
   onOpenSearch: () => void;
   onOpenSettings: () => void;
+  onToggleRail: () => void;
 };
 
 export function TaskToolbar(props: Props) {
@@ -75,6 +77,16 @@ export function TaskToolbar(props: Props) {
         <button type="button" className="tn-primary tn-collect-button" onClick={props.onCollect}>
           <Icon name="collect" />
           {props.locale === "zh" ? "收集页面" : "Collect pages"}
+        </button>
+        <button
+          type="button"
+          className="tn-icon-button tn-rail-toggle"
+          data-open={props.railOpen}
+          onClick={props.onToggleRail}
+          aria-label={props.railOpen ? (props.locale === "zh" ? "收起标签操作台" : "Collapse tab workbench") : (props.locale === "zh" ? "展开标签操作台" : "Expand tab workbench")}
+          title={props.railOpen ? (props.locale === "zh" ? "收起标签操作台" : "Collapse tab workbench") : (props.locale === "zh" ? "展开标签操作台" : "Expand tab workbench")}
+        >
+          <Icon name="collect" />
         </button>
         <div className="tn-more" ref={menuRef}>
           <button type="button" className="tn-icon-button" onClick={() => setMenuOpen((value) => !value)} aria-haspopup="menu" aria-expanded={menuOpen} aria-label={props.locale === "zh" ? "更多操作" : "More actions"}>
