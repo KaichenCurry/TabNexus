@@ -173,46 +173,29 @@ test("collects pages directly into the chosen context section", async () => {
   expect(assignment.cardSections).toEqual(["research", "research"]);
 });
 
-test("AI summarize writes the conclusion back through SUMMARIZE_TASK", async () => {
+test("compact workspace removes conclusion UI and jumps to API and MCP setup", async () => {
   const id = await extensionId();
-  await context.route("https://api.deepseek.com/chat/completions", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        choices: [{ message: { content: JSON.stringify({
-          summary: "调研结论摘要",
-          conclusion: "Perplexity 值得研究，但短期不宜复制",
-          nextStep: "补一个失败案例"
-        }) } }]
-      })
-    });
-  });
-  const setup = await context.newPage();
-  await setup.goto(`chrome-extension://${id}/workspace.html`);
-  await setup.evaluate(async () => {
-    const s = (await chrome.storage.local.get("tabnexus.appState.v1"))["tabnexus.appState.v1"] as { workspaces: Record<string, { cards: Record<string, unknown>; v2?: Record<string, unknown> }> };
-    const ws = s.workspaces["ws-1"] as { cards: Record<string, unknown>; v2?: Record<string, unknown> };
-    ws.cards = {
-      a: { id: "a", type: "web", title: "融资轮次", url: "https://tabnexus.test/a", note: "估值 90 亿", status: "adopted", groupId: null, source: "user" },
-      b: { id: "b", type: "web", title: "旧测评", url: "https://tabnexus.test/b", note: "", status: "excluded", excludedReason: "已过期", groupId: null, source: "user" }
-    };
-    await chrome.storage.local.set({
-      "tabnexus.settings.v1": {
-        locale: "zh", tutorialCompleted: true, v2ShellEnabled: true,
-        aiEnabled: true, aiProvider: "deepseek",
-        aiProviderConfigs: { deepseek: { apiKey: "e2e-runtime-only", model: "deepseek-v4-flash", verifiedAt: "2026-08-15T00:00:00.000Z" } }
-      },
-      "tabnexus.appState.v1": s
-    });
-  });
-  await setup.close();
-
   const workspace = await context.newPage();
   await workspace.goto(`chrome-extension://${id}/workspace.html`);
-  await workspace.getByRole("button", { name: "AI 总结" }).click();
-  await expect(workspace.getByText("Perplexity 值得研究，但短期不宜复制", { exact: true })).toBeVisible();
-  await expect(workspace.locator(".tn-nextstep-input")).toHaveValue("补一个失败案例");
+
+  await expect(workspace.getByText("当前结论", { exact: true })).toHaveCount(0);
+  await expect(workspace.getByRole("button", { name: "AI 总结" })).toHaveCount(0);
+
+  await workspace.getByRole("button", { name: "更多操作" }).click();
+  const aiPagePromise = context.waitForEvent("page");
+  await workspace.getByRole("menuitem", { name: /AI \/ API 配置/ }).click();
+  const aiPage = await aiPagePromise;
+  await aiPage.waitForLoadState("domcontentloaded");
+  await expect(aiPage).toHaveURL(new RegExp(`chrome-extension://${id}/options\\.html#ai$`));
+  await expect(aiPage.getByRole("heading", { name: "选择你的 AI 服务" })).toBeVisible();
+
+  await workspace.getByRole("button", { name: "更多操作" }).click();
+  const agentPagePromise = context.waitForEvent("page");
+  await workspace.getByRole("menuitem", { name: /Agent \/ MCP 接入/ }).click();
+  const agentPage = await agentPagePromise;
+  await agentPage.waitForLoadState("domcontentloaded");
+  await expect(agentPage).toHaveURL(new RegExp(`chrome-extension://${id}/options\\.html#agent$`));
+  await expect(agentPage.getByRole("heading", { name: "连接你常用的 Agent" })).toBeVisible();
 });
 
 test("AI organize by content moves only unassigned pages into real sections", async () => {

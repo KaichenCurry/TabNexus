@@ -50,7 +50,7 @@
 
 | # | 任务 | 状态 |
 |---|---|---|
-| R1.1 | ✅ `src/v2/` 骨架：TaskApp（编排）+ TaskHeader/ProgressBar/SectionList/PageBlock/ConclusionBlock/FirstRun | 完成 |
+| R1.1 | ✅ `src/v2/` 骨架：TaskApp（编排）+ TaskHeader/ProgressBar/SectionList/PageBlock/FirstRun；独立结论区已按精简要求移除，结论数据仍供导出与 MCP 使用 | 完成 |
 | R1.2 | ✅ 空状态首启「这次你想搞清楚什么？」 | 完成 |
 | R1.3 | ✅ 任务头 + 分段式进度条（派生 computeProgress，可交付态高亮） | 完成 |
 | R1.4 | ✅ 自由章节 + Page 引用块（四态勾选/备注正面/排除原因/移动章节） | 完成 |

@@ -5,9 +5,9 @@ import { buildContextPacket, renderContextPacketMarkdown } from "../core/context
 import type { Task } from "../core/taskModel";
 import { Icon } from "./Icon";
 
-type Props = { task: Task; locale: Locale; onClose: () => void };
+type Props = { task: Task; locale: Locale; onOpenAgentSettings: () => void; onClose: () => void };
 
-export function HandoffModal({ task, locale, onClose }: Props) {
+export function HandoffModal({ task, locale, onOpenAgentSettings, onClose }: Props) {
   const packet = useMemo(() => buildContextPacket(task), [task]);
   const markdown = useMemo(() => renderContextPacketMarkdown(packet, locale), [packet, locale]);
   const [copied, setCopied] = useState(false);
@@ -39,6 +39,9 @@ export function HandoffModal({ task, locale, onClose }: Props) {
           <div className="tn-modal-actions">
             <button type="button" className="tn-primary" onClick={() => void copy()}>
               {copied ? message(locale, "v2Copied") : message(locale, "v2HandoffCopy")}
+            </button>
+            <button type="button" className="tn-secondary" onClick={onOpenAgentSettings}>
+              <Icon name="agent" />{locale === "zh" ? "Agent / MCP 接入" : "Agent / MCP setup"}
             </button>
           </div>
           <p className="tn-modal-scope">{locale === "zh" ? "已连接 TabNexus MCP 的 Agent 可以直接读取；也可以复制后粘贴到任意 Agent。" : "Connected Agents can read through TabNexus MCP, or you can paste this packet into any Agent."}</p>

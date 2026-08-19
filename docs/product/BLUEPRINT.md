@@ -274,7 +274,7 @@ extension/src/v2/
   app/ProgressBar.tsx      # 纯展示组件，props = computeProgress(task)
   app/SectionList.tsx      # 章节渲染（折叠/拖入/重命名）
   app/PageBlock.tsx        # 引用块：状态勾选 + 备注正面 + 打开原页
-  app/ConclusionBlock.tsx  # 结论区 + AI 总结
+  # 结论仍由数据层、导出与 MCP 保留；Chrome 工作区不再渲染独立结论区
   app/InboxDrawer.tsx      # 收件口（仅收，不整理）
   app/CommandPalette.tsx   # ⌘K
   app/CanvasView.tsx       # React.lazy 加载 @excalidraw/excalidraw

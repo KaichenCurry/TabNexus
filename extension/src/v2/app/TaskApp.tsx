@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   loadAppState,
-  loadRecentlyClosed,
   loadSettings,
   saveAppState,
-  saveRecentlyClosed,
   saveSettings,
   subscribeToAppState,
   subscribeToSettings
 } from "../../core/storage";
-import type { AppState, Locale, OpenTab, RecentClosedTab, Settings } from "../../core/types";
+import type { AppState, Locale, OpenTab, Settings } from "../../core/types";
 import { applyGroupingProposal } from "../../core/grouping";
 import { normalizeUrl } from "../../core/url";
 import { collectTabs, updateWorkspace } from "../../core/workspace";
@@ -31,7 +29,6 @@ import {
 import type { PageStatus, Task } from "../core/taskModel";
 import { AppSidebar } from "./AppSidebar";
 import { CommandPalette } from "./CommandPalette";
-import { ConclusionBlock } from "./ConclusionBlock";
 import { ExportModal } from "./ExportModal";
 import { FirstRun } from "./FirstRun";
 import { HandoffModal } from "./HandoffModal";
@@ -49,7 +46,6 @@ const DEFAULT_TASK_NAMES = new Set(["我的工作区", "My workspace", "未命�
 export function TaskApp() {
   const [state, setState] = useState<AppState | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
-  const [recentlyClosed, setRecentlyClosed] = useState<RecentClosedTab[]>([]);
   const [saveError, setSaveError] = useState<string | null>(null);
   const forceInboxOpen = useMemo(() => new URLSearchParams(window.location.search).has("inbox"), []);
   const [inboxOpen, setInboxOpen] = useState(forceInboxOpen);
@@ -76,11 +72,10 @@ export function TaskApp() {
 
   useEffect(() => {
     let disposed = false;
-    void Promise.all([loadAppState(), loadSettings(), loadRecentlyClosed()]).then(([nextState, nextSettings, nextRecent]) => {
+    void Promise.all([loadAppState(), loadSettings()]).then(([nextState, nextSettings]) => {
       if (disposed) return;
       setState(nextState);
       setSettings(nextSettings);
-      setRecentlyClosed(nextRecent);
     });
     const offState = subscribeToAppState(() => void loadAppState().then(setState));
     const offSettings = subscribeToSettings(() => void loadSettings().then(setSettings));
@@ -138,8 +133,9 @@ export function TaskApp() {
     void saveSettings(nextSettings);
   };
 
-  const openSettings = () => {
-    const url = typeof chrome !== "undefined" && chrome.runtime?.getURL ? chrome.runtime.getURL("options.html") : "options.html";
+  const openSettings = (section?: "ai" | "agent") => {
+    const baseUrl = typeof chrome !== "undefined" && chrome.runtime?.getURL ? chrome.runtime.getURL("options.html") : "options.html";
+    const url = section ? `${baseUrl}#${section}` : baseUrl;
     window.open(url, "_blank", "noopener");
   };
   const openPage = (url?: string) => {
@@ -183,18 +179,6 @@ export function TaskApp() {
     return "saved";
   };
 
-  const handleRestoreRecent = (item: RecentClosedTab) => {
-    openPage(item.url);
-    const next = recentlyClosed.filter((candidate) => candidate.id !== item.id);
-    setRecentlyClosed(next);
-    void saveRecentlyClosed(next);
-  };
-  const handleDismissRecent = (id: string) => {
-    if (!window.confirm(locale === "zh" ? "从最近关闭记录中移除这一项？" : "Remove this item from recently closed?")) return;
-    const next = recentlyClosed.filter((candidate) => candidate.id !== id);
-    setRecentlyClosed(next);
-    void saveRecentlyClosed(next);
-  };
   const handleDeleteSection = (sectionId: string) => {
     const section = task.sections.find((candidate) => candidate.id === sectionId);
     if (!section || !window.confirm(locale === "zh" ? `删除章节「${section.name}」？页面会保留为未归类。` : `Delete “${section.name}”? Its pages will remain unassigned.`)) return;
@@ -225,7 +209,9 @@ export function TaskApp() {
           railOpen={inboxOpen}
           onView={setView} onCollect={() => { setCollectTargetSectionId(null); setRailOpen(true); }} onOrganize={() => setOrganizeOpen(true)}
           onHandoff={() => setHandoffOpen(true)} onUndo={handleUndoOrganize} onExport={() => setExportOpen(true)}
-          onOpenSearch={() => setPaletteOpen(true)} onOpenSettings={openSettings} onToggleRail={() => setRailOpen(!inboxOpen)}
+          onOpenSearch={() => setPaletteOpen(true)} onOpenSettings={() => openSettings()}
+          onOpenAiSettings={() => openSettings("ai")} onOpenAgentSettings={() => openSettings("agent")}
+          onToggleRail={() => setRailOpen(!inboxOpen)}
         />
         {saveError && <div className="tn-save-error" role="alert">{saveError}</div>}
         <div className="tn-content">
@@ -245,7 +231,6 @@ export function TaskApp() {
                     onCollectToSection={(sectionId) => { setCollectTargetSectionId(sectionId); setRailOpen(true); }}
                     onDeletePage={handleDeletePage}
                   />
-                  <ConclusionBlock task={task} locale={locale} settings={settings} onApplySummary={(patch) => void persist(updateTaskMeta(state, task.id, patch))} />
                 </>
               )}
             </>
@@ -263,15 +248,14 @@ export function TaskApp() {
       )}
       {inboxOpen && (
         <InboxDrawer
-          task={task} locale={locale} recentlyClosed={recentlyClosed} targetSectionName={collectTargetSection?.name}
+          task={task} locale={locale} targetSectionName={collectTargetSection?.name}
           onClose={() => { setCollectTargetSectionId(null); setRailOpen(false); }} onCollect={handleCollect}
-          onRestoreRecent={handleRestoreRecent} onDismissRecent={handleDismissRecent}
         />
       )}
 
-      {organizeOpen && <OrganizeModal task={task} locale={locale} settings={settings} onApply={handleApplyOrganize} onClose={() => setOrganizeOpen(false)} />}
+      {organizeOpen && <OrganizeModal task={task} locale={locale} settings={settings} onApply={handleApplyOrganize} onOpenAiSettings={() => openSettings("ai")} onClose={() => setOrganizeOpen(false)} />}
       {exportOpen && <ExportModal task={task} locale={locale} onClose={() => setExportOpen(false)} />}
-      {handoffOpen && <HandoffModal task={task} locale={locale} onClose={() => setHandoffOpen(false)} />}
+      {handoffOpen && <HandoffModal task={task} locale={locale} onOpenAgentSettings={() => openSettings("agent")} onClose={() => setHandoffOpen(false)} />}
       {paletteOpen && (
         <CommandPalette
           tasks={tasks} activeTaskId={task.id} locale={locale} onSwitchTask={switchTask}

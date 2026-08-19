@@ -18,6 +18,7 @@ type Props = {
   locale: Locale;
   settings: Settings;
   onApply: (proposal: GroupingProposal) => void;
+  onOpenAiSettings: () => void;
   onClose: () => void;
 };
 
@@ -28,7 +29,7 @@ const MODES: Array<{ id: RegroupMode; labelKey: "v2OrganizeByContent" | "v2Organ
   { id: "custom", labelKey: "v2OrganizeCustom" }
 ];
 
-export function OrganizeModal({ task, locale, settings, onApply, onClose }: Props) {
+export function OrganizeModal({ task, locale, settings, onApply, onOpenAiSettings, onClose }: Props) {
   const ai = useMemo(() => {
     if (!settings.aiEnabled) return null;
     try { return activeAiConfig(settings); } catch { return null; }
@@ -170,7 +171,14 @@ export function OrganizeModal({ task, locale, settings, onApply, onClose }: Prop
           )}
 
           <p className="tn-modal-scope">{message(locale, "v2OrganizeScope", { count: scopePageIds.length, meta: needsAi ? message(locale, "v2OrganizeMetaHint") : "" })}</p>
-          {!ai && needsAi && <p className="tn-modal-warn">{message(locale, "v2OrganizeLocalOnly")}</p>}
+          {!ai && needsAi && (
+            <div className="tn-modal-warn tn-modal-config-warn">
+              <span>{message(locale, "v2OrganizeLocalOnly")}</span>
+              <button type="button" className="tn-secondary" onClick={onOpenAiSettings}>
+                <Icon name="sparkles" />{locale === "zh" ? "配置 AI API" : "Set up AI API"}
+              </button>
+            </div>
+          )}
 
           {!proposal ? (
             <button type="button" className="tn-primary tn-modal-primary" disabled={busy || scopePageIds.length === 0 || (needsAi && !ai)} onClick={() => void generate()}>

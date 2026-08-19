@@ -20,6 +20,8 @@ type Props = {
   onExport: () => void;
   onOpenSearch: () => void;
   onOpenSettings: () => void;
+  onOpenAiSettings: () => void;
+  onOpenAgentSettings: () => void;
   onToggleRail: () => void;
 };
 
@@ -94,6 +96,8 @@ export function TaskToolbar(props: Props) {
           </button>
           {menuOpen && (
             <div className="tn-more-menu" role="menu">
+              <button type="button" role="menuitem" onClick={() => run(props.onOpenAiSettings)}><Icon name="sparkles" />{props.locale === "zh" ? "AI / API 配置" : "AI / API setup"}<span aria-hidden="true">↗</span></button>
+              <button type="button" role="menuitem" onClick={() => run(props.onOpenAgentSettings)}><Icon name="agent" />{props.locale === "zh" ? "Agent / MCP 接入" : "Agent / MCP setup"}<span aria-hidden="true">↗</span></button>
               <button type="button" role="menuitem" onClick={() => run(props.onExport)}><Icon name="export" />{message(props.locale, "export")}</button>
               <button type="button" role="menuitem" onClick={() => run(props.onOpenSearch)}><Icon name="search" />{props.locale === "zh" ? "搜索与命令" : "Search and commands"}<kbd>⌘K</kbd></button>
               <button type="button" role="menuitem" onClick={() => run(props.onOpenSettings)}><Icon name="settings" />{message(props.locale, "settings")}</button>

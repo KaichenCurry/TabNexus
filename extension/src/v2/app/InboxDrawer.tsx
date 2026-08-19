@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Locale, RecentClosedTab } from "../../core/types";
+import type { Locale } from "../../core/types";
 import { message } from "../../i18n";
 import { buildInboxSnapshot, closeableTabIds, selectionToOpenTabs, type InboxTabItem } from "../core/inbox";
 import type { Task } from "../core/taskModel";
@@ -8,17 +8,14 @@ import { Icon } from "./Icon";
 type Props = {
   task: Task;
   locale: Locale;
-  recentlyClosed: RecentClosedTab[];
   targetSectionName?: string;
   onClose: () => void;
   onCollect: (tabs: ReturnType<typeof selectionToOpenTabs>, closeAfter: boolean) => Promise<"saved" | "cancelled" | "failed">;
-  onRestoreRecent: (item: RecentClosedTab) => void;
-  onDismissRecent: (id: string) => void;
 };
 
 type RawTab = { id?: number; windowId?: number; title?: string; url?: string; favIconUrl?: string; pinned?: boolean };
 
-export function InboxDrawer({ task, locale, recentlyClosed, targetSectionName, onClose, onCollect, onRestoreRecent, onDismissRecent }: Props) {
+export function InboxDrawer({ task, locale, targetSectionName, onClose, onCollect }: Props) {
   const [items, setItems] = useState<InboxTabItem[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
@@ -151,19 +148,6 @@ export function InboxDrawer({ task, locale, recentlyClosed, targetSectionName, o
           </button>
         )}
       </footer>
-
-      {recentlyClosed.length > 0 && (
-        <div className="tn-inbox-recent">
-          <strong>最近关闭 · 未保存</strong>
-          {recentlyClosed.map((item) => (
-            <div key={item.id} className="tn-inbox-recent-item">
-              <span>{item.title}</span>
-              <button type="button" onClick={() => onRestoreRecent(item)} aria-label={message(locale, "v2Restore")}><Icon name="external" /></button>
-              <button type="button" onClick={() => onDismissRecent(item.id)} aria-label={message(locale, "delete")}><Icon name="close" /></button>
-            </div>
-          ))}
-        </div>
-      )}
     </aside>
   );
 }
