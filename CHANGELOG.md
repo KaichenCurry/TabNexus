@@ -4,6 +4,9 @@ All notable changes to TabNexus will be documented here.
 
 ## [Unreleased]
 
+- Added a dedicated loopback-only DSH relay channel on `127.0.0.1:43120`, independent from the optional Agent bridge setting.
+- Limited the DSH channel to live-tab reads and revision-safe focus actions; it does not expose Agent/MCP tools.
+
 ## [2.0.0] - 2026-08-15
 
 ### 全量重构：任务上下文文档

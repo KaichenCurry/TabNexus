@@ -48,6 +48,7 @@ import type {
 
 const RETRY_DELAY_MS = 750;
 const AGENT_BRIDGE_ENDPOINT = "ws://127.0.0.1:43119/tabnexus" as const;
+const DSH_BRIDGE_ENDPOINT = "ws://127.0.0.1:43120/tabnexus-dsh" as const;
 
 let agentBridgeSocket: WebSocket | null = null;
 let bridgeStatus: BridgeConnectionStatus = {
@@ -59,6 +60,10 @@ let bridgeConnectWaiter: ((connected: boolean) => void) | null = null;
 let bridgeKeepAliveTimer: ReturnType<typeof globalThis.setInterval> | null = null;
 let bridgeReconnectTimer: ReturnType<typeof globalThis.setTimeout> | null = null;
 let bridgeShouldReconnect = false;
+let dshBridgeSocket: WebSocket | null = null;
+let dshBridgeReconnectTimer: ReturnType<typeof globalThis.setTimeout> | null = null;
+let dshBridgeKeepAliveTimer: ReturnType<typeof globalThis.setInterval> | null = null;
+let dshBridgeWasConnected = false;
 let agentToolQueue: Promise<void> = Promise.resolve();
 
 class AiTransportError extends Error {
@@ -1283,6 +1288,83 @@ function disconnectAgentBridge(): BridgeConnectionStatus {
   return bridgeStatus;
 }
 
+function sendDshBridgeMessage(message: unknown): void {
+  if (dshBridgeSocket?.readyState === WebSocket.OPEN) dshBridgeSocket.send(JSON.stringify(message));
+}
+
+function scheduleDshBridgeReconnect(): void {
+  if (!dshBridgeWasConnected || dshBridgeReconnectTimer !== null) return;
+  dshBridgeReconnectTimer = globalThis.setTimeout(() => {
+    dshBridgeReconnectTimer = null;
+    void connectDshBridge();
+  }, 2_500);
+}
+
+async function executeDshTabTool(payload: CollaborationToolRequest): Promise<BackgroundResponse<CollaborationToolResult>> {
+  try {
+    const settings = await loadSettings();
+    const state = await loadAppState(settings.locale);
+    const workspace = state.workspaces[state.activeWorkspaceId];
+    if (!workspace) return { ok: false, code: "invalid_request", error: "Workspace not found" };
+    if (payload.tool === "read_tab_workbench") {
+      const workbench = await readTabWorkbenchContext(workspace, settings);
+      const unchanged = payload.input?.sinceRevision === workbench.revision;
+      return { ok: true, data: { tool: "read_tab_workbench", revision: workbench.revision, unchanged, ...(unchanged ? {} : { workbench }) } };
+    }
+    if (payload.tool === "manage_tab_workbench") {
+      return { ok: true, data: await executeTabWorkbenchManagement(workspace, settings, payload) };
+    }
+    return { ok: false, code: "invalid_request", error: "DSH bridge only supports reading and focusing tabs" };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "DSH tab operation failed";
+    return { ok: false, code: message.startsWith("Tab workbench changed") ? "conflict" : "invalid_request", error: message };
+  }
+}
+
+function handleDshBridgeMessage(message: unknown): void {
+  if (!message || typeof message !== "object") return;
+  const value = message as Record<string, unknown>;
+  if (value.type === "bridge_ready") {
+    dshBridgeWasConnected = true;
+    if (dshBridgeKeepAliveTimer !== null) globalThis.clearInterval(dshBridgeKeepAliveTimer);
+    dshBridgeKeepAliveTimer = globalThis.setInterval(() => sendDshBridgeMessage({ type: "keepalive", at: Date.now() }), 20_000);
+    return;
+  }
+  if (
+    value.type !== "agent_tool_request" ||
+    typeof value.requestId !== "string" ||
+    !value.payload ||
+    typeof value.payload !== "object"
+  ) return;
+  const requestId = value.requestId.slice(0, 120);
+  void executeDshTabTool(value.payload as CollaborationToolRequest).then((response) => {
+    sendDshBridgeMessage(response.ok
+      ? { type: "agent_tool_result", requestId, ok: true, data: response.data }
+      : { type: "agent_tool_result", requestId, ok: false, error: response.error });
+  });
+}
+
+async function connectDshBridge(): Promise<void> {
+  if (typeof WebSocket === "undefined" || dshBridgeSocket?.readyState === WebSocket.OPEN) return;
+  dshBridgeSocket?.close();
+  const socket = new WebSocket(DSH_BRIDGE_ENDPOINT);
+  dshBridgeSocket = socket;
+  socket.addEventListener("message", (event) => {
+    if (dshBridgeSocket !== socket || typeof event.data !== "string") return;
+    try { handleDshBridgeMessage(JSON.parse(event.data)); } catch { /* Ignore malformed local relay messages. */ }
+  });
+  socket.addEventListener("close", () => {
+    if (dshBridgeSocket !== socket) return;
+    dshBridgeSocket = null;
+    if (dshBridgeKeepAliveTimer !== null) globalThis.clearInterval(dshBridgeKeepAliveTimer);
+    dshBridgeKeepAliveTimer = null;
+    scheduleDshBridgeReconnect();
+  });
+  socket.addEventListener("error", () => {
+    if (dshBridgeSocket === socket && !dshBridgeWasConnected) dshBridgeSocket = null;
+  });
+}
+
 chrome.action.onClicked.addListener(() => {
   void openWorkspace();
 });
@@ -1320,6 +1402,7 @@ chrome.runtime.onMessage.addListener((request: BackgroundRequest, _sender, sendR
 
 async function initializeBackground(): Promise<void> {
   await initializeStorageAccess();
+  void connectDshBridge();
   try {
     const settings = await loadSettings();
     bridgeShouldReconnect = settings.agentBridgeEnabled;
