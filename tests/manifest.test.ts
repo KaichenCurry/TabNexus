@@ -31,7 +31,7 @@ describe("MV3 manifest security surface", () => {
       "file:///*"
     ]);
     expect(manifest.content_security_policy).toEqual({
-      extension_pages: "script-src 'self'; object-src 'self'; connect-src 'self' https://api.deepseek.com https://api.openai.com https://api.anthropic.com https://api.moonshot.cn https://dashscope.aliyuncs.com https://api.minimaxi.com ws://127.0.0.1:43119"
+      extension_pages: "script-src 'self'; object-src 'self'; connect-src 'self' https://api.deepseek.com https://api.openai.com https://api.anthropic.com https://api.moonshot.cn https://dashscope.aliyuncs.com https://api.minimaxi.com ws://127.0.0.1:43119 ws://127.0.0.1:43120"
     });
     expect(JSON.stringify(manifest)).not.toContain("nativeMessaging");
     expect(JSON.stringify(manifest)).not.toContain("<all_urls>");

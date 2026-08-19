@@ -7,13 +7,15 @@
  * 3. MCP 契约只做加法：v1 工具名不动，适配层（R2）负责 v1↔v2 映射；
  * 4. progress 永远是派生值，不落库。
  */
-import type { Card, Edge, Workspace } from "../../core/types";
+import type { Card, CardType, Edge, Workspace } from "../../core/types";
 
 export type PageStatus = "unread" | "read" | "adopted" | "excluded";
 export type PageSource = "user" | "ai" | "agent";
 
 export type Page = {
   id: string;
+  /** 保留原始资料类型；任何 v2 编辑都不能把 note/html/report/agent 降级成 web。 */
+  type: CardType;
   title: string;
   url?: string;
   favicon?: string;
@@ -23,8 +25,10 @@ export type Page = {
   excludedReason?: string;
   source: PageSource;
   savedAt?: string;
-  /** 画布节点绑定（R3 起使用） */
-  canvasNodeId?: string;
+  lastAccessedAt?: string;
+  /** 旧关系图坐标继续透传，保证 v2 写回不破坏既有数据。 */
+  flow?: Card["flow"];
+  flowLayout?: Card["flowLayout"];
 };
 
 export type Section = {
@@ -37,9 +41,9 @@ export type Section = {
 
 export type CanvasState = {
   version: 1;
-  /** Excalidraw elements JSON（R3 起渲染） */
+  /** 为后续关系视图扩展预留；当前版本使用自动布局，不存 UI 坐标。 */
   elements: unknown[];
-  /** v1 edges 的迁移产物（R3 映射为手绘箭头） */
+  /** v1 edges 的无损映射。 */
   arrows: Array<{ fromPageId: string; toPageId: string; label?: string }>;
 };
 
@@ -144,9 +148,15 @@ export function migrateWorkspaceToTask(workspace: Workspace, now: string = new D
     pages[cardId] = migrateCardToPage(card);
   }
 
-  const sections: Section[] = workspace.groupOrder.map((groupId) => {
+  const sections: Section[] = workspace.groupOrder.flatMap((groupId) => {
     const group = workspace.groups[groupId];
-    return { id: group.id, name: group.name, color: group.color, pageIds: [...group.cardIds] };
+    if (!group) return [];
+    return [{
+      id: group.id,
+      name: group.name,
+      color: group.color,
+      pageIds: [...new Set(group.cardIds)].filter((pageId) => Boolean(pages[pageId]))
+    }];
   });
 
   const arrows: CanvasState["arrows"] = workspace.edges.map((edge: Edge) => ({
@@ -176,6 +186,7 @@ export function migrateWorkspaceToTask(workspace: Workspace, now: string = new D
 export function migrateCardToPage(card: Card): Page {
   return {
     id: card.id,
+    type: card.type,
     title: card.title,
     url: card.url,
     favicon: card.favicon,
@@ -183,7 +194,10 @@ export function migrateCardToPage(card: Card): Page {
     status: card.status,
     excludedReason: card.excludedReason,
     source: card.source,
-    savedAt: card.savedAt
+    savedAt: card.savedAt,
+    lastAccessedAt: card.lastAccessedAt,
+    flow: card.flow,
+    flowLayout: card.flowLayout
   };
 }
 

@@ -5,22 +5,40 @@
  */
 :root {
   /* 主色：全局唯一强调色（主 CTA / 链接 / 选中态） */
-  --tn-primary: #304f93;
-  --tn-primary-hover: #28447d;
-  --tn-primary-soft: #eef1f8;
+  --tn-primary: #0a66d6;
+  --tn-primary-hover: #0758ba;
+  --tn-primary-soft: #eaf3ff;
+  --tn-primary-glow: rgba(10, 102, 214, 0.22);
 
   /* 辅助色：AI/Agent 专属紫色；语义色仅用于状态 */
-  --tn-accent: #7a6edc;
-  --tn-danger: #d6455e;
-  --tn-success: #3f9d6a;
-  --tn-warning: #b7791f;
+  --tn-accent: #7957d5;
+  --tn-accent-soft: #f2edff;
+  --tn-danger: #c93b55;
+  --tn-danger-soft: #fff0f3;
+  --tn-success: #23875a;
+  --tn-success-soft: #eaf8f0;
+  --tn-warning: #a76712;
+  --tn-warning-soft: #fff7e6;
 
   /* 灰阶 5 档 */
-  --tn-gray-50: #fafbfc;
-  --tn-gray-100: #f2f4f6;
-  --tn-gray-200: #e5e8ed;
-  --tn-gray-400: #8a93a3;
-  --tn-gray-700: #1b2430;
+  --tn-bg: #f5f5f7;
+  --tn-surface: #ffffff;
+  --tn-toolbar-bg: rgba(248, 249, 251, 0.76);
+  --tn-glass: rgba(255, 255, 255, 0.68);
+  --tn-glass-strong: rgba(255, 255, 255, 0.86);
+  --tn-glass-muted: rgba(247, 248, 251, 0.70);
+  --tn-glass-highlight: rgba(255, 255, 255, 0.92);
+  --tn-brand-layer: rgba(255, 255, 255, 0.14);
+  --tn-hairline: rgba(31, 35, 43, 0.10);
+  --tn-hairline-strong: rgba(31, 35, 43, 0.16);
+  --tn-overlay: rgba(20, 26, 38, 0.24);
+  --tn-gray-50: #fafafa;
+  --tn-gray-100: #f0f1f3;
+  --tn-gray-200: #e2e3e7;
+  --tn-gray-300: #c7c9cf;
+  --tn-gray-400: #86868b;
+  --tn-gray-500: #5f6368;
+  --tn-gray-700: #1d1d1f;
 
   /* 字号 5 档（正文最小 12px，废除 7px 级） */
   --tn-text-xs: 12px;
@@ -28,6 +46,7 @@
   --tn-text-md: 14px;
   --tn-text-lg: 16px;
   --tn-text-xl: 20px;
+  --tn-text-2xl: 28px;
 
   /* 字重 3 级 */
   --tn-weight-strong: 600;
@@ -35,9 +54,9 @@
   --tn-weight-regular: 400;
 
   /* 圆角 3 档 */
-  --tn-radius-sm: 6px;
-  --tn-radius-md: 10px;
-  --tn-radius-lg: 14px;
+  --tn-radius-sm: 9px;
+  --tn-radius-md: 13px;
+  --tn-radius-lg: 20px;
 
   /* 间距：4px 栅格 */
   --tn-space-1: 4px;
@@ -45,10 +64,18 @@
   --tn-space-3: 12px;
   --tn-space-4: 16px;
   --tn-space-5: 24px;
+  --tn-space-6: 32px;
+  --tn-space-7: 40px;
 
-  /* 阴影：极淡，最多一层 */
-  --tn-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --tn-shadow-pop: 0 4px 12px rgba(27, 36, 48, 0.08);
+  /* 材质与运动：玻璃层只用于容器，正文保持高对比度 */
+  --tn-shadow-soft: 0 1px 2px rgba(18, 25, 38, 0.04), 0 14px 34px rgba(18, 25, 38, 0.055);
+  --tn-shadow-hover: 0 2px 5px rgba(18, 25, 38, 0.06), 0 18px 42px rgba(18, 25, 38, 0.09);
+  --tn-shadow-pop: 0 24px 72px rgba(18, 25, 38, 0.20), 0 2px 8px rgba(18, 25, 38, 0.08);
+  --tn-inset-highlight: inset 0 1px 0 var(--tn-glass-highlight);
+  --tn-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --tn-ease-press: cubic-bezier(0.2, 0, 0, 1);
+  --tn-motion-fast: 140ms;
+  --tn-motion-base: 240ms;
 
   /* 章节色：受限调色板（与旧 GROUP_COLORS 对齐，不再随机） */
   --tn-section-1: #e8833a;

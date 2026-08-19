@@ -1,3 +1,3 @@
 name: TabNexus Research
-description: 浏览器任务上下文 Agent：读取你的 TabNexus 任务档案（目标/页面/备注/状态），帮你整理、补充、写回结论。
+description: 浏览器任务上下文 Agent：读取你的 TabNexus 任务档案（目标/页面/备注/状态），帮你整理、补充，并通过 MCP 写回任务结论数据。
 order: 10

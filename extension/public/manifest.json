@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TabNexus",
   "short_name": "TabNexus",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "A local-first workspace for browser tabs and AI task context.",
   "minimum_chrome_version": "118",
   "incognito": "not_allowed",
@@ -17,7 +17,7 @@
     "file:///*"
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://api.deepseek.com https://api.openai.com https://api.anthropic.com https://api.moonshot.cn https://dashscope.aliyuncs.com https://api.minimaxi.com ws://127.0.0.1:43119"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://api.deepseek.com https://api.openai.com https://api.anthropic.com https://api.moonshot.cn https://dashscope.aliyuncs.com https://api.minimaxi.com ws://127.0.0.1:43119 ws://127.0.0.1:43120"
   },
   "background": {
     "service_worker": "background.js",

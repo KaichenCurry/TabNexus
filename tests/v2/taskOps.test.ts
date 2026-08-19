@@ -9,6 +9,7 @@ import {
   renameTask,
   setPageNote,
   setPageStatus,
+  taskToWorkspaceView,
   updateTaskMeta
 } from "../../extension/src/v2/core/taskOps";
 import { computeProgress, type Task } from "../../extension/src/v2/core/taskModel";
@@ -118,5 +119,30 @@ describe("v2 taskOps", () => {
     const state = makeState();
     expect(listTasks(state).map((task) => task.name)).toEqual(["评估 Perplexity"]);
     expect(() => updateTaskMeta(state, "nope", { goal: "x" })).toThrow(/Unknown task id/);
+  });
+
+  it("preserves non-web page types and legacy metadata through the v2 bridge", () => {
+    const state = makeState();
+    state.workspaces["task-1"].cards.a = makeCard("a", {
+      type: "report",
+      lastAccessedAt: "2026-08-15T09:00:00.000Z",
+      flow: { x: 120, y: -20 },
+      flowLayout: "mind"
+    });
+    const workspace = taskToWorkspaceView(activeTask(state)!);
+    expect(workspace.cards.a).toMatchObject({
+      type: "report",
+      lastAccessedAt: "2026-08-15T09:00:00.000Z",
+      flow: { x: 120, y: -20 },
+      flowLayout: "mind"
+    });
+  });
+
+  it("recovers task lists when stale workspace ids remain in stored order", () => {
+    const state = makeState();
+    state.workspaceOrder = ["missing", "task-1"];
+    state.activeWorkspaceId = "missing";
+    expect(activeTask(state)?.id).toBe("task-1");
+    expect(listTasks(state).map((task) => task.id)).toEqual(["task-1"]);
   });
 });

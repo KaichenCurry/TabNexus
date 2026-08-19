@@ -1,30 +1,59 @@
 @import "./v2/tokens.css";
 
-body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; min-height: 100%; }
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Segoe UI", sans-serif; background: var(--tn-bg); -webkit-font-smoothing: antialiased; }
+button:focus-visible { outline: 2px solid var(--tn-primary); outline-offset: 2px; }
+
 .popup {
-  width: 300px;
-  padding: var(--tn-space-4);
+  width: 332px;
   display: flex;
   flex-direction: column;
-  gap: var(--tn-space-2);
-  background: var(--tn-gray-50);
+  gap: 9px;
+  padding: 17px 16px 15px;
+  background:
+    radial-gradient(circle at 4% -8%, var(--tn-primary-soft), transparent 36%),
+    radial-gradient(circle at 100% 0, var(--tn-accent-soft), transparent 32%),
+    var(--tn-glass-strong);
   color: var(--tn-gray-700);
   font-size: var(--tn-text-sm);
+  animation: popup-enter 280ms var(--tn-ease-out);
 }
-.popup-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--tn-space-2); }
-.popup-head strong { font-size: var(--tn-text-lg); }
+.popup-head { display: flex; align-items: center; gap: 10px; margin-bottom: 3px; }
+.popup-head > span:last-child { display: flex; flex-direction: column; gap: 2px; }
+.popup-head strong { font-size: var(--tn-text-lg); letter-spacing: -.02em; }
 .popup-head small { color: var(--tn-gray-400); font-size: var(--tn-text-xs); }
-.popup-primary {
-  background: var(--tn-primary); color: #fff; border: none; cursor: pointer;
-  border-radius: var(--tn-radius-sm); padding: var(--tn-space-2) var(--tn-space-3);
-  font-size: var(--tn-text-sm); font-weight: var(--tn-weight-medium);
+.popup-brand-mark { position: relative; width: 34px; height: 34px; flex: none; overflow: hidden; border-radius: 11px; background: linear-gradient(145deg, var(--tn-primary), var(--tn-primary-hover)); box-shadow: var(--tn-inset-highlight), 0 8px 18px var(--tn-primary-glow); }
+.popup-brand-mark::after { content: ""; position: absolute; inset: 0; background: linear-gradient(145deg, var(--tn-glass-highlight), transparent 42%); opacity: .34; pointer-events: none; }
+.popup-brand-mark i { position: absolute; width: 13px; height: 11px; border: 1.5px solid var(--tn-surface); border-radius: 3px; }
+.popup-brand-mark i:first-child { left: 8px; top: 7px; }
+.popup-brand-mark i:last-child { left: 12px; top: 13px; background: var(--tn-brand-layer); }
+.popup-task { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; margin: 7px 0 4px; padding: 12px 13px; border: 1px solid var(--tn-hairline); border-radius: var(--tn-radius-md); background: var(--tn-glass); box-shadow: var(--tn-inset-highlight), var(--tn-shadow-soft); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.popup-task small { grid-column: 1 / -1; color: var(--tn-gray-400); font-size: var(--tn-text-xs); letter-spacing: .07em; }
+.popup-task strong { min-width: 0; overflow: hidden; font-size: var(--tn-text-sm); text-overflow: ellipsis; white-space: nowrap; }
+.popup-task span { color: var(--tn-gray-400); font-size: var(--tn-text-xs); }
+.popup-primary, .popup-secondary, .popup-tertiary { min-height: 39px; display: flex; align-items: center; justify-content: center; gap: 7px; border-radius: var(--tn-radius-sm); cursor: pointer; font-size: var(--tn-text-sm); transition: color var(--tn-motion-fast) var(--tn-ease-out), background-color var(--tn-motion-fast) var(--tn-ease-out), border-color var(--tn-motion-fast) var(--tn-ease-out), box-shadow var(--tn-motion-base) var(--tn-ease-out), transform var(--tn-motion-fast) var(--tn-ease-press); }
+.popup-primary { border: 1px solid var(--tn-primary); background: linear-gradient(180deg, var(--tn-primary), var(--tn-primary-hover)); color: var(--tn-surface); box-shadow: var(--tn-inset-highlight), 0 8px 18px var(--tn-primary-glow); font-weight: var(--tn-weight-medium); }
+.popup-primary:hover { border-color: var(--tn-primary-hover); box-shadow: var(--tn-inset-highlight), 0 11px 24px var(--tn-primary-glow); transform: translateY(-1px); }
+.popup-primary:disabled { cursor: not-allowed; opacity: .5; }
+.popup-secondary { border: 1px solid var(--tn-hairline); background: var(--tn-glass); color: var(--tn-gray-700); box-shadow: var(--tn-inset-highlight); }
+.popup-secondary:hover { border-color: var(--tn-hairline-strong); background: var(--tn-glass-highlight); box-shadow: var(--tn-shadow-soft); transform: translateY(-1px); }
+.popup-tertiary { min-height: 32px; justify-content: space-between; padding: 0 4px; border: 0; background: transparent; color: var(--tn-gray-500); }
+.popup-tertiary:hover { color: var(--tn-primary); }
+.popup-primary:active:not(:disabled), .popup-secondary:active, .popup-tertiary:active { transform: scale(.975); }
+.popup-helper { margin: -4px 0 1px; color: var(--tn-gray-400); font-size: var(--tn-text-xs); text-align: center; }
+.popup-status { margin: 1px 0 0; padding: 8px 9px; border: 1px solid var(--tn-hairline); border-radius: var(--tn-radius-sm); background: var(--tn-success-soft); color: var(--tn-success); box-shadow: var(--tn-inset-highlight); font-size: var(--tn-text-xs); text-align: center; animation: popup-status-in var(--tn-motion-base) var(--tn-ease-out); }
+
+@keyframes popup-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.popup-primary:hover { background: var(--tn-primary-hover); }
-.popup-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.popup-secondary {
-  background: var(--tn-gray-50); color: var(--tn-gray-700); cursor: pointer;
-  border: 1px solid var(--tn-gray-200); border-radius: var(--tn-radius-sm);
-  padding: var(--tn-space-2) var(--tn-space-3); font-size: var(--tn-text-sm);
+
+@keyframes popup-status-in {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.popup-secondary:hover { background: var(--tn-gray-100); }
-.popup-status { margin: 0; color: var(--tn-success); font-size: var(--tn-text-xs); }
+
+@media (prefers-reduced-motion: reduce) {
+  .popup, .popup * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

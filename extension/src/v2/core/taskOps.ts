@@ -37,12 +37,19 @@ export function taskFromWorkspace(workspace: Workspace): Task {
 }
 
 export function activeTask(state: AppState): Task | null {
-  const workspace = state.workspaces[state.activeWorkspaceId];
+  const workspace = state.workspaces[state.activeWorkspaceId]
+    ?? state.workspaceOrder.map((id) => state.workspaces[id]).find(Boolean)
+    ?? Object.values(state.workspaces)[0];
   return workspace ? taskFromWorkspace(workspace) : null;
 }
 
 export function listTasks(state: AppState): Task[] {
-  return state.workspaceOrder.map((id) => taskFromWorkspace(state.workspaces[id]));
+  const ordered = state.workspaceOrder
+    .map((id) => state.workspaces[id])
+    .filter((workspace): workspace is Workspace => Boolean(workspace));
+  const seen = new Set(ordered.map((workspace) => workspace.id));
+  const recovered = Object.values(state.workspaces).filter((workspace) => !seen.has(workspace.id));
+  return [...ordered, ...recovered].map(taskFromWorkspace);
 }
 
 export function taskMeta(workspace: Workspace): WorkspaceV2Meta {
@@ -162,7 +169,7 @@ export function taskToWorkspaceView(task: Task): Workspace {
   for (const [pageId, page] of Object.entries(task.pages)) {
     cards[pageId] = {
       id: pageId,
-      type: "web",
+      type: page.type,
       title: page.title,
       url: page.url,
       favicon: page.favicon,
@@ -171,7 +178,10 @@ export function taskToWorkspaceView(task: Task): Workspace {
       excludedReason: page.excludedReason,
       groupId: sectionOf.get(pageId) ?? null,
       source: page.source,
-      savedAt: page.savedAt
+      savedAt: page.savedAt,
+      lastAccessedAt: page.lastAccessedAt,
+      flow: page.flow,
+      flowLayout: page.flowLayout
     };
   }
   return {

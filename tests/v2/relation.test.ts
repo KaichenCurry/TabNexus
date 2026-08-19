@@ -27,8 +27,9 @@ describe("v2 relation layout", () => {
     expect(layout.nodes.map((node) => node.pageId)).toEqual(["a", "b"]);
     const a = layout.nodes[0];
     const b = layout.nodes[1];
-    expect(a.x).toBe(48);
+    expect(a.x).toBe(44);
     expect(a.status).toBe("adopted");
+    expect(layout.lanes.map((lane) => lane.name)).toEqual(["市场", "未归类"]);
     // 未归类泳道在章节泳道右侧（第二列）
     expect(b.x).toBeGreaterThan(a.x);
     expect(layout.width).toBeGreaterThan(480);
@@ -37,7 +38,7 @@ describe("v2 relation layout", () => {
   it("keeps edges with labels and only for existing pages", () => {
     const layout = layoutRelations(makeTask());
     expect(layout.edges).toEqual([{ fromPageId: "a", toPageId: "b", label: "对比" }]);
-    expect(nodeCenter(layout.nodes[0])).toEqual({ x: 48 + 208 / 2, y: 40 + 64 / 2 });
+    expect(nodeCenter(layout.nodes[0])).toEqual({ x: 44 + 224 / 2, y: 100 + 64 / 2 });
   });
 
   it("handles an empty task", () => {
@@ -48,6 +49,7 @@ describe("v2 relation layout", () => {
     const layout = layoutRelations(empty);
     expect(layout.nodes).toEqual([]);
     expect(layout.edges).toEqual([]);
-    expect(layout.height).toBe(320);
+    expect(layout.lanes).toEqual([]);
+    expect(layout.height).toBe(400);
   });
 });

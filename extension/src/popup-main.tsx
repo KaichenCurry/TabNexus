@@ -5,6 +5,7 @@ import { collectTabs, updateWorkspace } from "./core/workspace";
 import { isSupportedUrl } from "./core/url";
 import type { AppState, Locale, OpenTab, Settings } from "./core/types";
 import { message } from "./i18n";
+import { Icon } from "./v2/app/Icon";
 import "./popup.css";
 
 function Popup() {
@@ -22,7 +23,10 @@ function Popup() {
 
   if (!state || !settings) return null;
   const locale: Locale = settings.locale;
-  const active = state.workspaces[state.activeWorkspaceId];
+  const active = state.workspaces[state.activeWorkspaceId]
+    ?? state.workspaceOrder.map((id) => state.workspaces[id]).find(Boolean)
+    ?? Object.values(state.workspaces)[0];
+  if (!active) return null;
 
   const openDocument = (withInbox: boolean) => {
     const url = chrome.runtime.getURL(`workspace.html${withInbox ? "?inbox=1" : ""}`);
@@ -52,8 +56,10 @@ function Popup() {
       };
       const collected = collectTabs(active, [openTab], null);
       await saveAppState(updateWorkspace(state, collected.workspace));
-      setStatus(message(locale, "v2SavedToast"));
-      setTimeout(() => window.close(), 700);
+      setStatus(collected.addedTabIds.length > 0
+        ? message(locale, "v2SavedToast")
+        : (locale === "zh" ? "这个页面已在当前任务中" : "This page is already in the current task"));
+      setTimeout(() => window.close(), 900);
     } catch {
       setStatus("保存失败");
     } finally {
@@ -64,17 +70,29 @@ function Popup() {
   return (
     <div className="popup">
       <header className="popup-head">
-        <strong>TabNexus</strong>
-        <small>{active.name}</small>
+        <span className="popup-brand-mark" aria-hidden="true"><i /><i /></span>
+        <span>
+          <strong>TabNexus</strong>
+          <small>{locale === "zh" ? "把页面收进任务上下文" : "Turn pages into task context"}</small>
+        </span>
       </header>
+      <div className="popup-task">
+        <small>{locale === "zh" ? "保存到" : "SAVE TO"}</small>
+        <strong>{active.name}</strong>
+        <span>{Object.keys(active.cards).length} {locale === "zh" ? "个页面" : "pages"}</span>
+      </div>
       <button type="button" className="popup-primary" disabled={busy} onClick={() => void saveCurrentPage()}>
+        <Icon name="collect" />
         {message(locale, "v2PopupSaveCurrent")}
       </button>
+      <p className="popup-helper">{locale === "zh" ? "保存后当前页面保持打开" : "The current page stays open after saving"}</p>
       <button type="button" className="popup-secondary" onClick={() => openDocument(true)}>
+        <Icon name="document" />
         {message(locale, "v2PopupSelectWindow")}
       </button>
-      <button type="button" className="popup-secondary" onClick={() => openDocument(false)}>
+      <button type="button" className="popup-tertiary" onClick={() => openDocument(false)}>
         {message(locale, "v2OpenTaskDoc")}
+        <Icon name="external" />
       </button>
       {status && <p className="popup-status">{status}</p>}
     </div>

@@ -3,7 +3,7 @@
  * 四模式：按内容理解（AI）/ 按时间（本地）/ 按域名（本地）/ 自定义提示词（AI）。
  * 全部纯函数；AI 调用与 UI 在组件/后台层。
  */
-import { createDomainProposal } from "../../core/grouping";
+import { colorForText, createDomainProposal } from "../../core/grouping";
 import type { GroupingProposal, GroupingRequest } from "../../core/types";
 import { taskToWorkspaceView } from "./taskOps";
 import type { Task } from "./taskModel";
@@ -36,9 +36,9 @@ export function createTimeProposal(task: Task, pageIds: string[], now: Date = ne
   }
   return {
     source: "local",
-    groups: buckets
-      .filter((bucket) => bucket.pageIds.length > 0)
-      .map((bucket, index) => ({ id: `time_${index}`, name: bucket.name, color: "", isNew: true })),
+    groups: buckets.flatMap((bucket, index) => bucket.pageIds.length > 0
+      ? [{ id: `time_${index}`, name: bucket.name, color: colorForText(bucket.name), isNew: true }]
+      : []),
     assignments: pageIds.flatMap((pageId) => {
       const page = task.pages[pageId];
       if (!page) return [];
@@ -69,7 +69,7 @@ export function buildRegroupRequest(task: Task, locale: "zh" | "en", pageIds: st
         id: page.id,
         title: page.title,
         url: page.url,
-        type: "web" as const,
+        type: page.type,
         hostname: hostname(page.url),
         savedAt: page.savedAt
       }] : [];
@@ -83,7 +83,7 @@ export function buildRegroupRequest(task: Task, locale: "zh" | "en", pageIds: st
           id: page.id,
           title: page.title,
           url: page.url,
-          type: "web" as const,
+          type: page.type,
           hostname: hostname(page.url),
           savedAt: page.savedAt
         }] : [];

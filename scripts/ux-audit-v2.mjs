@@ -84,6 +84,19 @@ const metrics = await page.evaluate(() => {
     const s = getComputedStyle(el);
     return { fontSize: s.fontSize, color: s.color, bg: s.backgroundColor, radius: s.borderRadius };
   };
+  const rootStyle = getComputedStyle(document.documentElement);
+  const colorProbe = document.createElement("span");
+  colorProbe.hidden = true;
+  document.body.append(colorProbe);
+  const allowedColors = new Set(["rgb(255, 255, 255)", "rgb(0, 0, 0)"]);
+  for (const name of rootStyle) {
+    if (!name.startsWith("--tn-")) continue;
+    const value = rootStyle.getPropertyValue(name).trim();
+    if (!CSS.supports("color", value)) continue;
+    colorProbe.style.color = value;
+    allowedColors.add(getComputedStyle(colorProbe).color);
+  }
+  colorProbe.remove();
   const palette = [...new Set(buttons.map((b) => { const s = computed(b); return `${s.bg}|${s.color}|${s.radius}|${s.fontSize}`; }))];
   const badTokens = [];
   for (const el of document.querySelectorAll(".tn-shell *")) {
@@ -95,29 +108,63 @@ const metrics = await page.evaluate(() => {
       ["border-radius", s.borderRadius, "radius"]
     ]) {
       if (!raw || raw === "rgba(0, 0, 0, 0)" || raw === "transparent") continue;
-      // 白/黑文字与 #fff 允许；其余色值必须是 var(--tn-*) 的产物——这里只报告非令牌来源的异常值
-      if (prop === "color" && (raw === "rgb(255, 255, 255)" || raw === "rgb(0, 0, 0)")) continue;
-      if (prop === "background-color" && raw === "rgb(255, 255, 255)") continue;
-      // 值是否是已知令牌渲染结果（由 CSS 变量展开后的具体值判断）
-      const allowed = new Set([
-        "rgb(250, 251, 252)", "rgb(242, 244, 246)", "rgb(229, 232, 237)", "rgb(138, 147, 163)", "rgb(27, 36, 48)",
-        "rgb(48, 79, 147)", "rgb(40, 68, 125)", "rgb(238, 241, 248)", "rgb(122, 110, 220)", "rgb(214, 69, 94)",
-        "rgb(63, 157, 106)", "rgb(183, 121, 31)", "rgb(232, 131, 58)", "rgb(51, 121, 214)", "rgb(32, 163, 158)",
-        "rgb(233, 235, 239)"
-      ]);
-      const rgb = raw.startsWith("rgb") ? raw.replace(/\s/g, "") : null;
-      if (rgb && !allowed.has(rgb)) badTokens.push({ tag: el.tagName, cls: (el.className || "").toString().slice(0, 40), prop, raw });
+      // 色值必须来自当前设计令牌。令牌动态解析，换主题时审计不需要维护手写色表。
+      const rgb = raw.startsWith("rgb") ? raw : null;
+      if (rgb && !allowedColors.has(rgb)) badTokens.push({ tag: el.tagName, cls: (el.className || "").toString().slice(0, 40), prop, raw });
     }
   }
   return {
     buttonCount: buttons.length,
+    toolbarButtonCount: [...document.querySelectorAll(".tn-toolbar button")].filter(vis).length,
     headings: [...document.querySelectorAll("h2,h3")].map((h) => h.textContent?.trim()),
-    fontSizes: [...new Set([...document.querySelectorAll(".tn-shell *")].filter(vis).map((el) => getComputedStyle(el).fontSize))].sort(),
+    fontSizes: [...new Set([...document.querySelectorAll(".tn-shell *")]
+      .filter((el) => vis(el) && [...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()))
+      .map((el) => getComputedStyle(el).fontSize))].sort(),
+    undersizedText: [...document.querySelectorAll(".tn-shell *")]
+      .filter((el) => vis(el) && [...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) && parseFloat(getComputedStyle(el).fontSize) < 12)
+      .map((el) => ({ tag: el.tagName, cls: (el.className || "").toString().slice(0, 60), text: el.textContent?.trim().slice(0, 60), fontSize: getComputedStyle(el).fontSize })),
     palette,
     badTokens: badTokens.slice(0, 10)
   };
 });
 await writeFile(resolve(outDir, "v2-metrics.json"), JSON.stringify(metrics, null, 2));
+
+// 布局与微交互验证：章节按横向资料列呈现，卡片菜单不被列容器裁切。
+const firstSection = page.locator(".tn-section").first();
+const boardMetrics = await page.evaluate(() => {
+  const board = document.querySelector(".tn-sections");
+  const columns = [...document.querySelectorAll(".tn-section")];
+  return {
+    display: board ? getComputedStyle(board).display : null,
+    gridAutoFlow: board ? getComputedStyle(board).gridAutoFlow : null,
+    columnCount: columns.length,
+    columnWidths: columns.map((column) => Math.round(column.getBoundingClientRect().width)),
+    pageCardCount: document.querySelectorAll(".tn-page").length,
+    collectLabels: [...document.querySelectorAll(".tn-section-collect")].map((button) => button.textContent?.replace(/\s+/g, " ").trim()),
+    horizontalOverflow: board ? board.scrollWidth > board.clientWidth : false
+  };
+});
+const lastPage = firstSection.locator(".tn-page").last();
+await lastPage.hover();
+await lastPage.locator(".tn-page-menu > summary").click();
+const popoverVisible = await lastPage.locator(".tn-page-menu > div").evaluate((el) => {
+  const rect = el.getBoundingClientRect();
+  const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + Math.min(rect.height / 2, 24));
+  return rect.width > 0 && rect.height > 0 && Boolean(hit && (hit === el || el.contains(hit)));
+});
+await lastPage.locator(".tn-page-menu > summary").click();
+
+await firstSection.locator(".tn-section-collect").click();
+await page.waitForTimeout(320);
+const targetedInboxTitle = await page.locator(".tn-inbox-header strong").textContent();
+await page.screenshot({ path: resolve(outDir, "10-v2-targeted-inbox.png") });
+await page.locator(".tn-inbox-header > button").click();
+await writeFile(resolve(outDir, "interaction-metrics.json"), JSON.stringify({ ...boardMetrics, popoverVisible, targetedInboxTitle }, null, 2));
+
+await page.getByRole("button", { name: "智能整理" }).click();
+await page.waitForTimeout(320);
+await page.screenshot({ path: resolve(outDir, "08-v2-organize.png") });
+await page.locator(".tn-modal-head > button").click();
 
 // 首启态：清空任务 → 默认任务名 → 首启输入框
 await page.evaluate(async () => {
@@ -167,6 +214,25 @@ const popupMetrics = await popup.evaluate(() => ({
   head: document.querySelector(".popup-head")?.textContent?.replace(/\s+/g, " ").trim()
 }));
 await writeFile(resolve(outDir, "popup-metrics.json"), JSON.stringify(popupMetrics, null, 2));
+
+// ── Settings ──
+const options = await context.newPage();
+await options.goto(`chrome-extension://${id}/options.html`);
+await options.waitForTimeout(900);
+await options.screenshot({ path: resolve(outDir, "07-v2-options.png") });
+const optionsMetrics = await options.evaluate(() => ({
+  headings: [...document.querySelectorAll("h1,h2")].filter((el) => el.getBoundingClientRect().top < innerHeight).map((el) => el.textContent?.trim()),
+  undersizedText: [...document.querySelectorAll(".options-page *")]
+    .filter((el) => {
+      const rect = el.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && [...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) && parseFloat(getComputedStyle(el).fontSize) < 12;
+    })
+    .map((el) => ({ tag: el.tagName, cls: (el.className || "").toString().slice(0, 80), parent: (el.parentElement?.className || "").toString().slice(0, 80), text: el.textContent?.trim().slice(0, 60), fontSize: getComputedStyle(el).fontSize }))
+}));
+await writeFile(resolve(outDir, "options-metrics.json"), JSON.stringify(optionsMetrics, null, 2));
+await options.locator(".agent-section-heading").scrollIntoViewIfNeeded();
+await options.waitForTimeout(300);
+await options.screenshot({ path: resolve(outDir, "09-v2-options-agent.png") });
 
 console.log("pageErrors:", pageErrors);
 await writeFile(resolve(outDir, "page-errors.json"), JSON.stringify(pageErrors, null, 2));

@@ -46,6 +46,20 @@ export function OptionsApp() {
   }, []);
 
   useEffect(() => {
+    if (!settings) return;
+    const scrollToHash = () => {
+      const targetId = globalThis.location.hash.slice(1);
+      if (targetId !== "ai" && targetId !== "agent") return;
+      globalThis.requestAnimationFrame(() => {
+        document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+    scrollToHash();
+    globalThis.addEventListener("hashchange", scrollToHash);
+    return () => globalThis.removeEventListener("hashchange", scrollToHash);
+  }, [settings]);
+
+  useEffect(() => {
     if (!isExtensionRuntime || !settings?.agentBridgeEnabled) return;
     const refresh = () => {
       const type = bridgeStatus.state === "connected" ? "M3_BRIDGE_STATUS" : "M3_BRIDGE_CONNECT";
@@ -293,7 +307,7 @@ export function OptionsApp() {
           </div>
         </section>
 
-        <div className="settings-section-heading">
+        <div className="settings-section-heading settings-jump-target" id="ai">
           <span>01 · {text("工作台智能", "WORKSPACE AI")}</span>
           <h2>{text("选择你的 AI 服务", "Choose your AI service")}</h2>
           <p>{text("选择服务商并填写 API key 即可；TabNexus 会自动使用适配模型，无需额外配置。", "Choose a provider and enter its API key. TabNexus automatically uses a compatible model, with no extra setup.")}</p>
@@ -315,7 +329,7 @@ export function OptionsApp() {
                   onClick={() => void selectProvider(providerId)}
                 >
                   <span className="provider-mark">{provider.mark}</span>
-                  <span><strong>{provider.name}</strong><small>{configured ? text("已保存密钥", "Key saved") : text("填写 API key", "Add API key")}</small></span>
+                  <span><strong>{provider.name}</strong><small>{configured ? text("密钥已保存", "Key saved") : text("配置密钥", "Add key")}</small></span>
                   <i aria-hidden="true">{selected ? "✓" : ""}</i>
                 </button>
               );
@@ -406,7 +420,7 @@ export function OptionsApp() {
           </div>
         </section>
 
-        <div className="settings-section-heading agent-section-heading">
+        <div className="settings-section-heading settings-jump-target agent-section-heading" id="agent">
           <span>02 · {text("外部协作", "AGENT COLLABORATION")}</span>
           <h2>{text("连接你常用的 Agent", "Connect your everyday Agent")}</h2>
           <p>{text("让 Codex、Claude、Cursor 等搜索和管理多工作区、整理资料、调整关系图，并安全保存或重开浏览器标签；无需使用上方的模型 API。", "Let Codex, Claude, Cursor, and others search and manage workspaces, organize sources, arrange relationship maps, and safely save or reopen browser tabs; no model API above is required.")}</p>

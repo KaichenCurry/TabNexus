@@ -87,7 +87,8 @@ describe("M3 native and MCP bridge", () => {
 
     const bridgeMessages: any[] = [];
     let extension: WebSocket | undefined;
-    for (let attempt = 0; attempt < 20 && !extension; attempt += 1) {
+    // Cold Node startup can exceed 500 ms on a busy desktop CI runner.
+    for (let attempt = 0; attempt < 80 && !extension; attempt += 1) {
       try {
         extension = await new Promise<WebSocket>((resolveSocket, reject) => {
           const candidate = new WebSocket(`ws://127.0.0.1:${port}/tabnexus`);
@@ -142,7 +143,7 @@ describe("M3 native and MCP bridge", () => {
 
     let extension: WebSocket | undefined;
     const bridgeMessages: any[] = [];
-    for (let attempt = 0; attempt < 20 && !extension; attempt += 1) {
+    for (let attempt = 0; attempt < 80 && !extension; attempt += 1) {
       try {
         extension = await new Promise<WebSocket>((resolveSocket, reject) => {
           const candidate = new WebSocket(`ws://127.0.0.1:${port}/tabnexus`);
@@ -177,7 +178,7 @@ describe("M3 native and MCP bridge", () => {
     await vi.waitFor(async () => {
       const health = await fetch(`http://127.0.0.1:${port}/health`).then((response) => response.json());
       expect(health.agents.map((agent: any) => agent.name).sort()).toEqual(["Codex", "Cursor"]);
-    });
+    }, { timeout: 5_000 });
 
     codex.stdin.write(`${JSON.stringify({ jsonrpc: "2.0", id: 41, method: "tools/call", params: { name: "read_workspace", arguments: { detail: "summary" } } })}\n`);
     cursor.stdin.write(`${JSON.stringify({ jsonrpc: "2.0", id: 42, method: "tools/call", params: { name: "read_workspace", arguments: { detail: "summary" } } })}\n`);

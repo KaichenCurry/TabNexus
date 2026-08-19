@@ -102,7 +102,7 @@ test("collects tabs through the v2 inbox and restores a closed page", async () =
   await workspace.locator(".tn-inbox-actions .tn-primary").click();
 
   await expect(workspace.locator(".tn-page")).toHaveCount(3);
-  await expect(workspace.getByText("0/3 已读")).toBeVisible();
+  await expect(workspace.getByText(/0\/3 已读/)).toBeVisible();
 
   // 关闭一个原标签后，从引用块 ↗ 恢复
   await sourcePages[0].close();
@@ -124,6 +124,7 @@ test("save-and-close closes originals only after saving", async () => {
   await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(0).click();
   await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(1).click();
   await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(2).click();
+  workspace.once("dialog", (dialog) => void dialog.accept());
   await workspace.getByRole("button", { name: "保存并关闭" }).click();
 
   await expect.poll(async () => {
@@ -133,46 +134,68 @@ test("save-and-close closes originals only after saving", async () => {
   await expect.poll(() => Promise.resolve(sourcePages.every((page) => page.isClosed()))).toBe(true);
 });
 
-test("AI summarize writes the conclusion back through SUMMARIZE_TASK", async () => {
+test("collects pages directly into the chosen context section", async () => {
+  for (const slug of ["section-source-a", "section-source-b"]) {
+    const source = await context.newPage();
+    await source.goto(`https://tabnexus.test/${slug}`);
+  }
   const id = await extensionId();
-  await context.route("https://api.deepseek.com/chat/completions", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        choices: [{ message: { content: JSON.stringify({
-          summary: "调研结论摘要",
-          conclusion: "Perplexity 值得研究，但短期不宜复制",
-          nextStep: "补一个失败案例"
-        }) } }]
-      })
-    });
-  });
-  const setup = await context.newPage();
-  await setup.goto(`chrome-extension://${id}/workspace.html`);
-  await setup.evaluate(async () => {
-    const s = (await chrome.storage.local.get("tabnexus.appState.v1"))["tabnexus.appState.v1"] as { workspaces: Record<string, { cards: Record<string, unknown>; v2?: Record<string, unknown> }> };
-    const ws = s.workspaces["ws-1"] as { cards: Record<string, unknown>; v2?: Record<string, unknown> };
-    ws.cards = {
-      a: { id: "a", type: "web", title: "融资轮次", url: "https://tabnexus.test/a", note: "估值 90 亿", status: "adopted", groupId: null, source: "user" },
-      b: { id: "b", type: "web", title: "旧测评", url: "https://tabnexus.test/b", note: "", status: "excluded", excludedReason: "已过期", groupId: null, source: "user" }
-    };
-    await chrome.storage.local.set({
-      "tabnexus.settings.v1": {
-        locale: "zh", tutorialCompleted: true, v2ShellEnabled: true,
-        aiEnabled: true, aiProvider: "deepseek",
-        aiProviderConfigs: { deepseek: { apiKey: "e2e-runtime-only", model: "deepseek-v4-flash", verifiedAt: "2026-08-15T00:00:00.000Z" } }
-      },
-      "tabnexus.appState.v1": s
-    });
-  });
-  await setup.close();
-
   const workspace = await context.newPage();
   await workspace.goto(`chrome-extension://${id}/workspace.html`);
-  await workspace.getByRole("button", { name: "AI 总结" }).click();
-  await expect(workspace.getByText("Perplexity 值得研究，但短期不宜复制", { exact: true })).toBeVisible();
-  await expect(workspace.locator(".tn-nextstep-input")).toHaveValue("补一个失败案例");
+  await workspace.evaluate(async () => {
+    const state = (await chrome.storage.local.get("tabnexus.appState.v1"))["tabnexus.appState.v1"] as any;
+    state.workspaces["ws-1"].groupOrder = ["research"];
+    state.workspaces["ws-1"].groups = {
+      research: { id: "research", name: "研究资料", color: "#3379D6", cardIds: [] }
+    };
+    await chrome.storage.local.set({ "tabnexus.appState.v1": state });
+  });
+  await workspace.reload();
+
+  await workspace.getByRole("button", { name: "添加资料到「研究资料」" }).click();
+  await expect(workspace.locator(".tn-inbox-header strong")).toHaveText("收进「研究资料」");
+  await expect(workspace.locator(".tn-inbox-item")).toHaveCount(2);
+  await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(0).click();
+  await workspace.locator(".tn-inbox-item input[type=checkbox]").nth(1).click();
+  await expect(workspace.locator(".tn-inbox-actions .tn-primary")).toContainText("收进「研究资料」 2");
+  await workspace.locator(".tn-inbox-actions .tn-primary").click();
+
+  await expect(workspace.locator("#section-research .tn-page")).toHaveCount(2);
+  const assignment = await workspace.evaluate(async () => {
+    const state = (await chrome.storage.local.get("tabnexus.appState.v1"))["tabnexus.appState.v1"] as any;
+    const task = state.workspaces["ws-1"];
+    return {
+      sectionIds: task.groups.research.cardIds,
+      cardSections: Object.values(task.cards).map((card: any) => card.groupId)
+    };
+  });
+  expect(assignment.sectionIds).toHaveLength(2);
+  expect(assignment.cardSections).toEqual(["research", "research"]);
+});
+
+test("compact workspace removes conclusion UI and jumps to API and MCP setup", async () => {
+  const id = await extensionId();
+  const workspace = await context.newPage();
+  await workspace.goto(`chrome-extension://${id}/workspace.html`);
+
+  await expect(workspace.getByText("当前结论", { exact: true })).toHaveCount(0);
+  await expect(workspace.getByRole("button", { name: "AI 总结" })).toHaveCount(0);
+
+  await workspace.getByRole("button", { name: "更多操作" }).click();
+  const aiPagePromise = context.waitForEvent("page");
+  await workspace.getByRole("menuitem", { name: /AI \/ API 配置/ }).click();
+  const aiPage = await aiPagePromise;
+  await aiPage.waitForLoadState("domcontentloaded");
+  await expect(aiPage).toHaveURL(new RegExp(`chrome-extension://${id}/options\\.html#ai$`));
+  await expect(aiPage.getByRole("heading", { name: "选择你的 AI 服务" })).toBeVisible();
+
+  await workspace.getByRole("button", { name: "更多操作" }).click();
+  const agentPagePromise = context.waitForEvent("page");
+  await workspace.getByRole("menuitem", { name: /Agent \/ MCP 接入/ }).click();
+  const agentPage = await agentPagePromise;
+  await agentPage.waitForLoadState("domcontentloaded");
+  await expect(agentPage).toHaveURL(new RegExp(`chrome-extension://${id}/options\\.html#agent$`));
+  await expect(agentPage.getByRole("heading", { name: "连接你常用的 Agent" })).toBeVisible();
 });
 
 test("AI organize by content moves only unassigned pages into real sections", async () => {
@@ -225,14 +248,14 @@ test("AI organize by content moves only unassigned pages into real sections", as
   await workspace.locator(".tn-inbox-actions .tn-primary").click();
   await expect(workspace.locator(".tn-page")).toHaveCount(3);
 
-  await workspace.getByRole("button", { name: /AI 一键整理/ }).click();
+  await workspace.getByRole("button", { name: "智能整理" }).click();
   await workspace.getByText("按内容理解", { exact: true }).click();
   await workspace.getByRole("button", { name: "生成整理建议" }).click();
   await expect(workspace.locator(".tn-proposal-group")).toHaveCount(1);
   expect(capturedCards.map((card) => card.title).sort()).toEqual(["ai-0", "ai-1", "ai-2"]);
   await workspace.getByRole("button", { name: "应用整理" }).click();
 
-  await expect(workspace.getByRole("heading", { name: /语义分组/ })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "语义分组", exact: true })).toBeVisible();
   await expect(workspace.locator(".tn-section .tn-page")).toHaveCount(3);
 });
 
@@ -264,7 +287,7 @@ test("M3 Agent write-back appears live in the v2 document", async () => {
   if (!organized.ok) throw new Error(organized.error);
 
   await expect(workspace.getByText("Agent market report")).toBeVisible();
-  await expect(workspace.locator(".tn-section-heading").getByRole("button", { name: "Agent organized", exact: true })).toBeVisible();
+  await expect(workspace.locator(".tn-section-heading").getByText("Agent organized", { exact: true })).toBeVisible();
 });
 
 test("uses the correct Agent path for source and portable builds", async () => {

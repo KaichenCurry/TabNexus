@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Locale } from "../../core/types";
 import { message } from "../../i18n";
-import { isUnassignedPage, type PageStatus, type Task } from "../core/taskModel";
+import { isUnassignedPage, type Page, type PageStatus, type Task } from "../core/taskModel";
+import { Icon } from "./Icon";
 import { PageBlock } from "./PageBlock";
 
 type Props = {
@@ -14,6 +15,8 @@ type Props = {
   onPageStatus: (pageId: string, status: PageStatus, excludedReason?: string) => void;
   onPageNote: (pageId: string, note: string) => void;
   onRestorePage: (url?: string) => void;
+  onRestoreSection: (urls: string[]) => void;
+  onCollectToSection: (sectionId: string | null) => void;
   onDeletePage: (pageId: string, title: string) => void;
 };
 
@@ -21,12 +24,10 @@ export function SectionList(props: Props) {
   const { task, locale } = props;
   const [adding, setAdding] = useState(false);
   const [draftName, setDraftName] = useState("");
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
-
-  const sections = task.sections.map((section) => ({
-    ...section,
-    pages: section.pageIds.map((pageId) => task.pages[pageId]).filter(Boolean)
-  }));
+  const moveTargets = [
+    { id: null, name: message(locale, "v2Unassigned") },
+    ...task.sections.map((section) => ({ id: section.id, name: section.name }))
+  ];
   const unassigned = Object.values(task.pages).filter((page) => isUnassignedPage(task, page.id));
 
   const submitSection = () => {
@@ -37,76 +38,68 @@ export function SectionList(props: Props) {
 
   return (
     <section className="tn-sections" aria-label={message(locale, "v2Document")}>
-      {sections.map((section) => (
-        <article key={section.id} id={`section-${section.id}`} className={`tn-section ${collapsed.has(section.id) ? "collapsed" : ""}`}>
-          <SectionHeading
-            name={section.name}
-            color={section.color}
-            count={section.pages.length}
-            locale={locale}
-            collapsed={collapsed.has(section.id)}
-            onToggle={() => setCollapsed((current) => {
-              const next = new Set(current);
-              if (next.has(section.id)) next.delete(section.id); else next.add(section.id);
-              return next;
-            })}
-            onRename={(name) => props.onRenameSection(section.id, name)}
-            onDelete={() => props.onDeleteSection(section.id)}
-          />
-          <div className="tn-section-pages">
-            {section.pages.map((page) => (
-              <PageBlock
-                key={page.id}
-                page={page}
-                locale={locale}
-                moveTargets={[{ id: null, name: message(locale, "v2Unassigned") }, ...task.sections.map((candidate) => ({ id: candidate.id, name: candidate.name }))]}
-                onMove={(targetId) => props.onMovePages([page.id], targetId)}
-                onStatus={(status, reason) => props.onPageStatus(page.id, status, reason)}
-                onNote={(note) => props.onPageNote(page.id, note)}
-                onRestore={() => props.onRestorePage(page.url)}
-                onDelete={() => props.onDeletePage(page.id, page.title)}
-              />
-            ))}
-          </div>
-        </article>
+      {task.sections.map((section) => (
+        <SectionColumn
+          key={section.id}
+          sectionId={section.id}
+          name={section.name}
+          color={section.color}
+          pages={section.pageIds.map((pageId) => task.pages[pageId]).filter(Boolean)}
+          locale={locale}
+          moveTargets={moveTargets}
+          onRename={(name) => props.onRenameSection(section.id, name)}
+          onDelete={() => props.onDeleteSection(section.id)}
+          onCollect={() => props.onCollectToSection(section.id)}
+          onRestoreSection={props.onRestoreSection}
+          onMovePages={props.onMovePages}
+          onPageStatus={props.onPageStatus}
+          onPageNote={props.onPageNote}
+          onRestorePage={props.onRestorePage}
+          onDeletePage={props.onDeletePage}
+        />
       ))}
 
       {unassigned.length > 0 && (
-        <article id="section-unassigned" className="tn-section unassigned">
-          <h3 className="tn-section-heading">{message(locale, "v2Unassigned")} <em>{unassigned.length}</em></h3>
-          <div className="tn-section-pages">
-            {unassigned.map((page) => (
-              <PageBlock
-                key={page.id}
-                page={page}
-                locale={locale}
-                moveTargets={task.sections.map((candidate) => ({ id: candidate.id, name: candidate.name }))}
-                onMove={(targetId) => props.onMovePages([page.id], targetId)}
-                onStatus={(status, reason) => props.onPageStatus(page.id, status, reason)}
-                onNote={(note) => props.onPageNote(page.id, note)}
-                onRestore={() => props.onRestorePage(page.url)}
-                onDelete={() => props.onDeletePage(page.id, page.title)}
-              />
-            ))}
-          </div>
-        </article>
+        <SectionColumn
+          sectionId={null}
+          name={message(locale, "v2Unassigned")}
+          pages={unassigned}
+          locale={locale}
+          moveTargets={moveTargets}
+          onCollect={() => props.onCollectToSection(null)}
+          onRestoreSection={props.onRestoreSection}
+          onMovePages={props.onMovePages}
+          onPageStatus={props.onPageStatus}
+          onPageNote={props.onPageNote}
+          onRestorePage={props.onRestorePage}
+          onDeletePage={props.onDeletePage}
+        />
       )}
 
       <div className="tn-section-add">
         {adding ? (
-          <>
+          <div className="tn-section-add-form">
+            <span>{locale === "zh" ? "新建任务章节" : "Create task section"}</span>
             <input
               autoFocus
               value={draftName}
               placeholder={message(locale, "v2NewSection")}
               onChange={(event) => setDraftName(event.target.value)}
-              onKeyDown={(event) => { if (event.key === "Enter") submitSection(); if (event.key === "Escape") setAdding(false); }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") submitSection();
+                if (event.key === "Escape") setAdding(false);
+              }}
             />
-            <button type="button" className="tn-primary" onClick={submitSection}>＋</button>
-          </>
+            <div>
+              <button type="button" className="tn-secondary" onClick={() => setAdding(false)}>{locale === "zh" ? "取消" : "Cancel"}</button>
+              <button type="button" className="tn-primary" onClick={submitSection}>{locale === "zh" ? "创建" : "Create"}</button>
+            </div>
+          </div>
         ) : (
-          <button type="button" className="tn-section-add-button" onClick={() => setAdding(true)}>
-            ＋ {message(locale, "v2NewSection")}
+          <button type="button" className="tn-new-section-card" onClick={() => setAdding(true)}>
+            <Icon name="add" />
+            <span>{message(locale, "v2NewSection")}</span>
+            <small>{locale === "zh" ? "为任务增加新的资料章节" : "Add another source section"}</small>
           </button>
         )}
       </div>
@@ -114,34 +107,95 @@ export function SectionList(props: Props) {
   );
 }
 
-function SectionHeading({ name, color, count, locale, collapsed, onToggle, onRename, onDelete }: {
-  name: string; color?: string; count: number; locale: Locale; collapsed: boolean;
-  onToggle: () => void; onRename: (name: string) => void; onDelete: () => void;
+function SectionColumn(props: {
+  sectionId: string | null;
+  name: string;
+  color?: string;
+  pages: Page[];
+  locale: Locale;
+  moveTargets: Array<{ id: string | null; name: string }>;
+  onRename?: (name: string) => void;
+  onDelete?: () => void;
+  onCollect: () => void;
+  onRestoreSection: (urls: string[]) => void;
+  onMovePages: Props["onMovePages"];
+  onPageStatus: Props["onPageStatus"];
+  onPageNote: Props["onPageNote"];
+  onRestorePage: Props["onRestorePage"];
+  onDeletePage: Props["onDeletePage"];
 }) {
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(name);
-  const submit = () => { onRename(draft.trim() || name); setEditing(false); };
+  const [draft, setDraft] = useState(props.name);
+  const menuRef = useRef<HTMLDetailsElement>(null);
+  const urls = props.pages.flatMap((page) => page.url ? [page.url] : []);
+  const submitRename = () => {
+    props.onRename?.(draft.trim() || props.name);
+    setEditing(false);
+  };
+  const closeMenu = () => { if (menuRef.current) menuRef.current.open = false; };
+
   return (
-    <h3 className="tn-section-heading">
-      <button type="button" className="tn-sec-collapse" onClick={onToggle} aria-pressed={collapsed} aria-label={collapsed ? "展开" : "折叠"}>
-        {collapsed ? "▸" : "▾"}
+    <article id={`section-${props.sectionId ?? "unassigned"}`} className={`tn-section ${props.sectionId === null ? "unassigned" : ""}`}>
+      <header className="tn-section-heading">
+        <span className="tn-section-copy">
+          {editing ? (
+            <input
+              autoFocus
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              onBlur={submitRename}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") submitRename();
+                if (event.key === "Escape") setEditing(false);
+              }}
+            />
+          ) : <h3>{props.name}</h3>}
+          <small>{props.locale === "zh" ? `已保存 ${props.pages.length} 个页面` : `${props.pages.length} pages saved`}</small>
+        </span>
+        <span className="tn-section-actions">
+          <em>{props.pages.length}</em>
+          <button
+            type="button"
+            className="tn-section-open"
+            disabled={urls.length === 0}
+            onClick={() => props.onRestoreSection(urls)}
+            aria-label={props.locale === "zh" ? `打开章节「${props.name}」全部页面` : `Open all pages in ${props.name}`}
+          ><Icon name="external" /></button>
+          {props.sectionId !== null && (
+            <details className="tn-section-menu" ref={menuRef}>
+              <summary aria-label={props.locale === "zh" ? `管理章节「${props.name}」` : `Manage ${props.name}`}><Icon name="more" /></summary>
+              <div>
+                <button type="button" onClick={() => { closeMenu(); setDraft(props.name); setEditing(true); }}><Icon name="note" />{message(props.locale, "rename")}</button>
+                <button type="button" className="danger" onClick={() => { closeMenu(); props.onDelete?.(); }}><Icon name="trash" />{message(props.locale, "delete")}</button>
+              </div>
+            </details>
+          )}
+        </span>
+      </header>
+
+      {props.color && <div className="tn-section-accent" style={{ background: props.color }} />}
+      <div className="tn-section-pages">
+        {props.pages.map((page) => (
+          <PageBlock
+            key={page.id}
+            page={page}
+            locale={props.locale}
+            currentSectionId={props.sectionId}
+            moveTargets={props.moveTargets}
+            onMove={(targetId) => props.onMovePages([page.id], targetId)}
+            onStatus={(status, reason) => props.onPageStatus(page.id, status, reason)}
+            onNote={(note) => props.onPageNote(page.id, note)}
+            onRestore={() => props.onRestorePage(page.url)}
+            onDelete={() => props.onDeletePage(page.id, page.title)}
+          />
+        ))}
+        {props.pages.length === 0 && <p className="tn-section-empty">{props.locale === "zh" ? "这个章节还没有资料" : "No sources in this section yet"}</p>}
+      </div>
+
+      <button type="button" className="tn-section-collect" onClick={props.onCollect}>
+        <Icon name="add" />
+        {props.locale === "zh" ? `添加资料到「${props.name}」` : `Add sources to “${props.name}”`}
       </button>
-      {color && <i className="tn-sec-dot" style={{ background: color }} />}
-      {editing ? (
-        <input
-          autoFocus
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onBlur={submit}
-          onKeyDown={(event) => { if (event.key === "Enter") submit(); if (event.key === "Escape") setEditing(false); }}
-        />
-      ) : (
-        <button type="button" onDoubleClick={() => { setDraft(name); setEditing(true); }} title={message(locale, "rename")}>
-          {name}
-        </button>
-      )}
-      <em>{count}</em>
-      <button type="button" className="tn-section-delete" onClick={onDelete} aria-label={message(locale, "delete")}>×</button>
-    </h3>
+    </article>
   );
 }
